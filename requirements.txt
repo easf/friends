@@ -1,0 +1,9 @@
+-f /usr/share/pip-wheels
+click==6.6
+-e git+https://github.com/mobolic/facebook-sdk.git@c7b9b48664f788b1c8b77469eeb44588c0769045#egg=facebook_sdk
+Flask==0.11.1
+itsdangerous==0.24
+Jinja2==2.8
+MarkupSafe==0.23
+requests==2.10.0
+Werkzeug==0.11.10
