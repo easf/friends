@@ -9,6 +9,9 @@ FB_APP_SECRET = 'a6b94f66589e9f9a7d558cda0e83a3dd'
 API_VERSION = 'v2.6'
 
 app = Flask(__name__)
+
+#app.config['APPLICATION_ROOT']= ''
+
 @app.route('/login', methods=['GET','POST'])
 def login():
     #names = ['Emanuel', 'Antonio', 'Sanchiz', 'Flores']
@@ -31,5 +34,5 @@ def logout():
     return 'logouuuut'
 
 
-    
+
 

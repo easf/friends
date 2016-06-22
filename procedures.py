@@ -21,26 +21,26 @@ def pagination(data):
 
 def proof(uid, token):
     tlist=[]
-    graph = facebook.GraphAPI(access_token=token, version='2.6')
-    
+    graph = facebook.GraphAPI(access_token=token, timeout=float(10.0), version='2.6')
+
     fusers = open("database/users.txt")
     users = json.load(fusers)
     fusers.close
-    
-    
+
+
     fprofiles = open("database/profiles.txt")
     profiles = json.load(fprofiles)
     fprofiles.close
 
 
     profile = graph.get_object(id=uid, fields= 'name,birthday,education,gender,hometown,interested_in,languages,location,meeting_for,political,relationship_status,religion,significant_other,work')
-    
+
     #todo: leer el archivo (el dictionario almacenado) y agregar el nuevo usuario
     users[uid] = profile['name']
     del profile['name']
     profiles[uid] = profile
 
-    
+
     fusers = open("database/users.txt", 'w')
     fprofiles = open("database/profiles.txt", 'w')
     json.dump(users, fusers)
@@ -50,7 +50,7 @@ def proof(uid, token):
     fprofiles.close
 
 
-    
+
     #todo read the friend file, verify if the uid user have already a friend
     ffriends = open("database/friends.txt")
     friends = json.load(ffriends)
@@ -89,10 +89,10 @@ def proof(uid, token):
 
 
     posts = graph.get_connections (id=uid, connection_name = '?fields=posts{created_time,from,reactions,comments{created_time,from,message,message_tags,likes,comments{created_time,from,message,message_tags,likes}}}')
-    
+
     #correct posts['data'] , at this moment I'm adding a new element to the dict (date: 18-06)
     posts['data'] = pagination (posts['posts'])
-    try: 
+    try:
         for post in posts['data']:
             try:
                 reactions = pagination(post['reactions'])
@@ -121,7 +121,7 @@ def proof(uid, token):
                         except KeyError:
                             pass
             except KeyError:
-                pass   
+                pass
     except KeyError:
         pass
 
@@ -130,7 +130,7 @@ def proof(uid, token):
     uposts[uid] = posts['data']
 
     newfile = "database/connections/" + uid + ".txt"
-    fposts = open(newfile, 'w')    
+    fposts = open(newfile, 'w')
     json.dump(uposts, fposts)
 
     fposts.close
@@ -138,15 +138,15 @@ def proof(uid, token):
 
 def counter(uid, token):
     graph = facebook.GraphAPI(access_token=token, version='2.6')
-    response = graph.get_connections(id=uid, connection_name='invitable_friends') 
+    response = graph.get_connections(id=uid, connection_name='invitable_friends')
     invitable_friends = pagination2(response['data'])
     len(invitable_friends)
-    
 
 
 
 
-    
+
+
 
 
 
@@ -186,18 +186,18 @@ def counter(uid, token):
 #     likesxfriend={}
 #     alllikesB = {}
 #     friends = friends['friends']['data']
-    
+
 #     for friend in friends:
 #         try:
 #             alllikesB = pagination(friend['likes'])
 #         except KeyError:
 #             pass
 
-#         #graph.get_connections(id=friend , connection_name='likes') 
+#         #graph.get_connections(id=friend , connection_name='likes')
 #         #alllikesB = pagination(likesB)
 #         likesxfriend.update({friend['name'] : set(alllikesB.values()).intersection(alllikesA.values())})
 #         alllikesB = {}
-    
+
 #     print likesxfriend
 
 #proof(uidt, tokent)
