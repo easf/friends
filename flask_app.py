@@ -8,8 +8,8 @@ FB_APP_NAME = 'Matching Finder'
 FB_APP_SECRET = 'a6b94f66589e9f9a7d558cda0e83a3dd'
 API_VERSION = 'v2.6'
 
+# instance_path: Please keep in mind that this path must be absolute when provided. , instance_path='/home/easf/friends/instance'
 app = Flask(__name__)
-
 
 
 #app.config['APPLICATION_ROOT'] = '/home/easf/friends/'
@@ -34,7 +34,4 @@ def index():
 @app.route('/logout')
 def logout():
     return 'logouuuut'
-
-
-
 

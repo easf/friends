@@ -6,7 +6,8 @@ app_idt='1733963700184652'
 NO = 0
 YES = 1
 
-HOME = '/home/easf/friends/'
+HOME = 'friends/'
+
 
 def pagination(data):
     alldata = []
