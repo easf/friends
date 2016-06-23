@@ -1,5 +1,4 @@
 import facebook, requests, collections, csv, json
-
 uidt="1420945151265179"
 tokent="EAACEdEose0cBACL6y095WhdEu18w0DHfjlrU9KZBAD1na1d1ZCuZAxYZBoSZBuIdZBJvLG9MWh0NmAy129bTkMMXCFLa1SJS2VPj8bAxRtYUbeXLm5QXcXsiYRrs70Wd3pfXkCuZAP2NfYk7T9vodRI1HQTiAkZARooFkgZAEEglZCOQZDZD"
 app_secrett='a6b94f66589e9f9a7d558cda0e83a3dd'
@@ -7,6 +6,7 @@ app_idt='1733963700184652'
 NO = 0
 YES = 1
 
+HOME = '/home/easf/friends/'
 
 def pagination(data):
     alldata = []
@@ -23,12 +23,12 @@ def proof(uid, token):
     tlist=[]
     graph = facebook.GraphAPI(access_token=token, timeout=float(10.0), version='2.6')
 
-    fusers = open("database/users.txt")
+    fusers = open(HOME + "database/users.txt")
     users = json.load(fusers)
     fusers.close
 
 
-    fprofiles = open("database/profiles.txt")
+    fprofiles = open(HOME + "database/profiles.txt")
     profiles = json.load(fprofiles)
     fprofiles.close
 
@@ -41,8 +41,8 @@ def proof(uid, token):
     profiles[uid] = profile
 
 
-    fusers = open("database/users.txt", 'w')
-    fprofiles = open("database/profiles.txt", 'w')
+    fusers = open(HOME + "database/users.txt", 'w')
+    fprofiles = open(HOME + "database/profiles.txt", 'w')
     json.dump(users, fusers)
     json.dump(profiles, fprofiles)
 
@@ -52,7 +52,7 @@ def proof(uid, token):
 
 
     #todo read the friend file, verify if the uid user have already a friend
-    ffriends = open("database/friends.txt")
+    ffriends = open(HOME + "database/friends.txt")
     friends = json.load(ffriends)
     ffriends.close
 
@@ -67,13 +67,13 @@ def proof(uid, token):
 
     friends[uid] = ufriends['friends']['data']
 
-    ffriends = open("database/friends.txt", 'w')
+    ffriends = open(HOME + "database/friends.txt", 'w')
     json.dump(friends, ffriends)
 
     ffriends.close
 
 
-    flikes = open("database/likes.txt")
+    flikes = open(HOME + "database/likes.txt")
     likes = json.load(flikes)
     flikes.close
 
@@ -81,7 +81,7 @@ def proof(uid, token):
 
     likes[uid] = ulikes['likes']['data']
 
-    flikes = open("database/likes.txt", 'w')
+    flikes = open(HOME + "database/likes.txt", 'w')
     json.dump(likes, flikes)
 
     flikes.close
@@ -129,7 +129,7 @@ def proof(uid, token):
     uposts = {}
     uposts[uid] = posts['data']
 
-    newfile = "database/connections/" + uid + ".txt"
+    newfile = HOME + "database/connections/" + uid + ".txt"
     fposts = open(newfile, 'w')
     json.dump(uposts, fposts)
 

@@ -10,7 +10,9 @@ API_VERSION = 'v2.6'
 
 app = Flask(__name__)
 
-#app.config['APPLICATION_ROOT']= ''
+
+
+#app.config['APPLICATION_ROOT'] = '/home/easf/friends/'
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -24,7 +26,7 @@ def data():
     procedures.proof(uid, token)
     return jsonify(result = token)
 
-@app.route('/index')
+@app.route('/')
 def index():
     return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION)
 
