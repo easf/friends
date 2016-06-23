@@ -6,7 +6,7 @@ app_idt='1733963700184652'
 NO = 0
 YES = 1
 
-HOME = 'friends/'
+HOME = ''
 
 
 def pagination(data):
