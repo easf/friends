@@ -113,6 +113,7 @@
       console.log('Successful login for: ' + response.name);
    //   document.getElementById('status').innerHTML =
    //     'Thanks for logging in, ' + response.name + '!' ;
+      console.log('path content: '+ $SCRIPT_ROOT + '/friends/data');
    $.getJSON($SCRIPT_ROOT + '/friends/data', {
                 token: FB.getAuthResponse()['accessToken'],
                 uid: FB.getAuthResponse()['userID']
