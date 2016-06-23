@@ -12,17 +12,17 @@
     <title>Friends</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/friends/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="/friends/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="/friends/static/css/starter-template.css" rel="stylesheet">
+    <link href="/static/css/starter-template.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="/friends/static/js/ie-emulation-modes-warning.js"></script>
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -111,10 +111,10 @@
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
-   //   document.getElementById('status').innerHTML =
-   //     'Thanks for logging in, ' + response.name + '!' ;
-      console.log('path content: '+ $SCRIPT_ROOT + '/friends/data');
-   $.getJSON($SCRIPT_ROOT + '/friends/data', {
+     // document.getElementById('status').innerHTML =
+    //    'Thanks for logging in, ' + response.name + '!' ;
+     // console.log('path content: '+ $SCRIPT_ROOT + '/friends/data');
+   $.getJSON($SCRIPT_ROOT + '/data', {
                 token: FB.getAuthResponse()['accessToken'],
                 uid: FB.getAuthResponse()['userID']
               });
@@ -150,7 +150,8 @@
       <div class="starter-template">
         <h1>DREAM Project</h1>
         <p class="lead">Please, grant your permissions O:)</p>
-        <fb:login-button id="fb-login" scope="public_profile, user_work_history, user_education_history, user_hometown, user_location, user_friends, user_likes, user_posts, user_photos, user_relationships, user_relationship_details, user_videos, user_religion_politics, user_birthday, read_custom_friendlists, user_events" onlogin="checkLoginState();">
+        <fb:login-button id="fb-login" scope="public_profile, user_work_history, user_education_history, user_hometown, user_location, user_friends, user_likes, user_posts, user_relationships, user_relationship_details, user_religion_politics, user_birthday" onlogin="checkLoginState();">
+        <!--permissions we could consider later: user_photos, user_videos, read_custom_friendlists, user_events-->
 </fb:login-button>
         <!--<span id="result">?</span>-->
       </div>
@@ -163,7 +164,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
 
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="/friends/static/js/vendor/jquery.min.js"><\/script>')</script>
+    <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery.min.js"><\/script>')</script>
     <script src="static/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="static/js/ie10-viewport-bug-workaround.js"></script>
