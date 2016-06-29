@@ -329,7 +329,7 @@ def process_profile_data (profile):
         for interest in profile['interested_in']:
             if interest == 'female':
                 profile_data['interested_women'] = True
-            elif interest == men:
+            elif interest == 'men':
                 profile_data['interested_men'] = True
     if 'relationship_status' in profile_keys:
         profile_data['relationship_status'] = profile['relationship_status']
