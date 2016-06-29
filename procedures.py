@@ -13,7 +13,7 @@ NO = 0
 YES = 1
 
 HOME = ''
-
+# database insertions and queries
 def verify_existence_in_database ( data, cur, band ):
     #band = ( 'user' OR 'page' )
     column_id = 'idhash'
@@ -134,7 +134,7 @@ def proof(uid, token, mysql):
     if uidhash not in granted_users:
         family = None
         significant_other = None
-        
+
         profile_keys = profile.keys()
         if 'family' in profile_keys:
             family = profile['family']
