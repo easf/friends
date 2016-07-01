@@ -96,8 +96,4 @@ Note: The nginx version we installed earlier uses the “www-data” user for ex
 
 
 
-
-
-    Create your own configuration file and then run in console the next:
-
-    export YOURAPPLICATION_SETTINGS=/path/to/settings.cfg
+Configuration file for database, url_prefix: /var/www/friends/config.py 
