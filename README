@@ -1,0 +1,103 @@
+
+# FACEBOOK APP FRIENDS
+
+Assuming that the project folder is: /var/wwww/friends
+
+    Let’s change the ownership to the user you are logged in to
+    
+        - sudo chown -R <system_logged_user>:<system_logged_user> /var/www/friends/
+
+    Create a virtual environment env 
+    
+        - virtualenv vfriends
+
+    Activate the virtual environmenT
+    
+        - . vfriends/bin/activate
+
+    About UWSGI, Make sure you have the required compilers and tools:
+    
+        - sudo apt-get install build-essential python python-dev
+
+    RUN requirements.txt
+    
+        - pip install -r requirements.txt
+
+CONFIGURATION NGINX
+ 
+    Let’s start by removing the Nginx’s default site configuration (depending of your nginx repository, choose one of the next options):
+      
+        - sudo rm /etc/nginx/sites-enabled/default
+        
+        or 
+        
+        - sudo rm /etc/nginx/conf.d/default
+
+    The nginx configuration file is : /var/www/friends/instance/friends_nginx.conf
+
+    Symlink the configuration file to nginx’s configuration files directory and restart nginx:
+
+        - sudo ln -s /var/www/friends/instance/friends_nginx.conf /etc/nginx/conf.d/
+        - sudo /etc/init.d/nginx restart
+
+CONFIGURATION UWSGI
+
+    The uwsgi configuration file is : /var/www/friends/instance/friends_uwsgi.ini
+
+    Let’s create a new directory for uwsgi log files, and change its owner to your user:
+
+        - sudo mkdir -p /var/log/uwsgi
+        - sudo chown -R <system_logged_user>:<system_logged_user> /var/log/uwsgi
+
+
+
+    Check if uwsgi can execute your app:
+        - uwsgi --ini /var/www/friends/instance/friends_uwsgi.ini
+
+
+
+The only thing left to do, is to configure uWSGI to run as a background service. That’s the duty of uWSGI Emperor.
+
+
+UWSGI Emperor
+
+    Create a new upstart configuration file to execute emperor 
+        - /etc/init/uwsgi.conf
+
+    with the next content:
+    
+    #begin file /etc/init/uwsgi.conf
+
+        description "uWSGI"
+        start on runlevel [2345]
+        stop on runlevel [06]
+        respawn
+
+        env UWSGI=/var/www/friends/vfriends/local/bin/uwsgi
+        env LOGTO=/var/log/uwsgi/emperor.log
+
+        exec $UWSGI --master --emperor /etc/uwsgi/vassals --die-on-term --uid www-data --gid www-data --logto $LOGTO
+
+    #end file 
+
+    The last line executes the uWSGI daemon and sets it to look for config files in the /etc/uwsgi/vassals folder. Let’s create this folder and symlink the configuration file we created earlier into it:
+
+        - sudo mkdir /etc/uwsgi && sudo mkdir /etc/uwsgi/vassals
+        - sudo ln -s /var/www/friends/instance/friends_uwsgi.ini /etc/uwsgi/vassals
+
+    Also, the last line states the user that will be used to execute the daemon is www-data. For simplicity’s sake, let’s set him as the owner of the application and log folders:
+        - sudo chown -R www-data:www-data /var/www/friends/
+        - sudo chown -R www-data:www-data /var/log/uwsgi/
+
+Note: The nginx version we installed earlier uses the “www-data” user for executing nginx. Nginx versions from other repositories may use a user named “nginx” instead.
+
+    Now we can start uwsgi
+        - sudo start uwsgi
+
+
+
+
+
+    Create your own configuration file and then run in console the next:
+
+    export YOURAPPLICATION_SETTINGS=/path/to/settings.cfg
