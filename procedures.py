@@ -5,14 +5,9 @@ import sys
 reload(sys)  
 sys.setdefaultencoding('utf8')
 
-uidt="1420945151265179"
-tokent="EAACEdEose0cBACL6y095WhdEu18w0DHfjlrU9KZBAD1na1d1ZCuZAxYZBoSZBuIdZBJvLG9MWh0NmAy129bTkMMXCFLa1SJS2VPj8bAxRtYUbeXLm5QXcXsiYRrs70Wd3pfXkCuZAP2NfYk7T9vodRI1HQTiAkZARooFkgZAEEglZCOQZDZD"
-app_secrett='a6b94f66589e9f9a7d558cda0e83a3dd'
-app_idt='1733963700184652'
 NO = 0
 YES = 1
 
-HOME = ''
 # database insertions and queries
 def verify_existence_in_database ( data, cur, band ):
     #band = ( 'user' OR 'page' )
@@ -326,7 +321,7 @@ def proof(uid, token, mysql):
 
     user_profile = data_processing.process_profile_data (profile)
     profile_data = []
-    profile_data.append ( ( uidhash, user_profile['birthday'], user_profile['gender'], user_profile['hometown_id'], user_profile['hometown_name'], user_profile['location_id'], user_profile['location_name'], user_profile['political'], user_profile['religion'], user_profile['interested_men'], user_profile['interested_women'], user_profile['relationship_status'], user_profile['languages'][0], user_profile['languages'][1], user_profile['languages'][2], user_profile['languages'][3], user_profile['languages'][4] ))
+    profile_data.append ( ( uidhash, user_profile['birthday'], user_profile['gender'], user_profile['hometown_id'], user_profile['hometown_name'], user_profile['location_id'], user_profile['location_name'], user_profile['political'], user_profile['religion'], user_profile['interested_women'], user_profile['interested_men'], user_profile['relationship_status'], user_profile['languages'][0], user_profile['languages'][1], user_profile['languages'][2], user_profile['languages'][3], user_profile['languages'][4] ))
     insertion_statement = ("INSERT INTO profile ( user_idhash, birthday, gender, hometown_id, hometown_name, location_id, location_name, political_view, religion, interested_women, interested_men, relationship_status, language_1, language_2, language_3, language_4, language_5 ) " 
     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE hometown_id = VALUES(hometown_id), hometown_name = VALUES(hometown_name), location_id = VALUES(location_id), location_name = VALUES(location_name), political_view = VALUES(political_view), religion = VALUES(religion), interested_women = VALUES(interested_women), interested_men = VALUES(interested_men), relationship_status = VALUES(relationship_status), language_1 = VALUES(language_1), language_2 = VALUES(language_2), language_3 = VALUES(language_3), language_4 = VALUES(language_4), language_5 = VALUES(language_5)")
     cur.executemany( insertion_statement, profile_data)
@@ -344,4 +339,5 @@ def counter(uid, token):
     response = graph.get_connections(id=uid, connection_name='invitable_friends')
     invitable_friends = pagination2(response['data'])
     len(invitable_friends)
+
 

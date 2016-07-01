@@ -323,14 +323,15 @@ def process_profile_data (profile):
     except KeyError: #else:
         profile_data['location_id'] = None
         profile_data['location_name'] = None
-    profile_data['interested_women'] = False 
+    profile_data['interested_women'] = False
     profile_data['interested_men'] = False
     if 'interested_in' in profile_keys:
         for interest in profile['interested_in']:
             if interest == 'female':
                 profile_data['interested_women'] = True
-            elif interest == 'men':
+            if interest == 'men':
                 profile_data['interested_men'] = True
+
     if 'relationship_status' in profile_keys:
         profile_data['relationship_status'] = profile['relationship_status']
     else:
