@@ -1,0 +1,19 @@
+Time processing graph api initialization: 0.000119924545288
+Time processing get profile (from graph API): 0.346201896667
+Time verifying the existence and insertion of current user in DB: 0.0411701202393
+Time processing and inserting place data: 0.0501658916473
+Time processing pagination likes: 0.154774904251
+Time processing and inserting likes data: 0.174072980881
+Time processing get post data (from GraphAPI): 1.95268011093
+Time processing post pagination: 0.181864976883
+Time processing post data in parallel: 1.46295404434
+Time processing post data: 1.69049811363
+Time verifying and inserting of users in comments, reactions, tags: 0.0207538604736
+Time inserting pages: 0.00668787956238
+Time inserting posts: 0.0100390911102
+Time inserting comments: 0.00270295143127
+Time inserting comment_has_comment: 0.000771045684814
+Time inserting reactions: 1.50203704834e-05
+Time inserting tags: 5.00679016113e-06
+Time inserting profile data: 0.000317811965942
+Time processing commit: 0.0405478477478

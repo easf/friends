@@ -1,6 +1,7 @@
 # coding=utf-8
-import hashlib, langdetect, json, requests
-
+import hashlib, langdetect, json, requests, time
+from multiprocessing import Pool, Manager
+from functools import partial
 """
 
 Processing data for the insertion into DB
@@ -8,9 +9,10 @@ Processing data for the insertion into DB
 """
 
 def pagination(data):
-    alldata = []
+    alldata = [] 
     while(True):
         try:
+#            alldata += data['data']
             for item in data['data']:
                 alldata.append(item)
             data=requests.get(data['paging']['next']).json()
@@ -171,49 +173,16 @@ def process_place_data ( uidhash, profile ) :
     return {'place_data':place_data, 'with_data':with_data, 'user_in_place_details':user_in_place_details, 'user_has_place':user_has_place}
 
 
-def process_posts_data(uid, uidhash, posts):
-    posts_data = []
-    comments_data = []
-    comments_inner_comm_data = []
-    reactions_data = []
-    story_tags_users = []
-    story_tags_pages = []
-    message_tags_users = []
-    message_tags_pages = []
-    try:
-        posts['data'] = pagination ( posts['posts'] )
-        for post in posts['data']:
-            try:
-                reactions = pagination ( post['reactions'] )
-                post['reactions']['data'] = reactions
-            except KeyError:
-                pass
-            try:
-                comments = pagination ( post['comments'] )
-                post['comments']['data'] = comments
-                for comment in post['comments']['data']:
-                    try:
-                        likesincomm = pagination( comment['likes'] )
-                        comment['likes']['data'] = likesincomm
-                    except KeyError:
-                        pass
-                    try:
-                        commentsincomm = pagination ( comment['comments'] )
-                        comment['comments']['data'] = commentsincomm
-                        for comment2 in comment['comments']['data']:
-                            try:
-                                likesincomm2 = pagination( comment2['likes'] )
-                                comment2['likes']['data'] =  likesincomm2
-                            except KeyError:
-                                pass
-                    except KeyError:
-                        pass
-            except KeyError:
-                pass
-    except KeyError:
-        pass
-
-    for post in posts['data']:
+def process_post_async ( uid, uidhash, posts_data, comments_data, comments_inner_comm_data, reactions_data, story_tags_users, story_tags_pages, message_tags_users, message_tags_pages, data):
+    # posts_data = []
+    # comments_data = []
+    # comments_inner_comm_data = []
+    # reactions_data = []
+    # story_tags_users = []
+    # story_tags_pages = []
+    # message_tags_users = []
+    # message_tags_pages = []
+    for post in data:
         post_keys = post.keys()
         if 'story' in post_keys:
             post_story = post['story']
@@ -292,12 +261,135 @@ def process_posts_data(uid, uidhash, posts):
         else:
             created_time = None
         posts_data.append ( { 'post_id':post['id'], 'idhash':uidhash, 'created_time':created_time, 'post_type':post['type'], 'story':post_story, 'privacy':post['privacy']['description'], 'text_length':post_message_lenght, 'link':post_link, 'nreactions':post_reactions_summary_total_count, 'ncomments':post_comments_summary_total_count, 'application':post_app, 'shares_count':post_shares_count, 'language':post_message_language } )
-        #unique = [] # remove the post with the same id. Facebook have posts that have the same ID!!!!
-        # for i in range(len(posts_data)):
-        #     if posts_data[i]['post_id'] in unique:
-        #         posts_data.pop(i)
-        #     else:
-        #         unique.append (posts_data[i]['post_id'])
+    
+#    return {'posts_data':posts_data, 'comments_data':comments_data, 'comment_has_comment':comments_inner_comm_data, 'reactions_data':reactions_data, 'story_tags_users':story_tags_users, 'story_tags_pages':story_tags_pages, 'message_tags_users': message_tags_users, 'message_tags_pages': message_tags_pages}
+
+def process_posts_data(uid, uidhash, posts, statistics):
+    manager = Manager()
+    posts_data = manager.list()
+    comments_data = manager.list()
+    comments_inner_comm_data = manager.list()
+    reactions_data = manager.list()
+    story_tags_users = manager.list()
+    story_tags_pages = manager.list()
+    message_tags_users = manager.list()
+    message_tags_pages = manager.list()
+    # posts_data = []
+    # comments_data = []
+    # comments_inner_comm_data = []
+    # reactions_data = []
+    # story_tags_users = []
+    # story_tags_pages = []
+    # message_tags_users = []
+    # message_tags_pages = []
+
+    start_time = time.time()
+    try:
+        posts['data'] = pagination ( posts['posts'] )
+        for post in posts['data']:
+            try:
+                reactions = pagination ( post['reactions'] )
+                post['reactions']['data'] = reactions
+            except KeyError:
+                pass
+            try:
+                comments = pagination ( post['comments'] )
+                post['comments']['data'] = comments
+                for comment in post['comments']['data']:
+                    try:
+                        likesincomm = pagination( comment['likes'] )
+                        comment['likes']['data'] = likesincomm
+                    except KeyError:
+                        pass
+                    try:
+                        commentsincomm = pagination ( comment['comments'] )
+                        comment['comments']['data'] = commentsincomm
+                        for comment2 in comment['comments']['data']:
+                            try:
+                                likesincomm2 = pagination( comment2['likes'] )
+                                comment2['likes']['data'] =  likesincomm2
+                            except KeyError:
+                                pass
+                    except KeyError:
+                        pass
+            except KeyError:
+                pass
+    except KeyError:
+        pass
+
+    end_time = time.time()
+    statistics.write( 'Time processing post pagination: ' + str(end_time - start_time) + '\n' )
+
+    
+    n = 8
+    if n == 1:
+        args = [ posts['data'] ]
+    else:
+        len_total_posts = len(posts['data'])
+        div = len_total_posts / n
+        t = []
+        for i in range( n - 1 ):
+            t.append ( (i + 1) * div )
+        
+    #    containers = [ posts_data, comments_data, comments_inner_comm_data, reactions_data, story_tags_users, story_tags_pages, message_tags_users, message_tags_pages ]
+        args = []
+        for i in range (len (t)):
+            if i == 0:
+                args.append( posts['data'][ :t[i] ] )
+            elif i == n - 2:
+                args.append (posts['data'][ t[i-1]:t[i]: ])
+                args.append( posts['data'][ t[i]: ] )
+            else:
+                args.append (posts['data'][ t[i-1]:t[i]: ])
+        
+    #    args_1 = posts['data'][:t[0] ]
+    #    args_2 = posts['data'][t[0]:t[1]:]
+    #    args_3 = posts['data'][t[1]:t[2]:]
+    #    args_4 = posts['data'][t[2]:]
+
+        #args = 
+#        for arg in args:
+#           print len ( arg )
+    
+    start_time = time.time()
+    pool = Pool(processes=None)
+    func = partial(process_post_async, uid, uidhash, posts_data, comments_data, comments_inner_comm_data, reactions_data, story_tags_users, story_tags_pages, message_tags_users, message_tags_pages)
+    data = pool.map (func, args)
+
+    #pool.apply_async (process_post_async, args_2)
+    #pool.apply_async (process_post_async, args_3)
+    #pool.apply_async (process_post_async, args_4)
+
+    pool.close()
+    pool.join()
+    end_time = time.time()
+    statistics.write( 'Time processing post data in parallel: ' + str(end_time - start_time) + '\n' )
+    
+    #unique = [] # remove the post with the same id. Facebook have posts that have the same ID!!!!
+    # for i in range(len(posts_data)):
+    #     if posts_data[i]['post_id'] in unique:
+    #         posts_data.pop(i)
+    #     else:
+    #         unique.append (posts_data[i]['post_id'])
+#    print data[0]['posts_data']
+#    data2 = pool.map (process_post_async, args_2)
+#    data3 = pool.map (process_post_async, args_3)
+#    data4 = pool.map (process_post_async, args_4)
+
+    # result1 = data1.get()
+    # result2 = data2.get()
+    # result3 = data3.get()
+    # result4 = data4.get()
+
+    # posts_data = data[0]['posts_data'] +  data[1]['posts_data'] + data[2]['posts_data'] + data[3]['posts_data'] 
+    # comments_data = data[0]['comments_data'] +  data[1]['comments_data'] + data[2]['comments_data'] + data[3]['comments_data']
+    # comments_inner_comm_data = data[0]['comment_has_comment'] +  data[1]['comment_has_comment'] + data[2]['comment_has_comment'] + data[3]['comment_has_comment']
+    # reactions_data = data[0]['reactions_data'] +  data[1]['reactions_data'] + data[2]['reactions_data'] + data[3]['reactions_data']
+    # story_tags_users = data[0]['story_tags_users'] +  data[1]['story_tags_users'] + data[2]['story_tags_users'] + data[3]['story_tags_users']
+    # story_tags_pages = data[0]['story_tags_pages'] +  data[1]['story_tags_pages'] + data[2]['story_tags_pages'] + data[3]['story_tags_pages']
+    # message_tags_users = data[0]['message_tags_users'] +  data[1]['message_tags_users'] + data[2]['message_tags_users'] + data[3]['message_tags_users']
+    # message_tags_pages = data[0]['message_tags_pages'] +  data[1]['message_tags_pages'] + data[2]['message_tags_pages'] + data[3]['message_tags_pages']
+
     return {'posts_data':posts_data, 'comments_data':comments_data, 'comment_has_comment':comments_inner_comm_data, 'reactions_data':reactions_data, 'story_tags_users':story_tags_users, 'story_tags_pages':story_tags_pages, 'message_tags_users': message_tags_users, 'message_tags_pages': message_tags_pages}
 
 def process_profile_data (profile):
@@ -385,8 +477,11 @@ def process_relationship_data ( uidhash, data ) :
                 users_to_relationship.append ( { 'uidhash':uidhash, 'idhash':idhash, 'relationship_type':'friendship', 'description':'friend' } )
     return { 'users_to_db':users_to_db, 'users_to_relationship':users_to_relationship }
 
-def process_liked_pages_data (uidhash, data):
+def process_liked_pages_data (uidhash, data, statistics):
+    start_time = time.time()
     liked_pages = pagination(data)
+    end_time = time.time()
+    statistics.write( 'Time processing pagination likes: ' + str(end_time - start_time) + '\n' )
     user_likes_pages = []
     for page in liked_pages:
         page['page_id'] = page['id']
