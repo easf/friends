@@ -1,0 +1,7 @@
+# ignore configuration files
+config.py
+instance/friends_nginx.conf
+instance/friends_uwsgi.ini
+instance/friends_uwsgi.sock
+# statistic file (perfomance)
+statistics.friends
