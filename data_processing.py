@@ -1,6 +1,6 @@
 # coding=utf-8
 import config
-from flask_app import mysql
+#from flask_app import mysql
 import hashlib, langdetect, json, requests, time
 import MySQLdb
 from multiprocessing import Pool, Manager
