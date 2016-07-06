@@ -1,5 +1,6 @@
 # coding=utf-8
 from multiprocessing import Process, Queue, Pool, Manager
+import multiprocessing.pool
 #import Queue
 import facebook, collections, hashlib, data_processing
 import sys
@@ -12,12 +13,25 @@ sys.setdefaultencoding('utf8')
 NO = 0
 YES = 1
 
+class NoDaemonProcess(multiprocessing.Process):
+    # make 'daemon' attribute always return False
+    def _get_daemon(self):
+        return False
+    def _set_daemon(self, value):
+        pass
+    daemon = property(_get_daemon, _set_daemon)
+
+class MyPool(multiprocessing.pool.Pool):
+    Process = NoDaemonProcess
+
+
 def pagination(queue, statistics, graph, uid):
     #start_time = time.time()
+#'?fields=posts.limit(108){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}'
     try:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(200){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
     except:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments}}')
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(200){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments}}')
         pass
     c=1
     #end_time = time.time()
@@ -131,7 +145,21 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
         except KeyError:
             pass
 
-
+def parallel_comment(post, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion, data):
+    comment = data
+    comment_keys = comment.keys()
+    process_comment_data ( post, comment, comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
+    if 'comments' in comment_keys:
+        try:
+            del comment['comments']['paging']
+        except KeyError:
+            pass
+        while comment['comments']['data']:
+            inner_comment = comment['comments']['data'].pop()
+            inner_comment_keys = inner_comment.keys()
+            process_comment_data ( post, inner_comment, inner_comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
+            comm_h_comm_insertion.append ( ( comment['id'], inner_comment['id'] ) )
+            #cur.execute ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", (comment['id'], inner_comment['id'] ))
 
 def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion, data):
     #   insertion_statement = ("INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)")
@@ -262,10 +290,10 @@ def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_
         try: 
             if post_comments_summary_total_count <> None:
                 if post_comments_summary_total_count > 0:
-                    comment_len = len(post['comments']['data'])
-                    while post['comments']['data']:
-                        comment = post['comments']['data'].pop(0) # 
-                        try:
+                    comment_len = len(post['comments']['data'])                        # 
+                    try: 
+                        while post['comments']['data']:
+                            comment =post['comments']['data'].pop(0)
                             comment_keys = comment.keys()
                             process_comment_data ( post, comment, comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
                             if 'comments' in comment_keys:
@@ -278,9 +306,15 @@ def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_
                                     inner_comment_keys = inner_comment.keys()
                                     process_comment_data ( post, inner_comment, inner_comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
                                     comm_h_comm_insertion.append ( ( comment['id'], inner_comment['id'] ) )
-                                    #cur.execute ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", (comment['id'], inner_comment['id'] ))
-                        except KeyError:
-                            pass
+
+                        #func = partial (parallel_comment, post, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
+                        #pool = Pool(processes = NoDaemonProcess)
+                        #pool.map ( func, post['comments']['data'])
+                        #pool.close()
+                        #pool.join()
+                        #del post['comments']['data'][:]
+                    except KeyError:
+                        pass
         except KeyError:
             pass
 
@@ -338,30 +372,31 @@ def parallel_code (data):
             break
         else:
             print "Process", len ( data_from_queue )
-            func = partial (process_posts_data, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
+            if data_from_queue <> []:
+                func = partial (process_posts_data, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
 
-            pool = Pool(processes = None)
-            pool.map ( func, data_from_queue )
+                pool = Pool(processes = 8)
+                pool.map ( func, data_from_queue )
 
-            pool.close()
-            pool.join()
+                pool.close()
+                pool.join()
 
-            cur.execute ("SET FOREIGN_KEY_CHECKS=0")
-            cur.executemany( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", user_d_insertion )
-            cur.executemany( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_d_insertion )
-            cur.executemany("INSERT INTO comment ( id, post_id, user_idhash, created_time, language, has_picture, has_link, nreactions, ncomments, text_lenght ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE has_picture = VALUES(has_picture), has_link = VALUES(has_link), nreactions = VALUES(nreactions), ncomments = VALUES(ncomments), text_lenght = VALUES(text_lenght)", comment_d_insertion ) 
-            cur.executemany ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", comm_h_comm_insertion)                                        
-            cur.executemany("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", reaction_d_insertion)                                                
-            cur.executemany("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", tag_d_insertion)                            
-            cur.executemany("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", page_d_insertion )
-            cur.execute ("SET FOREIGN_KEY_CHECKS=1")
-            del post_d_insertion[:]
-            del comment_d_insertion[:]
-            del reaction_d_insertion[:]
-            del user_d_insertion[:]
-            del comm_h_comm_insertion[:]
-            del tag_d_insertion[:]
-            del page_d_insertion[:]
+                cur.execute ("SET FOREIGN_KEY_CHECKS=0")
+                cur.executemany( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", user_d_insertion )
+                cur.executemany( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_d_insertion )
+                cur.executemany("INSERT INTO comment ( id, post_id, user_idhash, created_time, language, has_picture, has_link, nreactions, ncomments, text_lenght ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE has_picture = VALUES(has_picture), has_link = VALUES(has_link), nreactions = VALUES(nreactions), ncomments = VALUES(ncomments), text_lenght = VALUES(text_lenght)", comment_d_insertion ) 
+                cur.executemany ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", comm_h_comm_insertion)                                        
+                cur.executemany("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", reaction_d_insertion)                                                
+                cur.executemany("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", tag_d_insertion)                            
+                cur.executemany("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", page_d_insertion )
+                cur.execute ("SET FOREIGN_KEY_CHECKS=1")
+                del post_d_insertion[:]
+                del comment_d_insertion[:]
+                del reaction_d_insertion[:]
+                del user_d_insertion[:]
+                del comm_h_comm_insertion[:]
+                del tag_d_insertion[:]
+                del page_d_insertion[:]
 
 # database insertions and queries
 def verify_existence_in_database ( data, cur, band ):
