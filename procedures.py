@@ -28,9 +28,9 @@ class MyPool(multiprocessing.pool.Pool):
 def pagination(queue, statistics, graph, uid):
 #'?fields=posts.limit(108){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}'
     try:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(200){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
     except:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(200){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments}}')
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments}}')
         pass
     c=1
     #end_time = time.time()
