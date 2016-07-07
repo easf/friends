@@ -27,14 +27,17 @@ class MyPool(multiprocessing.pool.Pool):
 
 def pagination(queue, statistics, graph, uid):
 #'?fields=posts.limit(108){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}'
+#'?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}'
+    start_time = time.time()
     try:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(100){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
+        print 'Funcionaaaaaaaaaaaa'
     except:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments}}')
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(100){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments}}')
         pass
     c=1
-    #end_time = time.time()
-    #statistics.write( 'Time getting post data (from GraphAPI): ' + str(end_time - start_time) + '\n' )
+    end_time = time.time()
+    statistics.write( 'Time getting post data (from GraphAPI) ' + str(c) + ': ' + str(end_time - start_time) + '\n' )
     data = posts['posts']
     alldata = [] 
     while(True):
@@ -45,8 +48,11 @@ def pagination(queue, statistics, graph, uid):
             queue.put(alldata[:])
             print "pagination", len (alldata)
             del alldata[:]
-            c+=1
+            start_time = time.time()
             data=requests.get(data['paging']['next']).json()
+            c+=1
+            end_time = time.time()
+            statistics.write( 'Time getting post data (from GraphAPI) ' + str(c) + ': ' + str(end_time - start_time) + '\n' )
         except KeyError:
             break
     #return alldata
@@ -91,18 +97,18 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
 
         if 'message' in comment_keys:
             message_length = len(comment['message'])
-            if message_length > 0:
-                try:
-                    message_language = langdetect.detect(comment['message'])
-                except:
-                    message_language = None
-                    pass
-            else:
-                message_language = None
-            del comment['message']
+        #     if message_length > 0:
+        #         try:
+        #             message_language = langdetect.detect(comment['message'])
+        #         except:
+        #             message_language = None
+        #             pass
+        #     else:
+        #         message_language = None
+        #     del comment['message']
         else:
             message_length = None
-            message_language = None
+        message_language = None
 
         #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, comment_from_id, comment_from_name ) )
         user_d_insertion.append ( ( idhash, comment_from_id, comment_from_name ) )
@@ -194,6 +200,8 @@ def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_
 
         post = data_from_queue.pop(0)
     """
+    e = 0
+    start_time = time.time()
     post = data
     post_keys = post.keys()
     try:
@@ -201,22 +209,26 @@ def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_
         del post['reactions']['summary']
     except KeyError:
         post_reactions_summary_total_count = None
+        e += 1
     try:
         post_comments_summary_total_count = post['comments']['summary']['total_count']
         del post['comments']['summary']
     except KeyError:
         post_comments_summary_total_count = None
+        e += 1
 
     if 'created_time' in post_keys:
         created_time = post['created_time']
         del post['created_time']
     else:
         created_time = None
+        e += 1
     try:
         post_privacy = post['privacy']['description']
         del post['privacy']
     except KeyError:
         post_privacy = None
+        e += 1
     if 'story' in post_keys:
         post_story = post['story']
         del post['story']
@@ -224,41 +236,49 @@ def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_
         post_story = None
     if 'message' in post_keys:
         post_message_lenght = len(post['message'])
-        if post_message_lenght > 0:
-            try:
-                post_message_language = langdetect.detect(post['message'])
-            except:
-                post_message_language = None
-                pass
-        else:
-            post_message_language= None
-        del post['message']
+    #     if post_message_lenght > 0:
+    #         try:
+    #             post_message_language = langdetect.detect(post['message'])
+    #         except:
+    #             post_message_language = None
+    #             pass
+    #     else:
+    #         post_message_language= None
+    #     del post['message']
     else:
         post_message_lenght = None
-        post_message_language = None
+    post_message_language = None
     try:
         post_shares_count = post['shares']['count']
         del post['shares']
     except KeyError:
         post_shares_count = None
+        e += 1
     try:
         post_app = post['application']['name']
         del post['application']
     except:
         post_app = None
+        e += 1
     try:
         post_link = post['link']
         del post['link']
     except:
         post_link = None
+        e += 1
     try:
         post_type = post['type']
     except KeyError:
         post_type = None
+        e += 1
     #posts_data.append ( { 'post_id':post['id'], 'idhash':uidhash, 'created_time':created_time, 'post_type':post['type'], 'story':post_story, 'privacy':post['privacy']['description'], 'text_length':post_message_lenght, 'link':post_link, 'nreactions':post_reactions_summary_total_count, 'ncomments':post_comments_summary_total_count, 'application':post_app, 'shares_count':post_shares_count, 'language':post_message_language } )
     # ( post['post_id'], post['idhash'],post['created_time'], post['post_type'], post['story'], post['privacy'], post['text_length'], post['link'], post['nreactions'], post['ncomments'], post['application'], post['shares_count'], post['language'] )
+    end_time = time.time()
+    print  'Time processing only post_____: ' + post['id'] + ' num of exceptions: '+ str(e) + ' time -> '+ str(end_time - start_time) + '\n'
     post_data = ( post['id'], uidhash, created_time, post_type, post_story, post_privacy, post_message_lenght, post_link, post_reactions_summary_total_count, post_comments_summary_total_count, post_app, post_shares_count, post_message_language )
     post_d_insertion.append ( post_data )
+
+
     #cur.execute( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_data )
     if 'reactions' in post_keys:
         try:
@@ -281,6 +301,7 @@ def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_
                             pass
         except KeyError:    
             pass
+    
     if 'comments' in post_keys:
         try:
             del post['comments']['paging']
@@ -364,6 +385,7 @@ def parallel_code (data):
         uidhash = data[2]
         granted_users = data[3]
         cur = data[4]
+        statistics = data[5]
         data_from_queue = queue.get()
         c+=1
         if data_from_queue == 'DONE':
@@ -374,11 +396,15 @@ def parallel_code (data):
             if data_from_queue <> []:
                 func = partial (process_posts_data, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
 
-                pool = Pool(processes = None)
+                pool = Pool( processes = None )
+                start_time = time.time()
                 pool.map ( func, data_from_queue )
 
                 pool.close()
                 pool.join()
+                end_time = time.time()
+                print  'Time processing data_____' + str(c) + ': ' + str(end_time - start_time) + '\n' 
+                print 'mbaeeeeeee'
 
                 cur.execute ("SET FOREIGN_KEY_CHECKS=0")
                 cur.executemany( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", user_d_insertion )
@@ -441,6 +467,7 @@ def get_granted_users(cur):
     return granted_users
 
 def proof(uid, token, mysql):
+    start_time_total = time.time()
     open('statistics.friends', 'w').close()
     statistics = open ('statistics.friends', 'a')
     # database connection
@@ -684,7 +711,7 @@ def proof(uid, token, mysql):
     queue   = Queue()
     #(queue, id, uidhash, posts, granted_users, statistics, cur)
     start_time = time.time()
-    reader_p = Process( target = parallel_code, args= ( ( queue, uid, uidhash, granted_users, cur ), )  )
+    reader_p = Process( target = parallel_code, args= ( ( queue, uid, uidhash, granted_users, cur, statistics ), )  )
     #reader_p.daemon = True
     reader_p.start()
 
@@ -844,8 +871,8 @@ def proof(uid, token, mysql):
     end_time = time.time()
     statistics.write( 'Time processing commit: ' + str(end_time - start_time) + '\n' )
     
-
-    
+    end_time_total = time.time()
+    statistics.write( 'Total time : ' + str(end_time_total - start_time_total) + '\n' )
 
 def counter(uid, token):
     graph = facebook.GraphAPI(access_token=token, version='2.6')
