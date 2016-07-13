@@ -4,11 +4,12 @@ import multiprocessing.pool
 #import Queue
 import facebook, collections, hashlib, data_processing
 import sys
-import time, hashlib, langdetect, json, requests
+import time, hashlib, langdetect, json, requests, config
 from functools import partial
 
 reload(sys)  
 sys.setdefaultencoding('utf8')
+
 
 NO = 0
 YES = 1
@@ -24,25 +25,62 @@ class NoDaemonProcess(multiprocessing.Process):
 class MyPool(multiprocessing.pool.Pool):
     Process = NoDaemonProcess
 
+def pagination_s(data, limit):
+    alldata = [] 
+    while(limit):
+        try:
+#            alldata += data['data']
+            for item in data['data']:
+                alldata.append(item)
+            data=requests.get(data['paging']['next']).json()
+            limit -= 1
+            print limit
+        except KeyError:
+            break
+    return alldata
 
-def pagination(queue, statistics, graph, uid):
-#'?fields=posts.limit(108){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}'
-#'?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}'
-    start_time = time.time()
+def paginate_posts(posts):
     try:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(100){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
-        print 'Funcionaaaaaaaaaaaa'
-    except:
-        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(100){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments}}')
+        for post in posts['data']:
+            try:
+                reactions = pagination_s ( post['reactions'], 2 )
+                post['reactions']['data'] = reactions
+            except KeyError:
+                pass
+            # try:
+            #     comments = pagination_s ( post['comments'], 1 )
+            #     post['comments']['data'] = comments
+            # except KeyError:
+            #     pass
+    except KeyError:
         pass
+
+def pagination(data):
+#'?fields=posts.limit(108){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}'
+#'?fields=posts.limit(100){created_time,type,story,story_tags,privacy,message,link,shares,from,reactions.summary(true),comments.summary(true){created_time,from,message,message_tags,likes.summary(true),comments.summary(true){created_time,from,message,message_tags,likes.summary(true)}}}
+    queue = data[0]
+    statistics = data[1]
+    graph = data[2]
+    uid = data[3]
+    start_time = time.time()                                                                                                                                                                                                                                                                                                                        
+    try:
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit('+ str(config.POST_FIRST_CALL_LIMIT_1) +'){created_time,type,story,story_tags,privacy,link,message,application,reactions.summary(true).limit('+str(config.REACTIONS_LIMIT)+'),comments.summary(true).limit('+str(config.COMMENTS_LIMIT)+'){created_time,from,attachment,message,message_tags,likes.summary(true).limit(10),comments.summary(true).limit(10){created_time,from}}}')
+    except:
+        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit('+ str(config.POST_FIRST_CALL_LIMIT_2) +'){created_time,type,story,story_tags,privacy,link,message,application,reactions.summary(true).limit('+str(config.REACTIONS_LIMIT)+'),comments.summary(true).limit('+str(config.COMMENTS_LIMIT)+'){created_time,from,attachment,message,message_tags,likes.summary(true).limit(10)}}')
+
+
+    #tmp_data = pagination_s ( posts['posts'] )
+    #del posts['posts']['data']
+    #posts['posts']['data'] = tmp_data
     c=1
     end_time = time.time()
     statistics.write( 'Time getting post data (from GraphAPI) ' + str(c) + ': ' + str(end_time - start_time) + '\n' )
-    data = posts['posts']
-    alldata = [] 
-    while(True):
+    data = posts['posts']   
+    alldata = []
+    p_limit = config.PAGINATION_LIMIT  
+    while(p_limit):
         try:
-#            alldata += data['data']
+            #paginate_posts ( data ) # modify posts
             for item in data['data']:
                 alldata.append(item)
             queue.put(alldata[:])
@@ -50,6 +88,7 @@ def pagination(queue, statistics, graph, uid):
             del alldata[:]
             start_time = time.time()
             data=requests.get(data['paging']['next']).json()
+            p_limit -= 1
             c+=1
             end_time = time.time()
             statistics.write( 'Time getting post data (from GraphAPI) ' + str(c) + ': ' + str(end_time - start_time) + '\n' )
@@ -72,7 +111,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
         try: #if 'from' in comment_keys:
             comment_from_id = comment['from']['id']
             comment_from_name = comment['from']['name'] 
-            idhash = hashlib.sha1( comment['from']['name'].encode("utf-8") + comment['from']['id']).hexdigest()
+            idhash = hashlib.sha1( comment['from']['id'] ).hexdigest()
             del comment['from']
         except KeyError: #else:
             comment_from_id = 'from does not exist' 
@@ -122,7 +161,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
             if comment_likes_total_count > 0:
                 while comment['likes']['data']:
                     like = comment['likes']['data'].pop(0)
-                    idhash = hashlib.sha1(like['name'].encode("utf-8") + like['id']).hexdigest()
+                    idhash = hashlib.sha1( like['id']).hexdigest()
                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, like['id'], like['name'] ))
                     user_d_insertion.append ( ( idhash, like['id'], like['name'] ) )
                     if uidhash not in granted_users:
@@ -135,7 +174,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
             while comment['message_tags']:
                 message_tag = comment['message_tags'].pop(0)
                 if message_tag['type'] == 'user':
-                    idhash = hashlib.sha1(message_tag['name'].encode("utf-8") + message_tag['id']).hexdigest()
+                    idhash = hashlib.sha1( message_tag['id']).hexdigest()
                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, message_tag['id'], message_tag['name'] ))
                     user_d_insertion.append ( ( idhash, message_tag['id'], message_tag['name'] ) )
                     if uidhash not in granted_users:
@@ -146,7 +185,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
                     page_d_insertion.append ( ( message_tag['id'], message_tag['name'], None, None ) )
                     if uidhash not in granted_users:
                          #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], None, message_tag['id'] ))
-                        tag_d_insertion.append ( ( post['id'], None, story_tag['type'], None, message_tag['id'] ) )                      
+                        tag_d_insertion.append ( ( post['id'], None, message_tag['type'], None, message_tag['id'] ) )                      
         except KeyError:
             pass
 
@@ -166,204 +205,222 @@ def parallel_comment(post, uid, uidhash, granted_users, post_d_insertion, commen
             comm_h_comm_insertion.append ( ( comment['id'], inner_comment['id'] ) )
             #cur.execute ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", (comment['id'], inner_comment['id'] ))
 
-def process_posts_data(uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion, data):
-    # insertion_statement = ("INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)")
-    # post_d_insertion
-    # comment_d_insertion
-    # reaction_d_insertion
-    # user_d_insertion
-    # comm_h_comm_insertion
-    # tag_d_insertion
-    # page_d_insertion
-    """
-        c=0
-        while True:
-            #queue, id, uidhash, granted_users, cur
-            queue = data[0]
-            uid = data[1]
-            uidhash = data[2]
-            granted_users = data[3]
-            cur = data[4]
-    """
-    #cur.execute ("SET FOREIGN_KEY_CHECKS=0")
-    """
-            data_from_queue = queue.get()
-     
-            if data_from_queue == 'DONE':
-                print 'Llamadas process', c
-                break
-            else:
+def process_posts_data( data ):
+# uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion, data
+    # insertion_statement = ("INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)")    
+    c=0
+    #manager = Manager()
+    post_d_insertion = []
+    comment_d_insertion = []
+    reaction_d_insertion = []
+    user_d_insertion = []
+    comm_h_comm_insertion = []
+    tag_d_insertion = []
+    page_d_insertion = []
 
-                print "Process", len ( data_from_queue )
-                c += 1
-                while data_from_queue:
+    while True:
+        #queue, id, uidhash, granted_users, cur
+        queue = data[0]
+        uid = data[1]
+        uidhash = data[2]
+        granted_users = data[3]
+        cur = data[4]
+        statistics = data[5]
 
-        post = data_from_queue.pop(0)
-    """
-    e = 0
-    start_time = time.time()
-    post = data
-    post_keys = post.keys()
-    try:
-        post_reactions_summary_total_count = post['reactions']['summary']['total_count']
-        del post['reactions']['summary']
-    except KeyError:
-        post_reactions_summary_total_count = None
-        e += 1
-    try:
-        post_comments_summary_total_count = post['comments']['summary']['total_count']
-        del post['comments']['summary']
-    except KeyError:
-        post_comments_summary_total_count = None
-        e += 1
+#        cur = data[4]
 
-    if 'created_time' in post_keys:
-        created_time = post['created_time']
-        del post['created_time']
-    else:
-        created_time = None
-        e += 1
-    try:
-        post_privacy = post['privacy']['description']
-        del post['privacy']
-    except KeyError:
-        post_privacy = None
-        e += 1
-    if 'story' in post_keys:
-        post_story = post['story']
-        del post['story']
-    else:
-        post_story = None
-    if 'message' in post_keys:
-        post_message_lenght = len(post['message'])
-    #     if post_message_lenght > 0:
-    #         try:
-    #             post_message_language = langdetect.detect(post['message'])
-    #         except:
-    #             post_message_language = None
-    #             pass
-    #     else:
-    #         post_message_language= None
-    #     del post['message']
-    else:
-        post_message_lenght = None
-    post_message_language = None
-    try:
-        post_shares_count = post['shares']['count']
-        del post['shares']
-    except KeyError:
-        post_shares_count = None
-        e += 1
-    try:
-        post_app = post['application']['name']
-        del post['application']
-    except:
-        post_app = None
-        e += 1
-    try:
-        post_link = post['link']
-        del post['link']
-    except:
-        post_link = None
-        e += 1
-    try:
-        post_type = post['type']
-    except KeyError:
-        post_type = None
-        e += 1
-    #posts_data.append ( { 'post_id':post['id'], 'idhash':uidhash, 'created_time':created_time, 'post_type':post['type'], 'story':post_story, 'privacy':post['privacy']['description'], 'text_length':post_message_lenght, 'link':post_link, 'nreactions':post_reactions_summary_total_count, 'ncomments':post_comments_summary_total_count, 'application':post_app, 'shares_count':post_shares_count, 'language':post_message_language } )
-    # ( post['post_id'], post['idhash'],post['created_time'], post['post_type'], post['story'], post['privacy'], post['text_length'], post['link'], post['nreactions'], post['ncomments'], post['application'], post['shares_count'], post['language'] )
-    end_time = time.time()
-    print  'Time processing only post_____: ' + post['id'] + ' num of exceptions: '+ str(e) + ' time -> '+ str(end_time - start_time) + '\n'
-    post_data = ( post['id'], uidhash, created_time, post_type, post_story, post_privacy, post_message_lenght, post_link, post_reactions_summary_total_count, post_comments_summary_total_count, post_app, post_shares_count, post_message_language )
-    post_d_insertion.append ( post_data )
+#cur.execute ("SET FOREIGN_KEY_CHECKS=0")
+
+        data_from_queue = queue.get()
+ 
+        if data_from_queue == 'DONE':
+            print 'Llamadas process', c
+            break
+        else:
+            print "Process", len ( data_from_queue )
+            c += 1
+            while data_from_queue:
+                post = data_from_queue.pop(0)
+                e = 0
+                start_time = time.time()
+                #post = data
+                post_keys = post.keys()
+                try:
+                    post_reactions_summary_total_count = post['reactions']['summary']['total_count']
+                    del post['reactions']['summary']
+                except KeyError:
+                    post_reactions_summary_total_count = None
+                    e += 1
+                try:
+                    post_comments_summary_total_count = post['comments']['summary']['total_count']
+                    del post['comments']['summary']
+                except KeyError:
+                    post_comments_summary_total_count = None
+                    e += 1
+
+                if 'created_time' in post_keys:
+                    created_time = post['created_time']
+                    del post['created_time']
+                else:
+                    created_time = None
+                    e += 1
+                try:
+                    post_privacy = post['privacy']['description']
+                    del post['privacy']
+                except KeyError:
+                    post_privacy = None
+                    e += 1
+                if 'story' in post_keys:
+                    post_story = post['story']
+                    del post['story']
+                else:
+                    post_story = None
+                if 'message' in post_keys:
+                    post_message_lenght = len(post['message'])
+                #     if post_message_lenght > 0:
+                #         try:
+                #             post_message_language = langdetect.detect(post['message'])
+                #         except:
+                #             post_message_language = None
+                #             pass
+                #     else:
+                #         post_message_language= None
+                #     del post['message']
+                else:
+                    post_message_lenght = None
+                post_message_language = None
+                try:
+                    post_shares_count = post['shares']['count']
+                    del post['shares']
+                except KeyError:
+                    post_shares_count = None
+                    e += 1
+                try:
+                    post_app = post['application']['name']
+                    del post['application']
+                except:
+                    post_app = None
+                    e += 1
+                try:
+                    post_link = post['link'][:64]
+                    del post['link']
+                except:
+                    post_link = None
+                    e += 1
+                try:
+                    post_type = post['type']
+                except KeyError:
+                    post_type = None
+                    e += 1
+                #posts_data.append ( { 'post_id':post['id'], 'idhash':uidhash, 'created_time':created_time, 'post_type':post['type'], 'story':post_story, 'privacy':post['privacy']['description'], 'text_length':post_message_lenght, 'link':post_link, 'nreactions':post_reactions_summary_total_count, 'ncomments':post_comments_summary_total_count, 'application':post_app, 'shares_count':post_shares_count, 'language':post_message_language } )
+                # ( post['post_id'], post['idhash'],post['created_time'], post['post_type'], post['story'], post['privacy'], post['text_length'], post['link'], post['nreactions'], post['ncomments'], post['application'], post['shares_count'], post['language'] )
+                end_time = time.time()
+                print  'Time processing only post_____: ' + post['id'] + ' num of exceptions: '+ str(e) + ' time -> '+ str(end_time - start_time) + '\n'
+                post_data = ( post['id'], uidhash, created_time, post_type, post_story, post_privacy, post_message_lenght, post_link, post_reactions_summary_total_count, post_comments_summary_total_count, post_app, post_shares_count, post_message_language )
+                post_d_insertion.append ( post_data )
 
 
-    #cur.execute( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_data )
-    if 'reactions' in post_keys:
-        try:
-            del post['reactions']['paging']
-        except KeyError:
-            pass
-        try:
-            if post_reactions_summary_total_count <> None:
-                if post_reactions_summary_total_count > 0:
-                    while post['reactions']['data']:
-                        reaction =  post['reactions']['data'].pop(0) #post['reactions']['data'][index_r]
-                        try:
-                            idhash = hashlib.sha1(reaction['name'].encode("utf-8") + reaction['id']).hexdigest()
-                            user_d_insertion.append ( ( idhash, reaction['id'], reaction['name'] ) )
-                            #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
-                            if uidhash not in granted_users:
-                                reaction_d_insertion.append ( ( idhash, post['id'], None, reaction['type'] ) )
-                                #cur.execute("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", ( idhash, post['id'], None, reaction['type'] ))
-                        except KeyError:
-                            pass
-        except KeyError:    
-            pass
-    
-    if 'comments' in post_keys:
-        try:
-            del post['comments']['paging']
-        except KeyError:
-            pass
-        try: 
-            if post_comments_summary_total_count <> None:
-                if post_comments_summary_total_count > 0:
-                    comment_len = len(post['comments']['data'])                        # 
-                    try: 
-                        while post['comments']['data']:
-                            comment =post['comments']['data'].pop(0)
-                            comment_keys = comment.keys()
-                            process_comment_data ( post, comment, comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
-                            if 'comments' in comment_keys:
-                                try:
-                                    del comment['comments']['paging']
-                                except KeyError:
-                                    pass
-                                while comment['comments']['data']:
-                                    inner_comment = comment['comments']['data'].pop()
-                                    inner_comment_keys = inner_comment.keys()
-                                    process_comment_data ( post, inner_comment, inner_comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
-                                    comm_h_comm_insertion.append ( ( comment['id'], inner_comment['id'] ) )
-
-                        #func = partial (parallel_comment, post, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
-                        #pool = Pool(processes = NoDaemonProcess)
-                        #pool.map ( func, post['comments']['data'])
-                        #pool.close()
-                        #pool.join()
-                        #del post['comments']['data'][:]
+                #cur.execute( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_data )
+                if 'reactions' in post_keys:
+                    try:
+                        del post['reactions']['paging']
                     except KeyError:
                         pass
-        except KeyError:
-            pass
+                    try:
+                        if post_reactions_summary_total_count <> None:
+                            if post_reactions_summary_total_count > 0:
+                                while post['reactions']['data']:
+                                    reaction =  post['reactions']['data'].pop(0) #post['reactions']['data'][index_r]
+                                    try:
+                                        idhash = hashlib.sha1( reaction['id']).hexdigest()
+                                        user_d_insertion.append ( ( idhash, reaction['id'], reaction['name'] ) )
+                                        #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
+                                        if uidhash not in granted_users:
+                                            reaction_d_insertion.append ( ( idhash, post['id'], None, reaction['type'] ) )
+                                            #cur.execute("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", ( idhash, post['id'], None, reaction['type'] ))
+                                    except KeyError:
+                                        pass
+                    except KeyError:    
+                        pass
+                
+                if 'comments' in post_keys:
+                    try:
+                        del post['comments']['paging']
+                    except KeyError:
+                        pass
+                    try: 
+                        if post_comments_summary_total_count <> None:
+                            if post_comments_summary_total_count > 0:
+                                comment_len = len(post['comments']['data'])                        # 
+                                try: 
+                                    while post['comments']['data']:
+                                        comment =post['comments']['data'].pop(0)
+                                        comment_keys = comment.keys()
+                                        process_comment_data ( post, comment, comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
+                                        if 'comments' in comment_keys:
+                                            try:
+                                                del comment['comments']['paging']
+                                            except KeyError:
+                                                pass
+                                            while comment['comments']['data']:
+                                                inner_comment = comment['comments']['data'].pop()
+                                                inner_comment_keys = inner_comment.keys()
+                                                process_comment_data ( post, inner_comment, inner_comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
+                                                comm_h_comm_insertion.append ( ( comment['id'], inner_comment['id'] ) )
 
-    if 'story_tags' in post_keys:
-        while post['story_tags']:
-            story_tag = post['story_tags'].pop(0)
-            try: # if there is not type of story_tag don't add
-                if story_tag['type'] == 'user':
-                    if story_tag['id'] <> uid:
-                        idhash = hashlib.sha1(story_tag['name'].encode("utf-8") + story_tag['id']).hexdigest()
-                        user_d_insertion.append ( ( idhash, story_tag['id'], story_tag['name'] )  )
-                        #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
-                        if uidhash not in granted_users:
-                            #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], idhash, None ))
-                            tag_d_insertion.append ( ( post['id'], None, story_tag['type'], idhash, None ) )
-                elif story_tag['type'] == 'page':
-                    #cur.execute("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", ( story_tag['id'], story_tag['name'], None, None ) )
-                    page_d_insertion.append (( story_tag['id'], story_tag['name'], None, None )  )
-                    if uidhash not in granted_users:
-                        #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
-                        tag_d_insertion.append (  ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
-                    #story_tags_pages.append({'post_id':post['id'], 'comment_id':None , 'idhash':None, 'id':None, 'name':story_tag['name'], 'type':story_tag['type'], 'page_id':story_tag['id']})
-            except KeyError:
-                pass
-                            
-        #else:
-        #    pass
+                                    #func = partial (parallel_comment, post, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
+                                    #pool = Pool(processes = NoDaemonProcess)
+                                    #pool.map ( func, post['comments']['data'])
+                                    #pool.close()
+                                    #pool.join()
+                                    #del post['comments']['data'][:]
+                                except KeyError:
+                                    pass
+                    except KeyError:
+                        pass
 
-#    cur.execute ("SET FOREIGN_KEY_CHECKS=1")
+                if 'story_tags' in post_keys:
+                    while post['story_tags']:
+                        story_tag = post['story_tags'].pop(0)
+                        try: # if there is not type of story_tag don't add
+                            if story_tag['type'] == 'user':
+                                if story_tag['id'] <> uid:
+                                    idhash = hashlib.sha1( story_tag['id']).hexdigest()
+                                    user_d_insertion.append ( ( idhash, story_tag['id'], story_tag['name'] )  )
+                                    #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
+                                    if uidhash not in granted_users:
+                                        #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], idhash, None ))
+                                        tag_d_insertion.append ( ( post['id'], None, story_tag['type'], idhash, None ) )
+                            elif story_tag['type'] == 'page':
+                                #cur.execute("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", ( story_tag['id'], story_tag['name'], None, None ) )
+                                page_d_insertion.append (( story_tag['id'], story_tag['name'], None, None )  )
+                                if uidhash not in granted_users:
+                                    #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
+                                    tag_d_insertion.append (  ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
+                                #story_tags_pages.append({'post_id':post['id'], 'comment_id':None , 'idhash':None, 'id':None, 'name':story_tag['name'], 'type':story_tag['type'], 'page_id':story_tag['id']})
+                        except KeyError:
+                            pass
+                                        
+                    #else:
+                    #    pass
+
+
+                cur.execute ("SET FOREIGN_KEY_CHECKS=0")
+                cur.executemany( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", user_d_insertion )
+                cur.executemany( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_d_insertion )
+                cur.executemany("INSERT INTO comment ( id, post_id, user_idhash, created_time, language, has_picture, has_link, nreactions, ncomments, text_lenght ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE has_picture = VALUES(has_picture), has_link = VALUES(has_link), nreactions = VALUES(nreactions), ncomments = VALUES(ncomments), text_lenght = VALUES(text_lenght)", comment_d_insertion ) 
+                cur.executemany ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", comm_h_comm_insertion)                                        
+                cur.executemany("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", reaction_d_insertion)                                                
+                cur.executemany("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", tag_d_insertion)                            
+                cur.executemany("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", page_d_insertion )
+                cur.execute ("SET FOREIGN_KEY_CHECKS=1")
+                del post_d_insertion[:]
+                del comment_d_insertion[:]
+                del reaction_d_insertion[:]
+                del user_d_insertion[:]
+                del comm_h_comm_insertion[:]
+                del tag_d_insertion[:]
+                del page_d_insertion[:]    #    cur.execute ("SET FOREIGN_KEY_CHECKS=1")
 
 
 
@@ -466,7 +523,7 @@ def get_granted_users(cur):
         granted_users.append(row[0])
     return granted_users
 
-def proof(uid, token, mysql):
+def download_data(uid, token, mysql):
     start_time_total = time.time()
     open('statistics.friends', 'w').close()
     statistics = open ('statistics.friends', 'a')
@@ -532,7 +589,7 @@ def proof(uid, token, mysql):
     del profile['name']
     # generate a hash code based on name and pass
     # for non-ascii symbols (e.g accents) -> use unicode _string = u"años luz detrás" -> _string.encode("utf-8")
-    uidhash = hashlib.sha1(user_name.encode("utf-8") + uid).hexdigest()
+    uidhash = hashlib.sha1( uid).hexdigest()
 
     # prepare user data for insertion into db
     current_user_data = [(uidhash, user_id, user_name)]
@@ -711,15 +768,23 @@ def proof(uid, token, mysql):
     queue   = Queue()
     #(queue, id, uidhash, posts, granted_users, statistics, cur)
     start_time = time.time()
-    reader_p = Process( target = parallel_code, args= ( ( queue, uid, uidhash, granted_users, cur, statistics ), )  )
-    #reader_p.daemon = True
+    reader_p = Process( target = process_posts_data, args= ( ( queue, uid, uidhash, granted_users, cur, statistics ), )  )
+    #parallel_code
+    reader_p.daemon = True
     reader_p.start()
 
     #_start = time.time()
-    pagination(queue, statistics, graph, uid) # writer
+    #writer_p = Process( target = pagination, args= ( ( queue, statistics, graph, uid ), )  )
+    data = ( queue, statistics, graph, uid )
+    pagination( data ) # writer
 
-    #reader_p.join()
+    #writer_p.daemon = True
+    #writer_p.start()
+    
     reader_p.join()
+    #reader_p.join()
+
+
     end_time = time.time()
     statistics.write( 'Time processing post data: ' + str(end_time - start_time) + '\n' )
     #start_time = time.time()
@@ -873,7 +938,7 @@ def proof(uid, token, mysql):
     
     end_time_total = time.time()
     statistics.write( 'Total time : ' + str(end_time_total - start_time_total) + '\n' )
-
+    return uidhash
 def counter(uid, token):
     graph = facebook.GraphAPI(access_token=token, version='2.6')
     response = graph.get_connections(id=uid, connection_name='invitable_friends')
@@ -881,3 +946,88 @@ def counter(uid, token):
     len(invitable_friends)
 
 
+def get_ranking(uidhash, mysql, token):
+    # database connection
+    conn = mysql.connect()
+    cur = conn.cursor()
+    graph = facebook.GraphAPI(access_token=token, timeout=float(60.0), version='2.6')
+
+    result = cur.execute("select u2.idhash, u2.name, u2.id, count(r.id) as total_reactions from user as u INNER JOIN profile as p on u.idhash = p.user_idhash"
+    " INNER JOIN post as pt on p.user_idhash = pt.user_idhash INNER JOIN reaction as r on pt.id = r.post_id"
+    " INNER JOIN user as u2 on r.user_idhash = u2.idhash where u.idhash = '"+uidhash+"' group by u.name, u2.idhash, u2.name, u2.id order by total_reactions desc limit 10")
+    result = cur.fetchall()
+    data_in_db = []
+    for row in result:
+        try:
+            data = graph.get_connections(id=row[2], connection_name='picture')
+            print data 
+            picture = data['url']
+            print picture
+        except:
+            picture = None
+        data_in_db.append({'id':row[0], 'name':row[1], 'pic':picture})    
+
+    conn.commit()
+    return data_in_db
+
+def closeness_filter( request, ranking, uidhash, mysql):
+    conn = mysql.connect()
+    cur = conn.cursor()
+    closer_users = []
+    users_in_closeness = request.form
+    for key in users_in_closeness.keys():
+        user_idhash1 = key.split('_')[1]
+        c_level = users_in_closeness[key]
+        try:
+            cur.execute ("UPDATE closeness_channels SET closeness_level = %s WHERE user_idhash = %s AND user_idhash1= %s", (c_level[1], uidhash, user_idhash1 ) )
+        except:
+            cur.execute ("INSERT INTO closeness_channels (user_idhash, user_idhash1, closeness_level) VALUES (%s, %s, %s)", (uidhash, user_idhash1, c_level[1] ) )
+        if c_level > 'c4':
+            ukey = key.split('_')[1]
+            print ukey
+            print ranking
+            for user2 in ranking:
+                if ukey == user2['id']:
+                    closer_users.append( user2 )
+                    break
+    conn.commit()
+    return closer_users
+
+def insert_survey_data(request, uidhash, current_close_user, mysql):
+    channels = {}
+    relationships = []
+    relationships_update = []
+    common_aspects = []
+    common_aspect_update = []
+    conn = mysql.connect()
+    cur = conn.cursor()
+    survey_data_keys = request.form.keys()
+    user_idhash1 = current_close_user['id']
+    for key in survey_data_keys:
+        key_splitted = key.split('_')
+        if key_splitted[0] == 'rg':
+            cur.execute ("UPDATE profile SET gender= %s WHERE user_idhash = %s", ( request.form[key], user_idhash1 ) )
+        if key_splitted[0] == 'rl':
+            channel = key_splitted[1]
+            interac_level = request.form[key][1] 
+            channels[ channel ] = interac_level
+        if key_splitted[0] == 'cbr':
+            try:
+                cur.execute("UPDATE relationship SET relationship_type = %s, description = %s WHERE user_idhash = %s and user_idhash1 = %s and relationship_type = %s and description = %s ", ( key_splitted[2], request.form[key], uidhash, user_idhash1, key_splitted[2], request.form[key] ) )
+            except:
+                cur.execute("INSERT INTO relationship (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, key_splitted[2], request.form[key] ) )
+            #relationships.append ( ( uidhash, user_idhash1, key_splitted[2], request.form[key] ) )
+            #relationships_update.append ( ( key_splitted[2], request.form[key], uidhash, user_idhash1 ) )
+        if key_splitted[0] == 'cba':
+            try:
+                cur.execute ( "UPDATE common_aspect SET type = %s, description = %s WHERE user_idhash = %s, user_idhash1 = %s and type = %s and description = %s", ( key_splitted[1], request.form[key], uidhash, user_idhash1, key_splitted[1], request.form[key]  ) )
+            except:
+                cur.execute ( "INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, key_splitted[1], request.form[key] ) )
+            #common_aspects.append ( ( uidhash, user_idhash1, key_splitted[1], request.form[key] ) )
+            #common_aspects_update.append ( ( key_splitted[1], request.form[key], uidhash, user_idhash1  ) )
+    
+    cur.execute ("UPDATE closeness_channels SET face_to_face = %s, phone_calls = %s, video_chats = %s, social_networks = %s, messaging = %s WHERE user_idhash = %s and user_idhash1 = %s ", ( channels['ftf'], channels['pc'], channels['vc'], channels['sn'],channels['sms'], uidhash, user_idhash1 ) )
+    #cur.executemany("INSERT INTO relationship (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s)", relationships)
+    #cur.executemany("INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", common_aspects)
+
+    conn.commit()

@@ -1,0 +1,247 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="container">     
+    <div class="span12">
+        <form method="post" action="{{ url_for('survey') }}">
+        <br>
+
+     <div class="jumbotron jumbotron-fluid">
+        <div class="container" align="left">
+          <h1><span class="label label-default">Best follower friends</span></h1>
+        </div>
+      </div>
+        
+<!--          <div align="center">
+            <h2>{{ user['name'] }}</h2>
+          </div>-->
+
+        <div class= "col-sm-3">
+            <label>
+              <h3><span class="label label-default">Please, fill this form about: </span></h3>  
+            </label>
+        </div>
+        <div class= "col-sm-1 vcenter">
+            <img src="{{ user['pic'] }}" class="img-thumbnail">
+        </div>
+        <div class= "col-sm-8 vcenter">
+            <h4><span class="label label-default">{{ user['name'] }}</span></h4>
+        </div>
+        <hr>
+        <fieldset class="vcenter">
+            <div class= "col-sm-4" >
+            <h4><span class="label label-default">Gender</span></h4>
+            </div>
+            <div class= "col-sm-8">
+                    <h5><label>
+                        <input id="radio1" name="rg_{{ user['id'] }}" type="radio" value="m">
+                        Male
+                    </label>
+                    <label>
+                        <input id="radio2" name="rg_{{ user['id'] }}" type="radio" value="f">
+                        Female
+                    </label></h5>
+            </div>
+        </fieldset>
+
+          <hr>
+          <div class="wrap">
+          <div class= "col-sm-20" >
+            <h3><span class="label label-default">How often did you communicate with this friend in the last month:</span></h3>
+            <!--The rating scale was as follows: 1 = less than once a month, 2 = once a month, 3 = every 2 weeks, 4 = weekly, 5 = biweekly, 6 = daily, 7 = more than once a day, and 8 = more than three times a day (Birnie 2002)
+            -1 ‘Lives in the same household’, 2 ‘Daily’, 3 ‘At least several times a week’, 4 ‘At least once a week’, 5 ‘At least once a month’, 6 ‘Several times a year’, 7 ‘Less often’, 8 ‘Never’ (Denissen 2008). 
+            -->
+          </div>
+            <br>
+            <div align="center">
+              <fieldset class="form-group">
+                  
+                <div class="row">
+                  <div class="likert3">
+                    <div class="col-xs-1">
+                        <label>Never</label>  
+                    </div>
+                    <div class="col-xs-1">
+                        <label>Once a month</label>
+                    </div>
+                    <div class="col-xs-1">
+                        <label>every 2 weeks</label>
+                    </div>
+                    <div class="col-xs-1">
+                        <label>weekly</label>
+                  </div>
+                  <div class="col-xs-1">
+                        <label>biweekly</label>
+                  </div>
+                  <div class="col-xs-1">
+                        <label>daily</label>
+                  </div>
+                  <div class="col-xs-1">
+                        <label>more than once a day</label>
+                  </div>                    
+                  </div>
+               </div>
+              </fieldset>
+
+                
+              {% for channel in channels %}
+              <fieldset class="form-group">
+                <div align="left">
+                      <div id="col" class="col-xs-2">
+                          <label name="{{ channel['name'] }}" >{{ channel['name'] }}</label>
+                      </div>
+                </div>
+                    <div class="row">
+                    <ul class='likert2'>
+                        <div class="col-xs-1">
+                      <input type="radio" name="rl_{{ channel['id'] }}_{{ user[id] }}" value="i1">
+                        </div>
+                        <div class="col-xs-1">
+                      <input type="radio" name="rl_{{ channel['id'] }}_{{ user[id] }}" value="i2">
+                        </div>
+                        <div class="col-xs-1">
+                      <input type="radio" name="rl_{{ channel['id'] }}_{{ user[id] }}" value="i3">
+                        </div>
+                        <div class="col-xs-1">
+                      <input type="radio" name="rl_{{ channel['id'] }}_{{ user[id] }}" value="i4">
+                      </div>
+                      <div class="col-xs-1">
+                      <input type="radio" name="rl_{{ channel['id'] }}_{{ user[id] }}" value="i5">
+                      </div>
+                      <div class="col-xs-1">
+                      <input type="radio" name="rl_{{ channel['id'] }}_{{ user[id] }}" value="i6">
+                      </div>
+                      <div class="col-xs-1">
+                      <input type="radio" name="rl_{{ channel['id'] }}_{{ user[id] }}" value="i7">
+                      </div>
+                      </ul>                    
+                   </div>
+                
+                </fieldset>
+            
+             {% endfor %}    
+          </div>
+        </div>
+      <hr>
+      <fieldset class="form-group" >
+        <h3><span class="label label-default">What kind of relationships do you have or had with this person? Please mark all (in both columns) that apply. </span></h3><br>
+        <!--<h3><span class="label label-default">{{ user['name'] }}:</span></h3>-->
+            <div id="col" class="col-xs-4">
+              <label>Relation</label><br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation1" value="coworker"> Was/is my co-worker <br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation2" value="same_school"> Was/is from the same school<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation3" value="same_high_school"> Was/is from the same high-school<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation4" value="same_university"> Was/is from the same college/university<br>
+              <input type="checkbox" id="cbr_other_same_institution" name="cbr_{{ user[id] }}_other_relation5" value="same_institution"> Was/is from the same other institution<br>
+              <!--<input type="text" class="form-control" id="e_other_same_institution" placeholder="Specify the institution ..." style="display:none;">-->
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation6" value="same_hometown"> Was/is from my same hometown<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation7" value="live_same_city"> Lived/Lives in the same city<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation8" value="live_together"> Lived/Lives with me<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation9" value="girl_boy_friend"> Was/is my girlfriend/boyfriend<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation10" value="spouse"> Was/is my spouse<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_friendship_relation11" value="significant_other"> Was/is my friend<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_other_relation11" value="significant_other"> Was/is my significant other<br>
+            </div>
+        
+
+            <div class="col-xs-4">
+              <label>Family relation</label><br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation1" value="parent"> Is my parent <br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation2" value="child"> Is my child<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation3" value="sibling"> Is my sibling<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation4" value="aunt_uncle"> Is my aunt/uncle<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation5" value="niece_nephew"> Is my niece/nephew<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation6" value="cousin"> Is my cousin<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation7" value="grandparent"> Is my grandparent<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation8" value="grandchild"> Is my grandchild<br>
+              <input type="checkbox" name="cbr_{{ user[id] }}_family_relation9" value="extended"> Is a member of my extended family<br>
+              <!--<input type="checkbox" name="cbr_{{ user[id] }}_family_relation10" value="other"> Other<br>-->
+            </div>
+      </fieldset>    
+
+      <hr>
+
+      <fieldset class="form-group" >
+        <h3><span class="label label-default">Aspects that connect you to this person</span></h3><br>
+            <div class="col-xs-2">
+              <label>Environment</label><br>
+              <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect1" value="work"> Work <br>
+              <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect2" value="education"> Education institution<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect3" value="club_association"> Club/Association<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect4" value="household"> Household<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect5" value="neighborhood"> Neighborhood<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect6" value="online_community"> Online community<br>
+              <!--<input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect7" value="other"> Other<br>-->
+            </div>
+
+            <div class="col-xs-2">
+              <label>Beliefs</label><br>
+              <input type="checkbox" name="cba_{{ user[id] }}_beliefs_commonaspect1" value="politics"> Politics<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_beliefs_commonaspect2" value="religion"> Religion<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_beliefs_commonaspect3" value="causes_you_care_about"> Causes you care about<br>
+              <!--<input type="checkbox" name="cba_{{ user[id] }}_beliefs_commonaspect4" value="other"> Other<br>-->
+            </div>
+
+
+            <div class="col-xs-2">
+              <label>Activities</label><br>
+              <input type="checkbox" name="cba_{{ user[id] }}_activities_commonaspect1" value="work_study"> Work/Study <br>
+              <input type="checkbox" name="cba_{{ user[id] }}_activities_commonaspect2" value="business"> Business<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_activities_commonaspect3" value="event_attendance"> Event attendance<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_activities_commonaspect4" value="sports_outdoor"> Sports/Outdoor<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_activities_commonaspect5" value="going_out"> Going out<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_activities_commonaspect6" value="traveling"> Traveling<br>
+              <!--<input type="checkbox" name="cba_{{ user[id] }}_activities_commonaspect7" value="other"> Other<br>-->
+            </div>
+
+            <div class="col-xs-2">
+              <label>Interests</label><br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect1" value="books"> Books<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect2" value="music"> Music<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect3" value="movies"> Movies<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect4" value="theater"> Theater<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect5" value="art_museum"> Art/Museum<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect6" value="tv"> TV<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect7" value="games"> Games<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect8" value="cooking"> Cooking<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect9" value="home_architecture"> Home & Architecture<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect10" value="computer_tech"> Computer/Technology<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect11" value="clothes_fashion"> Clothes/Fashion<br>
+            </div>
+
+            <div class="col-xs-2">  
+              <label>Interests</label><br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect12" value="health_beauty"> Health & Beauty<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect13" value="photography"> Photography<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect15" value="sports"> Sports<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect16" value="food_beverages"> Food & Beverages<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect17" value="cars"> Cars<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect18" value="animals_pets"> Animals & Pets<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect19" value="sciences"> Science<br>
+              <input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect20" value="history"> History<br>
+              <!--<input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect14" value="other"> Other<br>-->
+              <!--<input type="checkbox" name="cba_{{ user[id] }}_interests_commonaspect21" value="other"> Other<br>-->
+            </div>
+      </fieldset>
+      <div align="center">
+          <br>
+          <button type="submit" class="btn btn-default btn-lg" style="padding-bottom=20px;">Next</button>
+          <label><br></label>
+      </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="static/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="static/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="static/js/ie10-viewport-bug-workaround.js"></script>
+<script src="static/js/jquery-1.12.4.js"></script>
+<script src="static/js/jquery.validate.js"></script>
+{% endblock %}

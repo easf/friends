@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="container">     
+    <div class="span12">
+        <h1> Thank you!!</h1>
+
+        <script>
+              $(function() {
+            $('#exit').bind('click', function() {
+                window.close();
+              });
+        </script>
+
+        <button class="btn btn-primary" id="exit">Exit</button>
+    </div>
+</div>
+
+{% endblock %}

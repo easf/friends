@@ -44,7 +44,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
         try: #if 'from' in comment_keys:
             comment_from_id = comment['from']['id']
             comment_from_name = comment['from']['name'] 
-            idhash = hashlib.sha1( comment['from']['name'].encode("utf-8") + comment['from']['id']).hexdigest()
+            idhash = hashlib.sha1(  comment['from']['id']).hexdigest()
             del comment['from']
         except KeyError: #else:
             comment_from_id = 'from does not exist' 
@@ -93,7 +93,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
             if comment_likes_total_count > 0:
                 while comment['likes']['data']:
                     like = comment['likes']['data'].pop(0)
-                    idhash = hashlib.sha1(like['name'].encode("utf-8") + like['id']).hexdigest()
+                    idhash = hashlib.sha1( like['id']).hexdigest()
                     cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, like['id'], like['name'] ))
                     if uidhash not in granted_users:
                         cur.execute("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", ( idhash, post['id'], comment['id'], 'LIKE' ))
@@ -104,7 +104,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
             while comment['message_tags']:
                 message_tag = comment['message_tags'].pop(0)
                 if message_tag['type'] == 'user':
-                    idhash = hashlib.sha1(message_tag['name'].encode("utf-8") + message_tag['id']).hexdigest()
+                    idhash = hashlib.sha1( message_tag['id']).hexdigest()
                     cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, message_tag['id'], message_tag['name'] ))
                     if uidhash not in granted_users:
                         cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], comment['id'], message_tag['type'], idhash, None  ))
@@ -150,7 +150,7 @@ def process_place_data ( uidhash, profile ) :
             if 'with' in edu_keys:
                 for person in edu_place['with']:
                     person['place_id'] = place_id
-                    idhash = hashlib.sha1(person['name'].encode("utf-8") + person['id']).hexdigest()
+                    idhash = hashlib.sha1( person['id']).hexdigest()
                     person['idhash'] = idhash
                 with_data += edu_place['with']
         del profile['education'] # delete the processed data
@@ -203,7 +203,7 @@ def process_place_data ( uidhash, profile ) :
                 work_with = [dict(user_tuple) for user_tuple in set([tuple(user.items()) for user in all_with])]
                 for person in work_with:
                     person['place_id'] = place_id
-                    idhash = hashlib.sha1(person['name'].encode("utf-8") + person['id']).hexdigest()
+                    idhash = hashlib.sha1(person['id']).hexdigest()
                     person['idhash'] = idhash
                 with_data += work_with
         del profile['work'] # delete the processed data
@@ -231,7 +231,7 @@ def async_reaction ( data ):
                     while post['reactions']['data']:
                         reaction =  post['reactions']['data'].pop(0) #post['reactions']['data'][index_r]
                         try:
-                            idhash = hashlib.sha1(reaction['name'].encode("utf-8") + reaction['id']).hexdigest()
+                            idhash = hashlib.sha1( reaction['id']).hexdigest()
                             l.append ( ( idhash, reaction['id'], reaction['name'] ) )
                             #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
                             if uidhash not in granted_users:
@@ -303,7 +303,7 @@ def async_tag ( data ):
             try: # if there is not type of story_tag don't add
                 if story_tag['type'] == 'user':
                     if story_tag['id'] <> uid:
-                        idhash = hashlib.sha1(story_tag['name'].encode("utf-8") + story_tag['id']).hexdigest()
+                        idhash = hashlib.sha1( story_tag['id']).hexdigest()
                         l.append ( ( idhash, story_tag['id'], story_tag['name'] ) )
                         #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
                         if uidhash not in granted_users:
@@ -405,7 +405,7 @@ def process_posts_data(uid, uidhash, posts, granted_users, statistics, cur):
                         while post['reactions']['data']:
                             reaction =  post['reactions']['data'].pop(0) #post['reactions']['data'][index_r]
                             try:
-                                idhash = hashlib.sha1(reaction['name'].encode("utf-8") + reaction['id']).hexdigest()
+                                idhash = hashlib.sha1( reaction['id']).hexdigest()
                                 cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
                                 if uidhash not in granted_users:
                                     cur.execute("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", ( idhash, post['id'], None, reaction['type'] ))
@@ -448,7 +448,7 @@ def process_posts_data(uid, uidhash, posts, granted_users, statistics, cur):
                 try: # if there is not type of story_tag don't add
                     if story_tag['type'] == 'user':
                         if story_tag['id'] <> uid:
-                            idhash = hashlib.sha1(story_tag['name'].encode("utf-8") + story_tag['id']).hexdigest()
+                            idhash = hashlib.sha1( story_tag['id']).hexdigest()
                             cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
                             if uidhash not in granted_users:
                                 cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], idhash, None ))
@@ -577,7 +577,7 @@ def process_relationship_data ( uidhash, data ) :
     users_to_relationship = []
     if all_users <> []:
         for user in all_users:
-            idhash = hashlib.sha1(user['name'].encode("utf-8") + user['id']).hexdigest()
+            idhash = hashlib.sha1( user['id']).hexdigest()
             users_to_db.append ({ 'idhash':idhash, 'id':user['id'], 'name':user['name']} )
             user_keys = user.keys()
             if 'relationship' in user_keys:
