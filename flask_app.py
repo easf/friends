@@ -5,7 +5,7 @@ import MySQLdb
 from flask import Flask, url_for, render_template, jsonify, request, redirect
 from flaskext.mysql import MySQL
 from PrefixMiddleware import PrefixMiddleware
-
+import socket, errno, time
 
 # Facebook app details
 FB_APP_ID = '1733963700184652'
@@ -79,5 +79,32 @@ def survey():
     else:
         return render_template('thankyou.html')
 
+@app.errorhandler(500)
+def internal_error(error):
+
+    return "Wrong things happened :'( , can you reload the page please"
+
+@app.errorhandler(404)
+def not_found(error):
+    return "404 error",404
+
 if __name__ == "__main__":
-    app.run(debug=False)
+    try:
+        app.run(debug=False, threaded=True)    
+    except socket.error, e:
+        if isinstance(e.args, tuple):
+            print "errno is %d" % e[0]
+            if e[0] == errno.EPIPE:
+               # remote peer disconnected
+               print "Detected remote disconnect"
+            else:
+               # determine and handle different error
+               pass
+        else:
+            print "socket error ", error
+    except IOError, e:
+        # Hmmm, Can IOError actually be raised by the socket module?
+        print "Got IOError: ", e
+
+
+    

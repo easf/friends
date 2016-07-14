@@ -460,47 +460,6 @@ def process_posts_data(uid, uidhash, posts, granted_users, statistics, cur):
                 except KeyError:
                     pass
 
-#         pool = Pool(processes = None)
-        
-#         l = manager.list()
-#         rl = manager.list()
-
-#         r1 = pool.apply_async ( async_reaction, [(post, uidhash, post_reactions_summary_total_count, l, rl )] )
-
-#         r2 = pool.apply_async ( async_comment, [(post, uidhash, post_comments_summary_total_count, l, rl)] ) 
-        
-#         r3 = pool.apply_async ( async_tag, [(post, uidhash, uid, l)] ) 
-
-#         r1.get()
-#         r2.get()
-#         r3.get()
-#                     message_tags_users.append({'post_id':post['id'], 'comment_id':comment['id'],'idhash':idhash, 'id':message_tag['id'], 'name':message_tag['name'], 'type':message_tag['type'], 'page_id':None})
-#         pool.close()
-#         pool.join()
-
-#         l = list ( set(list(l) ) )
-#         cur.executemany( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", l ) 
-#         rl = list ( set(list(rl)) )
-#         cur.executemany("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", rl)
-
-
-        #else story_tag still empty
-        #del posts['posts']['data'][index_c]
-        #c+=1
-
-    #print c
-
-    # cur.execute ("ALTER TABLE `post` ENABLE KEYS")
-    # cur.execute ("ALTER TABLE `comment` ENABLE KEYS")
-    # cur.execute ("ALTER TABLE `reaction` ENABLE KEYS")
-    # cur.execute ("ALTER TABLE `tag` ENABLE KEYS")
-    # cur.execute ("ALTER TABLE `comment_has_comment` ENABLE KEYS")
-    # cur.execute ("ALTER TABLE `user` ENABLE KEYS")
-    
-  #  cur.execute ("SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS")
-    
-#    cur.execute ("SET UNIQUE_CHECKS = 1")
-
 
     
 def process_profile_data (profile):

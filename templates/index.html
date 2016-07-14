@@ -23,13 +23,14 @@
       // they are logged into this app or not.
       document.getElementById('status').innerHTML = 'Please log ' +
         'into Facebook.';
+
     }
   }
 
   // This function is called when someone finishes with the Login
   // Button.  See the onlogin handler attached to it in the sample
   // code below.
-  function checkLoginState() {
+  function checkLoginState() { 
     FB.getLoginStatus(function(response) {
       statusChangeCallback(response);
     });
@@ -77,63 +78,45 @@
   // successful.  See statusChangeCallback() for when this call is made.
   function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);       
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!' ;
-      //console.log('path content: '+ $SCRIPT_ROOT + '/data');                                                                                
-   $('#loading-image').show(); 
-   $.getJSON($SCRIPT_ROOT + '/data', {
-                token: FB.getAuthResponse()['accessToken'],
-                uid: FB.getAuthResponse()['userID']
-              }, 
-              function(data){
-                  $('#loading-image').hide();
-                  $('#fb-login').hide();
-                  $('#ranking').show();
-                  //$("#result").text(data.result);
-              }
-              );
+    emessage = document.getElementById("emessage");
+    
+    try {
+        FB.api('/me', function(response) { 
+          console.log('Successful login for: ' + response.name);       
+          document.getElementById('status').innerHTML =
+            'Thanks for logging in, ' + response.name + '!' ;
 
 
-    });
+          $.getJSON($SCRIPT_ROOT + '/data', {
+              token: FB.getAuthResponse()['accessToken'],
+              uid: FB.getAuthResponse()['userID']
+            }, 
+
+            function(data){
+              $('#loading-image').hide();
+              $('#fb-login').hide();
+              $('#ranking').show();
+              //$("#result").text(data.result);
+            });
+        });
+    }
+
+    catch(err) {
+        emessage.innerHTML = "Input is " + err;
+    }
   }
 
 
 </script>
-<!--
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Friends</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </div><!--/.nav-collapse 
-      </div>
-    </nav>
--->
     <div class="container">
-
+    <span id="emessage"></span>
       <div class="starter-template">
         <h1>DREAM Project</h1>
         <p class="lead">Please, help us to achieve our dream</p>
-        
             <fb:login-button id="fb-login" data-size="xlarge" scope="public_profile, user_work_history, user_education_history, user_hometown, user_location, user_friends, user_likes, user_posts, user_relationships, user_relationship_details, user_religion_politics, user_birthday" onlogin="checkLoginState();">
             <!--permissions we could consider later: user_photos, user_videos, read_custom_friendlists, user_events-->
             </fb:login-button>
             <!--<span id="result"></span>-->
-
         <form id="myform" method="post" action="{{ url_for('ranking') }}" onsubmit="return loading()">
             <div id="status">
             </div>
@@ -141,33 +124,29 @@
             <img src="static/src/Loading_icon.gif" id="loading-image">
             <button type="submit" id="ranking" class="btn btn-default btn-lg" style="display:none;">Next</button>
         </form>
-        <!--<span id="result">?</span>-->
       </div>
-      
-
     </div><!-- /.container -->
 
-<script> 
- function loading (){
-     $('#ranking').hide();
-     $('#loading-image').show();
-     return true;
-  } 
-</script>
+  <script> 
+   function loading (){
+       $('#ranking').hide();
+       $('#loading-image').show();
+       return true;
+    } 
+  </script>
 
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="static/js/vendor/jquery.min.js"><\/script>')</script>
-<script src="static/js/bootstrap.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="static/js/ie10-viewport-bug-workaround.js"></script>
-<script src="static/js/jquery-1.12.4.js"></script>
-<script src="static/js/jquery.validate.js"></script>
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="static/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="static/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="static/js/jquery-1.12.4.js"></script>
+  <script src="static/js/jquery.validate.js"></script>
 
 {% endblock %}
 
