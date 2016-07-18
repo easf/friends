@@ -390,6 +390,61 @@ CREATE TABLE IF NOT EXISTS `friendsdb`.`common_aspect` (
 ENGINE = InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 --
+-- Temporary view structure for view `most_comments`
+--
+
+DROP TABLE IF EXISTS `most_comments`;
+/*!50001 DROP VIEW IF EXISTS `most_comments`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE VIEW `most_comments` AS SELECT 
+ 1 AS `po_fbid`,
+ 1 AS `po_id`,
+ 1 AS `post_owner`,
+ 1 AS `friend_fbid`,
+ 1 AS `friend_id`,
+ 1 AS `friend`,
+ 1 AS `total_interactions`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `most_reactions`
+--
+
+DROP TABLE IF EXISTS `most_reactions`;
+/*!50001 DROP VIEW IF EXISTS `most_reactions`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE VIEW `most_reactions` AS SELECT 
+ 1 AS `po_fbid`,
+ 1 AS `po_id`,
+ 1 AS `post_owner`,
+ 1 AS `friend_fbid`,
+ 1 AS `friend_id`,
+ 1 AS `friend`,
+ 1 AS `total_interactions`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `most_tagged`
+--
+
+DROP TABLE IF EXISTS `most_tagged`;
+/*!50001 DROP VIEW IF EXISTS `most_tagged`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE VIEW `most_tagged` AS SELECT 
+ 1 AS `po_fbid`,
+ 1 AS `po_id`,
+ 1 AS `post_owner`,
+ 1 AS `friend_fbid`,
+ 1 AS `friend_id`,
+ 1 AS `friend`,
+ 1 AS `total_interactions`*/;
+SET character_set_client = @saved_cs_client;
+
+
+--
 -- Temporary view structure for view `comments_replied_by_comment`
 --
 
@@ -497,59 +552,7 @@ SET character_set_client = utf8;
  1 AS `total_interaction`*/;
 SET character_set_client = @saved_cs_client;
 
---
--- Temporary view structure for view `most_comments`
---
 
-DROP TABLE IF EXISTS `most_comments`;
-/*!50001 DROP VIEW IF EXISTS `most_comments`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `most_comments` AS SELECT 
- 1 AS `po_fbid`,
- 1 AS `po_id`,
- 1 AS `post_owner`,
- 1 AS `friend_fbid`,
- 1 AS `friend_id`,
- 1 AS `friend`,
- 1 AS `total_interactions`*/;
-SET character_set_client = @saved_cs_client;
-
---
--- Temporary view structure for view `most_reactions`
---
-
-DROP TABLE IF EXISTS `most_reactions`;
-/*!50001 DROP VIEW IF EXISTS `most_reactions`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `most_reactions` AS SELECT 
- 1 AS `po_fbid`,
- 1 AS `po_id`,
- 1 AS `post_owner`,
- 1 AS `friend_fbid`,
- 1 AS `friend_id`,
- 1 AS `friend`,
- 1 AS `total_interactions`*/;
-SET character_set_client = @saved_cs_client;
-
---
--- Temporary view structure for view `most_tagged`
---
-
-DROP TABLE IF EXISTS `most_tagged`;
-/*!50001 DROP VIEW IF EXISTS `most_tagged`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `most_tagged` AS SELECT 
- 1 AS `po_fbid`,
- 1 AS `po_id`,
- 1 AS `post_owner`,
- 1 AS `friend_fbid`,
- 1 AS `friend_id`,
- 1 AS `friend`,
- 1 AS `total_interactions`*/;
-SET character_set_client = @saved_cs_client;
 
 --
 -- Temporary view structure for view `ratio_amount_replied`
@@ -568,6 +571,61 @@ SET character_set_client = utf8;
  1 AS `friend`,
  1 AS `interaction_ratio`*/;
 SET character_set_client = @saved_cs_client;
+
+
+--
+-- Final view structure for view `most_comments`
+--
+
+/*!50001 DROP VIEW IF EXISTS `most_comments`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `most_comments` AS select `u`.`id` AS `po_fbid`,`u`.`idhash` AS `po_id`,`u`.`name` AS `post_owner`,`u2`.`id` AS `friend_fbid`,`u2`.`idhash` AS `friend_id`,`u2`.`name` AS `friend`,count(`r`.`id`) AS `total_interactions` from ((((`user` `u` join `profile` `p` on((`u`.`idhash` = `p`.`user_idhash`))) join `post` `pt` on((`p`.`user_idhash` = `pt`.`user_idhash`))) join `comment` `r` on((`pt`.`id` = `r`.`post_id`))) join `user` `u2` on((`r`.`user_idhash` = `u2`.`idhash`))) where (`u`.`name` <> `u2`.`name`) group by `u`.`idhash`,`u2`.`idhash`,`u`.`name`,`u2`.`name`,`u`.`id`,`u2`.`id` order by `u`.`name`,count(`r`.`id`) desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `most_reactions`
+--
+
+/*!50001 DROP VIEW IF EXISTS `most_reactions`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `most_reactions` AS select `u`.`id` AS `po_fbid`,`u`.`idhash` AS `po_id`,`u`.`name` AS `post_owner`,`u2`.`id` AS `friend_fbid`,`u2`.`idhash` AS `friend_id`,`u2`.`name` AS `friend`,count(`r`.`id`) AS `total_interactions` from ((((`user` `u` join `profile` `p` on((`u`.`idhash` = `p`.`user_idhash`))) join `post` `pt` on((`p`.`user_idhash` = `pt`.`user_idhash`))) join `reaction` `r` on((`pt`.`id` = `r`.`post_id`))) join `user` `u2` on((`r`.`user_idhash` = `u2`.`idhash`))) where (`u`.`name` <> `u2`.`name`) group by `u`.`idhash`,`u2`.`idhash`,`u`.`name`,`u2`.`name`,`u`.`id`,`u2`.`id` order by `u`.`name`,count(`r`.`id`) desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `most_tagged`
+--
+
+/*!50001 DROP VIEW IF EXISTS `most_tagged`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `most_tagged` AS select `u`.`id` AS `po_fbid`,`u`.`idhash` AS `po_id`,`u`.`name` AS `post_owner`,`u2`.`id` AS `friend_fbid`,`u2`.`idhash` AS `friend_id`,`u2`.`name` AS `friend`,count(`r`.`id`) AS `total_interactions` from ((((`user` `u` join `profile` `p` on((`u`.`idhash` = `p`.`user_idhash`))) join `post` `pt` on((`p`.`user_idhash` = `pt`.`user_idhash`))) join `tag` `r` on((`pt`.`id` = `r`.`post_id`))) join `user` `u2` on((`r`.`user_idhash` = `u2`.`idhash`))) where (`u`.`name` <> `u2`.`name`) group by `u`.`idhash`,`u2`.`idhash`,`u`.`name`,`u2`.`name`,`u`.`id`,`u2`.`id` order by `u`.`name`,count(`r`.`id`) desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
 -- Final view structure for view `comments_replied_by_comment`
@@ -677,59 +735,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
 
---
--- Final view structure for view `most_comments`
---
 
-/*!50001 DROP VIEW IF EXISTS `most_comments`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `most_comments` AS select `u`.`id` AS `po_fbid`,`u`.`idhash` AS `po_id`,`u`.`name` AS `post_owner`,`u2`.`id` AS `friend_fbid`,`u2`.`idhash` AS `friend_id`,`u2`.`name` AS `friend`,count(`r`.`id`) AS `total_interactions` from ((((`user` `u` join `profile` `p` on((`u`.`idhash` = `p`.`user_idhash`))) join `post` `pt` on((`p`.`user_idhash` = `pt`.`user_idhash`))) join `comment` `r` on((`pt`.`id` = `r`.`post_id`))) join `user` `u2` on((`r`.`user_idhash` = `u2`.`idhash`))) where (`u`.`name` <> `u2`.`name`) group by `u`.`idhash`,`u2`.`idhash`,`u`.`name`,`u2`.`name`,`u`.`id`,`u2`.`id` order by `u`.`name`,count(`r`.`id`) desc */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `most_reactions`
---
-
-/*!50001 DROP VIEW IF EXISTS `most_reactions`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `most_reactions` AS select `u`.`id` AS `po_fbid`,`u`.`idhash` AS `po_id`,`u`.`name` AS `post_owner`,`u2`.`id` AS `friend_fbid`,`u2`.`idhash` AS `friend_id`,`u2`.`name` AS `friend`,count(`r`.`id`) AS `total_interactions` from ((((`user` `u` join `profile` `p` on((`u`.`idhash` = `p`.`user_idhash`))) join `post` `pt` on((`p`.`user_idhash` = `pt`.`user_idhash`))) join `reaction` `r` on((`pt`.`id` = `r`.`post_id`))) join `user` `u2` on((`r`.`user_idhash` = `u2`.`idhash`))) where (`u`.`name` <> `u2`.`name`) group by `u`.`idhash`,`u2`.`idhash`,`u`.`name`,`u2`.`name`,`u`.`id`,`u2`.`id` order by `u`.`name`,count(`r`.`id`) desc */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `most_tagged`
---
-
-/*!50001 DROP VIEW IF EXISTS `most_tagged`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `most_tagged` AS select `u`.`id` AS `po_fbid`,`u`.`idhash` AS `po_id`,`u`.`name` AS `post_owner`,`u2`.`id` AS `friend_fbid`,`u2`.`idhash` AS `friend_id`,`u2`.`name` AS `friend`,count(`r`.`id`) AS `total_interactions` from ((((`user` `u` join `profile` `p` on((`u`.`idhash` = `p`.`user_idhash`))) join `post` `pt` on((`p`.`user_idhash` = `pt`.`user_idhash`))) join `tag` `r` on((`pt`.`id` = `r`.`post_id`))) join `user` `u2` on((`r`.`user_idhash` = `u2`.`idhash`))) where (`u`.`name` <> `u2`.`name`) group by `u`.`idhash`,`u2`.`idhash`,`u`.`name`,`u2`.`name`,`u`.`id`,`u2`.`id` order by `u`.`name`,count(`r`.`id`) desc */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
 -- Final view structure for view `ratio_amount_replied`
