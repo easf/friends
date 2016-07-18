@@ -375,7 +375,7 @@ CREATE TABLE IF NOT EXISTS `friendsdb`.`common_aspect` (
   `type` VARCHAR(64) NULL,
   `description` VARCHAR(128) NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_user_has_user_user4_idx` (`user_idhash1` ASC),xx
+  INDEX `fk_user_has_user_user4_idx` (`user_idhash1` ASC),
   INDEX `fk_user_has_user_user3_idx` (`user_idhash` ASC),
   CONSTRAINT `fk_user_has_user_user3`
     FOREIGN KEY (`user_idhash`)
@@ -388,10 +388,6 @@ CREATE TABLE IF NOT EXISTS `friendsdb`.`common_aspect` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-
-
-
-
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
