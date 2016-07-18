@@ -1,7 +1,6 @@
 # coding=utf-8
 import config
 import procedures
-import MySQLdb
 from flask import Flask, url_for, render_template, jsonify, request, redirect
 from flaskext.mysql import MySQL
 from PrefixMiddleware import PrefixMiddleware
@@ -34,17 +33,17 @@ mysql.init_app(app)
 uidhash = None
 current_close_user = None
 closer_users = []
-ranking = []
+list_of_friends = []
 token = None
 
-@app.route('/ranking', methods=['GET','POST'])
-def ranking():
-    global ranking    
-    ranking = procedures.get_ranking(uidhash, mysql, token)    
-    return render_template('ranking.html', users=ranking)
+@app.route('/connectedness', methods=['GET','POST'])
+def connectedness():
+    global list_of_friends    
+    list_of_friends = procedures.get_list_of_friends(uidhash, mysql, token)    
+    return render_template('closeness.html', users=list_of_friends)
 
-@app.route('/data')
-def data():
+@app.route('/userdata')
+def userdata():
     global uidhash
     global token
     token = request.args.get('token', 0, type=str)
@@ -57,11 +56,12 @@ def index():
     return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION)
 
 
-@app.route('/hello', methods=['POST'])
-def hello():
+@app.route('/connectedata', methods=['GET','POST'] )
+def connectedata():
     global uidhash
     global closer_users
-    closer_users = procedures.closeness_filter( request, ranking, uidhash, mysql )
+    #print request.form
+    closer_users = procedures.store_connectedness_data( request, list_of_friends, uidhash, mysql )
     return redirect(url_for('survey'))
 
 @app.route('/survey', methods=['GET','POST'] )
@@ -69,7 +69,7 @@ def survey():
     global current_close_user
         
     #channels = channels = [{"id":"ftf", "name":"Face to face"}, {"id":"pc","name":"Phone Calls"}, {"id":"vc","name":"Video chats"}, {"id":"sn", "name":"Social Networks"}, {"id":"sms","name":"Messaging"}]
-    channels = channels = [{"id":"ftf", "name":"Face to face"}, {"id":"fb","name":"Facebook"}, {"id":"other","name":"Other remote channels"}]
+    channels = channels = [{"id":"f2f", "name":"Face to face"}, {"id":"online","name":"Online"}]
     if request.method == 'POST':
         procedures.insert_survey_data( request, uidhash, current_close_user, mysql )
     #closer_users = [{"id":"0" ,"name":"Emanuel Sanchiz", 'pic':"https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/13124828_1405791279447233_1812688549634903355_n.jpg?oh=85e93710c4000544ccadbe2535cdf09e&oe=57EC99C8"}]
@@ -105,6 +105,7 @@ if __name__ == "__main__":
     except IOError, e:
         # Hmmm, Can IOError actually be raised by the socket module?
         print "Got IOError: ", e
+
 
 
     

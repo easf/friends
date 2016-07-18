@@ -1,0 +1,90 @@
+.welcome, .question {
+  margin-top: 70px;
+}
+.welcome h1, .question h1 {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-weight: 300;
+}
+.welcome h1 {
+  font-size: 5em;
+}
+.question h1 {
+  font-size: 3em;
+}
+
+
+.logo {
+  height: 110%;
+}
+nav.navbar-white {
+  background-color: white;
+}
+
+.etc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;  
+}
+
+.friend .name {
+  font-size: 1.5em;
+  padding-left: 5px;
+}
+
+.friend .lead {
+  padding-left: 10px;
+}
+
+.friend .form-group.gender {
+  margin-top: 10px;
+}
+
+.closeness {
+  margin-top: 10px;
+}
+
+.closeness img {
+  max-height: 70px;
+}
+.closeness label {
+  min-width: 145px;
+}
+
+.closeness label:hover img, .closeness .selected img{
+  -webkit-filter: saturate(40) hue-rotate(180deg);
+  filter: saturate(40) hue-rotate(180deg);    
+}
+
+.interactions  label:first-child {
+  min-width: 230px;
+}
+
+.score {
+  position: absolute;
+  width: 200px;
+  margin-left: -200px;
+}
+.score h4{
+  margin-top: 0;
+}
+
+
+@media (max-width: 1000px) {
+  .radio-desc {
+    display: block;
+  }
+}
+@media (max-width: 430px) {
+  .interactions .radio-inline, .closeness .radio-inline {
+    display: block;
+  }    
+}
+
+@media (max-width: 768px){
+  .score {
+    width: 200px;
+    top: 15px;
+    right: 0;
+  }    
+}
+

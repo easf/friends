@@ -1,15 +1,15 @@
 # coding=utf-8
 from multiprocessing import Process, Queue, Pool, Manager
 import multiprocessing.pool
-#import Queue
 import facebook, collections, hashlib, data_processing
 import sys
 import time, hashlib, langdetect, json, requests, config
 from functools import partial
+import numpy as np
+import random
 
 reload(sys)  
 sys.setdefaultencoding('utf8')
-
 
 NO = 0
 YES = 1
@@ -105,7 +105,7 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
         except KeyError:
             comment_summary_total_count = None
         try:
-            comment_likes_total_count = comment['comments']['summary']['total_count'] # for the most inner comment I don't retriever the inner comments related (leaf)
+            comment_likes_total_count = comment['likes']['summary']['total_count'] # for the most inner comment I don't retriever the inner comments related (leaf)
         except KeyError:
             comment_likes_total_count = None
         try: #if 'from' in comment_keys:
@@ -136,27 +136,16 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
 
         if 'message' in comment_keys:
             message_length = len(comment['message'])
-        #     if message_length > 0:
-        #         try:
-        #             message_language = langdetect.detect(comment['message'])
-        #         except:
-        #             message_language = None
-        #             pass
-        #     else:
-        #         message_language = None
-        #     del comment['message']
         else:
             message_length = None
+        
         message_language = None
 
         #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, comment_from_id, comment_from_name ) )
         user_d_insertion.append ( ( idhash, comment_from_id, comment_from_name ) )
         #cur.execute("INSERT INTO comment ( id, post_id, user_idhash, created_time, language, has_picture, has_link, nreactions, ncomments, text_lenght ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE has_picture = VALUES(has_picture), has_link = VALUES(has_link), nreactions = VALUES(nreactions), ncomments = VALUES(ncomments), text_lenght = VALUES(text_lenght)", ( comment['id'], post['id'], idhash, created_time, message_language, has_picture, has_link, comment_likes_total_count, comment_summary_total_count, message_length ) )
-        comment_d_insertion.append( ( comment['id'], post['id'], idhash, created_time, message_language, has_picture, has_link, comment_likes_total_count, comment_summary_total_count, message_length ) )
-        try:
-            del comment['likes']['paging']
-        except KeyError:
-            pass
+        comment_d_insertion.append( ( comment['id'], post['id'], idhash, created_time, has_picture, has_link, comment_likes_total_count, comment_summary_total_count, message_length ) )
+
         try: #if 'likes' in comment_keys:
             if comment_likes_total_count > 0:
                 while comment['likes']['data']:
@@ -164,9 +153,9 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
                     idhash = hashlib.sha1( like['id']).hexdigest()
                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, like['id'], like['name'] ))
                     user_d_insertion.append ( ( idhash, like['id'], like['name'] ) )
-                    if uidhash not in granted_users:
+                    #if uidhash not in granted_users:
                         #cur.execute("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", ( idhash, post['id'], comment['id'], 'LIKE' ))
-                        reaction_d_insertion.append (( idhash, post['id'], comment['id'], 'LIKE' ))
+                    reaction_d_insertion.append (( idhash, post['id'], comment['id'], 'LIKE' ))
         except KeyError:
             pass
 
@@ -177,33 +166,18 @@ def process_comment_data (post, comment, comment_keys, uidhash, granted_users, c
                     idhash = hashlib.sha1( message_tag['id']).hexdigest()
                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, message_tag['id'], message_tag['name'] ))
                     user_d_insertion.append ( ( idhash, message_tag['id'], message_tag['name'] ) )
-                    if uidhash not in granted_users:
+                    #if uidhash not in granted_users:
                         #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], comment['id'], message_tag['type'], idhash, None  ))
-                        tag_d_insertion.append ( ( post['id'], comment['id'], message_tag['type'], idhash, None  ) )
+                    tag_d_insertion.append ( ( post['id'], comment['id'], message_tag['type'], idhash, None  ) )
                 elif message_tag['type'] == 'page':
                     #cur.execute("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", ( message_tag['id'], message_tag['name'], None, None ) )                    
                     page_d_insertion.append ( ( message_tag['id'], message_tag['name'], None, None ) )
-                    if uidhash not in granted_users:
+                    #if uidhash not in granted_users:
                          #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], None, message_tag['id'] ))
-                        tag_d_insertion.append ( ( post['id'], None, message_tag['type'], None, message_tag['id'] ) )                      
+                    tag_d_insertion.append ( ( post['id'], None, message_tag['type'], None, message_tag['id'] ) )                      
         except KeyError:
             pass
 
-def parallel_comment(post, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion, data):
-    comment = data
-    comment_keys = comment.keys()
-    process_comment_data ( post, comment, comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
-    if 'comments' in comment_keys:
-        try:
-            del comment['comments']['paging']
-        except KeyError:
-            pass
-        while comment['comments']['data']:
-            inner_comment = comment['comments']['data'].pop()
-            inner_comment_keys = inner_comment.keys()
-            process_comment_data ( post, inner_comment, inner_comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
-            comm_h_comm_insertion.append ( ( comment['id'], inner_comment['id'] ) )
-            #cur.execute ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", (comment['id'], inner_comment['id'] ))
 
 def process_posts_data( data ):
 # uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion, data
@@ -226,10 +200,6 @@ def process_posts_data( data ):
         granted_users = data[3]
         cur = data[4]
         statistics = data[5]
-
-#        cur = data[4]
-
-#cur.execute ("SET FOREIGN_KEY_CHECKS=0")
 
         data_from_queue = queue.get()
  
@@ -277,15 +247,6 @@ def process_posts_data( data ):
                     post_story = None
                 if 'message' in post_keys:
                     post_message_lenght = len(post['message'])
-                #     if post_message_lenght > 0:
-                #         try:
-                #             post_message_language = langdetect.detect(post['message'])
-                #         except:
-                #             post_message_language = None
-                #             pass
-                #     else:
-                #         post_message_language= None
-                #     del post['message']
                 else:
                     post_message_lenght = None
                 post_message_language = None
@@ -316,9 +277,8 @@ def process_posts_data( data ):
                 # ( post['post_id'], post['idhash'],post['created_time'], post['post_type'], post['story'], post['privacy'], post['text_length'], post['link'], post['nreactions'], post['ncomments'], post['application'], post['shares_count'], post['language'] )
                 end_time = time.time()
                 print  'Time processing only post_____: ' + post['id'] + ' num of exceptions: '+ str(e) + ' time -> '+ str(end_time - start_time) + '\n'
-                post_data = ( post['id'], uidhash, created_time, post_type, post_story, post_privacy, post_message_lenght, post_link, post_reactions_summary_total_count, post_comments_summary_total_count, post_app, post_shares_count, post_message_language )
+                post_data = ( post['id'], uidhash, created_time, post_type, post_story, post_privacy, post_message_lenght, post_link, post_reactions_summary_total_count, post_comments_summary_total_count, post_app )
                 post_d_insertion.append ( post_data )
-
 
                 #cur.execute( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_data )
                 if 'reactions' in post_keys:
@@ -335,8 +295,8 @@ def process_posts_data( data ):
                                         idhash = hashlib.sha1( reaction['id']).hexdigest()
                                         user_d_insertion.append ( ( idhash, reaction['id'], reaction['name'] ) )
                                         #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
-                                        if uidhash not in granted_users:
-                                            reaction_d_insertion.append ( ( idhash, post['id'], None, reaction['type'] ) )
+                                        #if uidhash not in granted_users:
+                                        reaction_d_insertion.append ( ( idhash, post['id'], None, reaction['type'] ) )
                                             #cur.execute("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", ( idhash, post['id'], None, reaction['type'] ))
                                     except KeyError:
                                         pass
@@ -368,12 +328,6 @@ def process_posts_data( data ):
                                                 process_comment_data ( post, inner_comment, inner_comment_keys, uidhash, granted_users, comment_d_insertion, reaction_d_insertion, tag_d_insertion, user_d_insertion, page_d_insertion)
                                                 comm_h_comm_insertion.append ( ( comment['id'], inner_comment['id'] ) )
 
-                                    #func = partial (parallel_comment, post, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
-                                    #pool = Pool(processes = NoDaemonProcess)
-                                    #pool.map ( func, post['comments']['data'])
-                                    #pool.close()
-                                    #pool.join()
-                                    #del post['comments']['data'][:]
                                 except KeyError:
                                     pass
                     except KeyError:
@@ -388,27 +342,24 @@ def process_posts_data( data ):
                                     idhash = hashlib.sha1( story_tag['id']).hexdigest()
                                     user_d_insertion.append ( ( idhash, story_tag['id'], story_tag['name'] )  )
                                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
-                                    if uidhash not in granted_users:
+                                    #if uidhash not in granted_users:
                                         #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], idhash, None ))
-                                        tag_d_insertion.append ( ( post['id'], None, story_tag['type'], idhash, None ) )
+                                    tag_d_insertion.append ( ( post['id'], None, story_tag['type'], idhash, None ) )
                             elif story_tag['type'] == 'page':
                                 #cur.execute("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", ( story_tag['id'], story_tag['name'], None, None ) )
                                 page_d_insertion.append (( story_tag['id'], story_tag['name'], None, None )  )
-                                if uidhash not in granted_users:
+                                #if uidhash not in granted_users:
                                     #cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
-                                    tag_d_insertion.append (  ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
+                                tag_d_insertion.append (  ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
                                 #story_tags_pages.append({'post_id':post['id'], 'comment_id':None , 'idhash':None, 'id':None, 'name':story_tag['name'], 'type':story_tag['type'], 'page_id':story_tag['id']})
                         except KeyError:
                             pass
-                                        
-                    #else:
-                    #    pass
 
 
                 cur.execute ("SET FOREIGN_KEY_CHECKS=0")
                 cur.executemany( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", user_d_insertion )
-                cur.executemany( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_d_insertion )
-                cur.executemany("INSERT INTO comment ( id, post_id, user_idhash, created_time, language, has_picture, has_link, nreactions, ncomments, text_lenght ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE has_picture = VALUES(has_picture), has_link = VALUES(has_link), nreactions = VALUES(nreactions), ncomments = VALUES(ncomments), text_lenght = VALUES(text_lenght)", comment_d_insertion ) 
+                cur.executemany( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application)", post_d_insertion )
+                cur.executemany("INSERT INTO comment ( id, post_id, user_idhash, created_time, has_picture, has_link, nreactions, ncomments, text_lenght ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE has_picture = VALUES(has_picture), has_link = VALUES(has_link), nreactions = VALUES(nreactions), ncomments = VALUES(ncomments), text_lenght = VALUES(text_lenght)", comment_d_insertion ) 
                 cur.executemany ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", comm_h_comm_insertion)                                        
                 cur.executemany("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", reaction_d_insertion)                                                
                 cur.executemany("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", tag_d_insertion)                            
@@ -420,65 +371,7 @@ def process_posts_data( data ):
                 del user_d_insertion[:]
                 del comm_h_comm_insertion[:]
                 del tag_d_insertion[:]
-                del page_d_insertion[:]    #    cur.execute ("SET FOREIGN_KEY_CHECKS=1")
-
-
-
-
-def parallel_code (data):
-    
-    manager = Manager()
-    post_d_insertion = manager.list()
-    comment_d_insertion = manager.list()
-    reaction_d_insertion = manager.list()
-    user_d_insertion = manager.list()
-    comm_h_comm_insertion = manager.list()
-    tag_d_insertion = manager.list()
-    page_d_insertion = manager.list()
-    c= 0
-    while True:
-        queue = data[0]
-        uid = data[1]
-        uidhash = data[2]
-        granted_users = data[3]
-        cur = data[4]
-        statistics = data[5]
-        data_from_queue = queue.get()
-        c+=1
-        if data_from_queue == 'DONE':
-            print 'Llamadas process', c
-            break
-        else:
-            print "Process", len ( data_from_queue )
-            if data_from_queue <> []:
-                func = partial (process_posts_data, uid, uidhash, granted_users, post_d_insertion, comment_d_insertion, reaction_d_insertion, user_d_insertion, comm_h_comm_insertion, tag_d_insertion, page_d_insertion )
-
-                pool = Pool( processes = None )
-                start_time = time.time()
-                pool.map ( func, data_from_queue )
-
-                pool.close()
-                pool.join()
-                end_time = time.time()
-                print  'Time processing data_____' + str(c) + ': ' + str(end_time - start_time) + '\n' 
-                print 'mbaeeeeeee'
-
-                cur.execute ("SET FOREIGN_KEY_CHECKS=0")
-                cur.executemany( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", user_d_insertion )
-                cur.executemany( "INSERT INTO post ( id, user_idhash, created_time, type, story, privacy, text_length, link, nreactions, ncomments, application, shares_count, language ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE type = VALUES(type), story = VALUES(story), privacy= VALUES(privacy), text_length= VALUES(text_length), link= VALUES(link), nreactions= VALUES(nreactions), ncomments = VALUES(ncomments), application = VALUES(application), shares_count = VALUES(shares_count), language = VALUES(language)", post_d_insertion )
-                cur.executemany("INSERT INTO comment ( id, post_id, user_idhash, created_time, language, has_picture, has_link, nreactions, ncomments, text_lenght ) " "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE has_picture = VALUES(has_picture), has_link = VALUES(has_link), nreactions = VALUES(nreactions), ncomments = VALUES(ncomments), text_lenght = VALUES(text_lenght)", comment_d_insertion ) 
-                cur.executemany ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", comm_h_comm_insertion)                                        
-                cur.executemany("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", reaction_d_insertion)                                                
-                cur.executemany("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", tag_d_insertion)                            
-                cur.executemany("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", page_d_insertion )
-                cur.execute ("SET FOREIGN_KEY_CHECKS=1")
-                del post_d_insertion[:]
-                del comment_d_insertion[:]
-                del reaction_d_insertion[:]
-                del user_d_insertion[:]
-                del comm_h_comm_insertion[:]
-                del tag_d_insertion[:]
-                del page_d_insertion[:]
+                del page_d_insertion[:]  
 
 # database insertions and queries
 def verify_existence_in_database ( data, cur, band ):
@@ -516,11 +409,13 @@ def verify_existence_in_database ( data, cur, band ):
     return data_to_add_in_db
 
 def get_granted_users(cur):
-    cur.execute("SELECT user_idhash from profile")
+    cur.execute("SELECT idhash, granted_permissions from user")
     result = cur.fetchall()
     granted_users = []
     for row in result:
-        granted_users.append(row[0])
+        if row[1] <> None:
+            if row[1] == True:
+                granted_users.append(row[0])
     return granted_users
 
 def download_data(uid, token, mysql):
@@ -536,34 +431,6 @@ def download_data(uid, token, mysql):
     graph = facebook.GraphAPI(access_token=token, timeout=float(60.0), version='2.6')
     end_time = time.time()
     statistics.write( 'Time processing graph api initialization: ' + str(end_time - start_time) + '\n' )
-
-    """
-    FROM dev.mysql.com
-
-    syntaxcursor.execute(operation, params=None, multi=False)
-
-    insert_stmt = (
-      "INSERT INTO employees (emp_no, first_name, last_name, hire_date) "
-      "VALUES (%s, %s, %s, %s)"
-    )
-    data = (2, 'Jane', 'Doe', datetime.date(2012, 3, 23))
-    cursor.execute(insert_stmt, data)
-
-    select_stmt = "SELECT * FROM employees WHERE emp_no = %(emp_no)s"
-    cursor.execute(select_stmt, { 'emp_no': 2 })
-
-
-    syntax: cursor.executemany(operation, seq_of_params)
-
-    data = [
-      ('Jane', date(2005, 2, 12)),
-      ('Joe', date(2006, 5, 23)),
-      ('John', date(2010, 10, 3)),
-    ]
-    stmt = "INSERT INTO employees (first_name, hire_date) VALUES (%s, %s)"
-    cursor.executemany(stmt, data)
-
-    """
 
     """ 
 
@@ -590,30 +457,30 @@ def download_data(uid, token, mysql):
     # generate a hash code based on name and pass
     # for non-ascii symbols (e.g accents) -> use unicode _string = u"años luz detrás" -> _string.encode("utf-8")
     uidhash = hashlib.sha1( uid).hexdigest()
-
-    # prepare user data for insertion into db
-    current_user_data = [(uidhash, user_id, user_name)]
-    person_to_add = [{'idhash':uidhash, 'id':user_id, 'name':user_name}]
-
-    
-    # carry at bottom
-    # verify if user exists in db
-    start_time = time.time()
-    person_to_add = verify_existence_in_database (person_to_add, cur, 'user')
-
-# insertion 1    
-    if person_to_add <> []:
-        insertion_statement = ("INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s)")    
-        cur.executemany( insertion_statement, current_user_data)
-    
-    end_time = time.time()
-    statistics.write( 'Time verifying the existence and insertion of current user in DB: ' + str(end_time - start_time) + '\n' )
-    """
-    Data for relationship table
-
-    """
-    granted_users = get_granted_users (cur)
+    granted_users = get_granted_users(cur)
     if uidhash not in granted_users:
+        # prepare user data for insertion into db
+        current_user_data = [(uidhash, user_id, user_name)]
+        person_to_add = [{'idhash':uidhash, 'id':user_id, 'name':user_name}]
+
+        
+        # carry at bottom
+        # verify if user exists in db
+        start_time = time.time()
+        person_to_add = verify_existence_in_database (person_to_add, cur, 'user')
+
+  
+        if person_to_add <> []:
+            insertion_statement = ("INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s)")    
+            cur.executemany( insertion_statement, current_user_data)
+        
+        end_time = time.time()
+        statistics.write( 'Time verifying the existence and insertion of current user in DB: ' + str(end_time - start_time) + '\n' )
+        """
+        Data for relationship table
+
+        """
+
         family = None
         significant_other = None
 
@@ -625,29 +492,20 @@ def download_data(uid, token, mysql):
             significant_other = profile['significant_other']
             del profile['significant_other']
 
-        # get data from facebook
-#        start_time = time.time()
-        #friends = profile #graph.get_connections (id=uid, connection_name= '?fields=friends.limit(5000)')
-#        end_time = time.time()
-#        statistics.write( 'Time processing get friends: ' + str(end_time - start_time) + '\n' )
-        
-        start_time = time.time()
+            
         relationships = data_processing.process_relationship_data ( uidhash, { 'family':family, 'significant_other':significant_other, 'friends':profile['friends'] } )
         del profile['friends']
-#        end_time = time.time()
-#        statistics.write( 'Time processing relationship data: ' + str(end_time - start_time) + '\n' )        
-        # { 'users_to_db':users_to_db, 'users_to_relationship':users_to_relationship }
+
         relations_user_data = verify_existence_in_database( relationships['users_to_db'], cur, 'user' )
-# insertion 2
+
         if relations_user_data <> []:
             insertion_statement = ("INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash")
             cur.executemany( insertion_statement, relations_user_data)
         del relations_user_data[:]
-        #start_time = time.time()
+
         relationships_data = []
         for relationship in relationships['users_to_relationship']:
             relationships_data.append ( ( relationship['uidhash'], relationship['idhash'], relationship['relationship_type'], relationship['description'] ) )
-#insertion 3
 
         if relationships_data <> []:
             insertion_statement = ("INSERT INTO relationship ( user_idhash, user_idhash1, relationship_type, description ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE relationship_type = VALUES(relationship_type), description = VALUES(description)")
@@ -665,39 +523,28 @@ def download_data(uid, token, mysql):
                         friends_of_friend.append(row[0])
                     if uidhash not in friends_of_friend:
                         cur.execute ( 'INSERT INTO relationship (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE user_idhash = user_idhash', ( user['idhash'], uidhash, 'friendship', 'friend' )  )
-                        #completing_friendships.append ( ( user['idhash'], uidhash, 'friendship', 'friend' ) )
-# insertion 4
-#        insertion_statement = 'INSERT INTO relationship (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE user_idhash = user_idhash'
- #       cur.executemany( insertion_statement, completing_friendships )                        
+                        #completing_friendships.append ( ( user['idhash'], uidhash, 'friendship', 'friend' ) )                     
+  
+        """
+        Data for place, user_with_in_place table
 
-        end_time = time.time()
-        statistics.write( 'Time processing and inserting relationship data: ' + str(end_time - start_time) + '\n' )        
-    """
-    Data for place, user_with_in_place table
+        """
+        places = data_processing.process_place_data (uidhash, profile) # it returns the list of places for current user 
+        places_user_data = places['place_data']
+        del places['place_data']
+        if places_user_data <> []: 
+            insertion_statement = ("INSERT INTO place ( id, type, name, school_type ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id")
+            cur.executemany (insertion_statement, places_user_data)
+        del places_user_data[:]
 
-    """
-    start_time = time.time()
-    places = data_processing.process_place_data (uidhash, profile) # it returns the list of places for current user 
-# insertion 5
-    places_user_data = places['place_data']
-    del places['place_data']
-    if places_user_data <> []: 
-        insertion_statement = ("INSERT INTO place ( id, type, name, school_type ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id")
-        cur.executemany (insertion_statement, places_user_data)
-    del places_user_data[:]
-# insertion 6
-    user_has_place_data = places['user_has_place']
-    del places['user_has_place']
-    if user_has_place_data <> []:
-        insertion_statement = ("INSERT INTO user_has_place ( user_idhash, place_id ) " "VALUES ( %s, %s ) ON DUPLICATE KEY UPDATE user_idhash = user_idhash")
-        cur.executemany (insertion_statement, user_has_place_data)
-    del user_has_place_data[:]
+        user_has_place_data = places['user_has_place']
+        del places['user_has_place']
+        if user_has_place_data <> []:
+            insertion_statement = ("INSERT INTO user_has_place ( user_idhash, place_id ) " "VALUES ( %s, %s ) ON DUPLICATE KEY UPDATE user_idhash = user_idhash")
+            cur.executemany (insertion_statement, user_has_place_data)
+        del user_has_place_data[:]
 
-#    granted_users = get_granted_users (cur)
-#granted_users was calculated above
 
-# insertion 7
-    if uidhash not in granted_users:
         place_details_data = places['user_in_place_details']
         del places['user_in_place_details']
         if place_details_data <> []:
@@ -705,171 +552,258 @@ def download_data(uid, token, mysql):
             cur.executemany (insertion_statement, place_details_data)
         del place_details_data[:]
 
-    user_data = []
-    user_data = verify_existence_in_database (places['with_data'], cur, 'user')
-# insertion 8
-    if user_data <> []:
-        insertion_statement = ("INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s)")
-        cur.executemany (insertion_statement, user_data)
-    del user_data[:]
+        user_data = []
+        user_data = verify_existence_in_database (places['with_data'], cur, 'user')
 
-    user_data = []
-    for person in places['with_data']:    
-        user_data.append( ( person['idhash'], uidhash, person['place_id'] ) )
-    del places['with_data']
-    
-    if user_data <> []:
-        insertion_statement = ("INSERT INTO user_with_in_place ( user_idhash, user_has_place_user_idhash, user_has_place_place_id ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE user_idhash = VALUES (user_idhash), user_has_place_user_idhash = VALUES(user_has_place_user_idhash), user_has_place_place_id = VALUES(user_has_place_place_id)")
-        cur.executemany (insertion_statement, user_data)
-    del user_data[:]
-    end_time = time.time()
-    statistics.write( 'Time processing and inserting place data: ' + str(end_time - start_time) + '\n' )
-    """
-    Data for page, user_likes_page table
-    
-    """
-    start_time = time.time()
-    ##liked_pages = profile #graph.get_connections (id= uid, connection_name= '?fields=likes.limit(5000){category,name,created_time,fan_count}')
-    
-    liked_pages_data = data_processing.process_liked_pages_data (uidhash, profile['likes'], statistics)
-    del profile['likes']
+        if user_data <> []:
+            insertion_statement = ("INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s)")
+            cur.executemany (insertion_statement, user_data)
+        del user_data[:]
 
-    #{'liked_pages':liked_pages['data'], 'user_likes_pages':user_likes_pages}
-    pages_to_add = verify_existence_in_database (liked_pages_data['liked_pages'], cur, 'page')
-    if pages_to_add <> []:
-        insertion_statement = ("INSERT INTO page ( id, name, category, total_fans ) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE total_fans = VALUES(total_fans)")
-        cur.executemany (insertion_statement, pages_to_add)    
-    del pages_to_add[:]
+        user_data = []
+        for person in places['with_data']:    
+            user_data.append( ( person['idhash'], uidhash, person['place_id'] ) )
+        del places['with_data']
+        
+        if user_data <> []:
+            insertion_statement = ("INSERT INTO user_with_in_place ( user_idhash, user_has_place_user_idhash, user_has_place_place_id ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE user_idhash = VALUES (user_idhash), user_has_place_user_idhash = VALUES(user_has_place_user_idhash), user_has_place_place_id = VALUES(user_has_place_place_id)")
+            cur.executemany (insertion_statement, user_data)
+        del user_data[:]
 
-    user_page_data = []
-    for page in liked_pages_data['user_likes_pages']:
-        user_page_data.append ( ( uidhash, page ) )
-    del liked_pages_data['user_likes_pages']
-    insertion_statement = ("INSERT INTO user_likes_page ( user_idhash, page_id ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE user_idhash = user_idhash")
-    cur.executemany (insertion_statement, user_page_data)        
-    end_time = time.time()
-    del user_page_data[:]
-    statistics.write( 'Time processing and inserting likes data: ' + str(end_time - start_time) + '\n' )
-    
-    """
-    Data for post, reaction, comment, tag, comment_has_comment
-    
-    """
-    
-#    start_time = time.time()
-#    try:
-#        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}}')
-#    except:
-#        posts = graph.get_connections (id=uid, connection_name = '?fields=posts.limit(5000){created_time,type,story,story_tags,privacy,message,link,application,shares,from,reactions.summary(true).limit(5000),comments.summary(true).limit(5000){created_time,from,message,attachment,message_tags,likes.summary(true).limit(5000)}}')
-#        pass
-#   end_time = time.time()
-#    statistics.write( 'Time getting post data (from GraphAPI): ' + str(end_time - start_time) + '\n' )
+        """
+        Data for page, user_likes_page table
+        
+        """
+        
+        liked_pages_data = data_processing.process_liked_pages_data (uidhash, profile['likes'], statistics)
+        del profile['likes']
 
-    queue   = Queue()
-    #(queue, id, uidhash, posts, granted_users, statistics, cur)
-    start_time = time.time()
-    reader_p = Process( target = process_posts_data, args= ( ( queue, uid, uidhash, granted_users, cur, statistics ), )  )
-    #parallel_code
-    reader_p.daemon = True
-    reader_p.start()
+        #{'liked_pages':liked_pages['data'], 'user_likes_pages':user_likes_pages}
+        pages_to_add = verify_existence_in_database (liked_pages_data['liked_pages'], cur, 'page')
+        if pages_to_add <> []:
+            insertion_statement = ("INSERT INTO page ( id, name, category, total_fans ) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE total_fans = VALUES(total_fans)")
+            cur.executemany (insertion_statement, pages_to_add)    
+        del pages_to_add[:]
 
-    #_start = time.time()
-    #writer_p = Process( target = pagination, args= ( ( queue, statistics, graph, uid ), )  )
-    data = ( queue, statistics, graph, uid )
-    pagination( data ) # writer
+        user_page_data = []
+        for page in liked_pages_data['user_likes_pages']:
+            user_page_data.append ( ( uidhash, page ) )
+        del liked_pages_data['user_likes_pages']
+        insertion_statement = ("INSERT INTO user_likes_page ( user_idhash, page_id ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE user_idhash = user_idhash")
+        cur.executemany (insertion_statement, user_page_data)        
 
-    #writer_p.daemon = True
-    #writer_p.start()
-    
-    reader_p.join()
-    queue.close()
-    #reader_p.join()
+        del user_page_data[:]
+        
+        """
+        Data for post, reaction, comment, tag, comment_has_comment
+        
+        """
+        start_time = time.time()
+        queue   = Queue()
+        #(queue, id, uidhash, posts, granted_users, statistics, cur)
+
+        reader_p = Process( target = process_posts_data, args= ( ( queue, uid, uidhash, granted_users, cur, statistics ), )  )
+        reader_p.daemon = True
+        reader_p.start()
+
+        #_start = time.time()
+        #writer_p = Process( target = pagination, args= ( ( queue, statistics, graph, uid ), )  )
+        data = ( queue, statistics, graph, uid )
+        pagination( data ) # writer
+
+        #writer_p.daemon = True
+        #writer_p.start()
+        
+        reader_p.join()
+        queue.close()
+        #reader_p.join()
 
 
-    end_time = time.time()
-    statistics.write( 'Time processing post data: ' + str(end_time - start_time) + '\n' )
-    #start_time = time.time()
-    #data_processing.process_posts_data (uid, uidhash, posts, granted_users, statistics, cur ) # posts_all_data = 
+        end_time = time.time()
+        statistics.write( 'Time processing post data: ' + str(end_time - start_time) + '\n' )
 
+
+            
+        """
+        Data for profile table
+
+        """
+
+        user_profile = data_processing.process_profile_data (profile)
+        profile_data = []
+        profile_data.append ( ( uidhash, user_profile['birthday'], user_profile['gender'], user_profile['hometown_id'], user_profile['hometown_name'], user_profile['location_id'], user_profile['location_name'], user_profile['political'], user_profile['religion'], user_profile['interested_women'], user_profile['interested_men'], user_profile['relationship_status'], user_profile['languages'][0], user_profile['languages'][1], user_profile['languages'][2], user_profile['languages'][3], user_profile['languages'][4] ))  
+        insertion_statement = ("INSERT INTO profile ( user_idhash, birthday, gender, hometown_id, hometown_name, location_id, location_name, political_view, religion, interested_women, interested_men, relationship_status, language_1, language_2, language_3, language_4, language_5 ) " 
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE hometown_id = VALUES(hometown_id), hometown_name = VALUES(hometown_name), location_id = VALUES(location_id), location_name = VALUES(location_name), political_view = VALUES(political_view), religion = VALUES(religion), interested_women = VALUES(interested_women), interested_men = VALUES(interested_men), relationship_status = VALUES(relationship_status), language_1 = VALUES(language_1), language_2 = VALUES(language_2), language_3 = VALUES(language_3), language_4 = VALUES(language_4), language_5 = VALUES(language_5)")
+        cur.executemany( insertion_statement, profile_data)
+        del profile_data[:]
         
 
-    """
-    Data for profile table
+        """
+        Finally, let's commit all the statements
+        """
+        conn.commit()
+        
+        end_time_total = time.time()
+        statistics.write( 'Total time : ' + str(end_time_total - start_time_total) + '\n' )
 
-    """
-    start_time = time.time()
-    user_profile = data_processing.process_profile_data (profile)
-    profile_data = []
-    profile_data.append ( ( uidhash, user_profile['birthday'], user_profile['gender'], user_profile['hometown_id'], user_profile['hometown_name'], user_profile['location_id'], user_profile['location_name'], user_profile['political'], user_profile['religion'], user_profile['interested_women'], user_profile['interested_men'], user_profile['relationship_status'], user_profile['languages'][0], user_profile['languages'][1], user_profile['languages'][2], user_profile['languages'][3], user_profile['languages'][4] ))  
-    insertion_statement = ("INSERT INTO profile ( user_idhash, birthday, gender, hometown_id, hometown_name, location_id, location_name, political_view, religion, interested_women, interested_men, relationship_status, language_1, language_2, language_3, language_4, language_5 ) " 
-    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE hometown_id = VALUES(hometown_id), hometown_name = VALUES(hometown_name), location_id = VALUES(location_id), location_name = VALUES(location_name), political_view = VALUES(political_view), religion = VALUES(religion), interested_women = VALUES(interested_women), interested_men = VALUES(interested_men), relationship_status = VALUES(relationship_status), language_1 = VALUES(language_1), language_2 = VALUES(language_2), language_3 = VALUES(language_3), language_4 = VALUES(language_4), language_5 = VALUES(language_5)")
-    cur.executemany( insertion_statement, profile_data)
-    del profile_data[:]
-    end_time = time.time()
-    statistics.write( 'Time inserting profile data: ' + str(end_time - start_time) + '\n' )
-    """
-    Finally, let's commit all the statements
-    """
-
-    start_time = time.time()
-    conn.commit()
-    end_time = time.time()
-    statistics.write( 'Time processing commit: ' + str(end_time - start_time) + '\n' )
-    
-    end_time_total = time.time()
-    statistics.write( 'Total time : ' + str(end_time_total - start_time_total) + '\n' )
     return uidhash
-def counter(uid, token):
-    graph = facebook.GraphAPI(access_token=token, version='2.6')
-    response = graph.get_connections(id=uid, connection_name='invitable_friends')
-    invitable_friends = pagination2(response['data'])
-    len(invitable_friends)
 
 
-def get_ranking(uidhash, mysql, token):
+def get_list_of_friends(uidhash, mysql, token):
     # database connection
     conn = mysql.connect()
     cur = conn.cursor()
     graph = facebook.GraphAPI(access_token=token, timeout=float(60.0), version='2.6')
-
-    result = cur.execute("select u2.idhash, u2.name, u2.id, count(r.id) as total_reactions from user as u INNER JOIN profile as p on u.idhash = p.user_idhash"
-    " INNER JOIN post as pt on p.user_idhash = pt.user_idhash INNER JOIN reaction as r on pt.id = r.post_id"
-    " INNER JOIN user as u2 on r.user_idhash = u2.idhash where u.idhash = '"+uidhash+"' group by u.name, u2.idhash, u2.name, u2.id order by total_reactions desc limit 10")
+    #rows -> po_fbid, po_id, post_owner, friend_fbid, friend_id, friend, total_interaction
+    cur.execute("SELECT * FROM interactions_in_posts_summary WHERE po_id= %s ", uidhash)
     result = cur.fetchall()
-    data_in_db = []
-    for row in result:
-        try:
-            data = graph.get_connections(id=row[2], connection_name='picture')
-            picture = data['url']
-        except:
-            picture = None
-        data_in_db.append({'id':row[0], 'name':row[1], 'pic':picture})    
-
     conn.commit()
-    return data_in_db
+    total_interaction_distinc_values = set()
+    data = []
+    for row in result:
+        total_interaction_distinc_values.add ( int(row[6]) )
+        data.append ( { "fbid":row[3] ,"id":row[4], "name":row[5], "total_interaction":int(row[6])  }  )
+    print total_interaction_distinc_values
+    np_total_interaction_values = np.array(list(total_interaction_distinc_values)) # input array
+    interactions_quartiles = np.percentile(np_total_interaction_values, np.arange(0, 100, 25)) # calculate quartile
+    interactions_quartiles = list (interactions_quartiles)
+    print "interaction quartiles",interactions_quartiles
+    q1=[]
+    q2=[]
+    q3=[]
+    q4=[]
 
-def closeness_filter( request, ranking, uidhash, mysql):
+    for user in data:
+        total_interaction = user["total_interaction"]
+        if total_interaction <= interactions_quartiles[1]:
+            q1.append ( user )
+        elif total_interaction > interactions_quartiles[1] and total_interaction <= interactions_quartiles[2]:
+            q2.append ( user )
+        elif total_interaction > interactions_quartiles[2] and total_interaction < interactions_quartiles[3]:
+            q3.append ( user )
+        elif total_interaction >= interactions_quartiles[3]:
+            q4.append ( user )
+ 
+    q1_len= len(q1)
+    q2_len= len(q2)
+    q3_len= len(q3)
+    q4_len= len(q4)
+
+    all_users = q1 + q2 + q3 + q4
+
+    random.seed()
+    NUMBER_OF_USER_PER_QUARTILE = 5
+    NUMBER_OF_CHOSENS_REQUIRED = 20
+
+    NUMBER_OF_USER_PER_QUARTILE_Q1 = NUMBER_OF_USER_PER_QUARTILE
+    NUMBER_OF_USER_PER_QUARTILE_Q2 = NUMBER_OF_USER_PER_QUARTILE
+    NUMBER_OF_USER_PER_QUARTILE_Q3 = NUMBER_OF_USER_PER_QUARTILE
+    NUMBER_OF_USER_PER_QUARTILE_Q4 = NUMBER_OF_USER_PER_QUARTILE
+
+    if q1_len < NUMBER_OF_USER_PER_QUARTILE:
+        NUMBER_OF_USER_PER_QUARTILE_Q1 = q1_len
+    if q2_len < NUMBER_OF_USER_PER_QUARTILE:
+        NUMBER_OF_USER_PER_QUARTILE_Q2 = q2_len
+    if q3_len < NUMBER_OF_USER_PER_QUARTILE:
+        NUMBER_OF_USER_PER_QUARTILE_Q3 = q3_len
+    if q4_len < NUMBER_OF_USER_PER_QUARTILE:
+        NUMBER_OF_USER_PER_QUARTILE_Q4 = q4_len
+
+    rand_user_from_q1 = random.sample ( xrange ( 0, q1_len ), NUMBER_OF_USER_PER_QUARTILE_Q1)
+    rand_user_from_q2 = random.sample ( xrange ( q1_len, q1_len + q2_len), NUMBER_OF_USER_PER_QUARTILE_Q2)
+    rand_user_from_q3 = random.sample ( xrange ( q1_len + q2_len, q1_len + q2_len + q3_len ), NUMBER_OF_USER_PER_QUARTILE_Q3)
+    rand_user_from_q4 = random.sample ( xrange ( q1_len + q2_len + q3_len, q1_len + q2_len + q3_len + q4_len ), NUMBER_OF_USER_PER_QUARTILE_Q4)
+    
+    total_chosens = NUMBER_OF_USER_PER_QUARTILE_Q1 + NUMBER_OF_USER_PER_QUARTILE_Q2 + NUMBER_OF_USER_PER_QUARTILE_Q3 + NUMBER_OF_USER_PER_QUARTILE_Q4
+    rand_user_rest = []
+    if total_chosens < NUMBER_OF_CHOSENS_REQUIRED:
+        others = [ item for item in range(len(all_users)) if item not in ( rand_user_from_q1 + rand_user_from_q2 + rand_user_from_q3 + rand_user_from_q4 ) ]
+        diff = NUMBER_OF_CHOSENS_REQUIRED - total_chosens
+        if diff < len(others):
+            random.shuffle(others)
+            rand_user_rest = others[:diff]
+        else:
+            rand_user_rest = others
+
+
+
+    #print NUMBER_OF_USER_PER_QUARTILE_Q2
+    #print "len of q2", len(q2)
+
+    chosen_ones = [ ]
+
+    for i in rand_user_from_q1:
+        chosen_ones.append ( all_users[ i ] )
+    for i in rand_user_from_q2:
+        chosen_ones.append ( all_users[ i ] )
+    for i in rand_user_from_q3:
+        chosen_ones.append ( all_users[ i ] )
+    for i in rand_user_from_q4:
+        chosen_ones.append ( all_users[ i ] )
+    for i in rand_user_rest:
+        chosen_ones.append ( all_users[ i ] )
+
+
+    random.shuffle ( chosen_ones )
+
+    print len (chosen_ones)
+
+    return chosen_ones
+
+
+
+def store_connectedness_data( request, list_of_friends, uidhash, mysql):
     conn = mysql.connect()
     cur = conn.cursor()
     closer_users = []
-    users_in_closeness = request.form
-    for key in users_in_closeness.keys():
-        user_idhash1 = key.split('_')[1]
-        c_level = users_in_closeness[key]
-        try:
-            cur.execute ("UPDATE closeness_channels SET closeness_level = %s WHERE user_idhash = %s AND user_idhash1= %s", (c_level[1], uidhash, user_idhash1 ) )
-        except:
-            cur.execute ("INSERT INTO closeness_channels (user_idhash, user_idhash1, closeness_level) VALUES (%s, %s, %s)", (uidhash, user_idhash1, c_level[1] ) )
-        if c_level > 'c4':
-            ukey = key.split('_')[1]
-            print ukey
-            print ranking
-            for user2 in ranking:
-                if ukey == user2['id']:
-                    closer_users.append( user2 )
-                    break
-    conn.commit()
-    return closer_users
+    top_ten = []
+    users_in_connectedness = request.form
+    print users_in_connectedness
+    dict_users = {}
+    granted_users = get_granted_users(cur)
+    added_users=[]
+    if uidhash not in granted_users:
+        for key in users_in_connectedness.keys():
+            user_idhash1 = key.split('_')[-1]
+            if user_idhash1 not in added_users:
+                added_users.append ( user_idhash1 )
+                print user_idhash1
+                gender = users_in_connectedness[ 'rg_' + user_idhash1 ]
+                
+                connectedness = users_in_connectedness[ 'connectedness_' + user_idhash1 ]
+                
+                online_interaction = users_in_connectedness[ 'interaction_online_' + user_idhash1 ]
+                
+                f2f_interaction = users_in_connectedness[ 'interaction_face_' + user_idhash1 ]
+               
+                #try:
+                cur.execute ("INSERT INTO connectedness (user_idhash, user_idhash1, connectedness_level, f2f_interaction, online_interaction) VALUES (%s, %s, %s, %s, %s)", (uidhash, user_idhash1, connectedness, f2f_interaction, online_interaction ) )
+                    #cur.execute ("UPDATE closeness_channels SET closeness_level = %s WHERE user_idhash = %s AND user_idhash1= %s", (c_level, uidhash, user_idhash1 ) )
+                #except:
+                #print 'hellooo1'
+                    #cur.execute ("INSERT INTO connectedness (user_idhash, user_idhash1, closeness_level) VALUES (%s, %s, %s)", (uidhash, user_idhash1, c_level[1] ) )
+                #pass
+                #try:
+                cur.execute ("INSERT INTO profile (user_idhash, gender) VALUES (%s, %s) ON DUPLICATE KEY UPDATE gender = VALUES (gender) ", (user_idhash1, gender) )
+                print 'gendeeeeer'
+                #except:
+                #print 'helloooo2'
+                #pass   
+                for user2 in list_of_friends:
+                    if user_idhash1 == user2['id']:
+                        dict_users[ connectedness + '_' + user_idhash1 ] = user2
+                        break
+            conn.commit()
+        dict_users_keys = dict_users.keys()
+        sorted ( dict_users_keys, reverse =  True )
+        limit = 10
+        for user_conn_key in dict_users_keys:
+            top_ten.append ( dict_users[user_conn_key] )
+            limit -= 1
+            if limit == 0:
+                break
+
+    return top_ten
 
 def insert_survey_data(request, uidhash, current_close_user, mysql):
     channels = {}
@@ -881,31 +815,22 @@ def insert_survey_data(request, uidhash, current_close_user, mysql):
     cur = conn.cursor()
     survey_data_keys = request.form.keys()
     user_idhash1 = current_close_user['id']
-    for key in survey_data_keys:
-        key_splitted = key.split('_')
-        if key_splitted[0] == 'rg':
-            cur.execute ("UPDATE profile SET gender= %s WHERE user_idhash = %s", ( request.form[key], user_idhash1 ) )
-        if key_splitted[0] == 'rl':
-            channel = key_splitted[1]
-            interac_level = request.form[key][1] 
-            channels[ channel ] = interac_level
-        if key_splitted[0] == 'cbr':
-            try:
-                cur.execute("UPDATE relationship SET relationship_type = %s, description = %s WHERE user_idhash = %s and user_idhash1 = %s and relationship_type = %s and description = %s ", ( key_splitted[2], request.form[key], uidhash, user_idhash1, key_splitted[2], request.form[key] ) )
-            except:
-                cur.execute("INSERT INTO relationship (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, key_splitted[2], request.form[key] ) )
-            #relationships.append ( ( uidhash, user_idhash1, key_splitted[2], request.form[key] ) )
-            #relationships_update.append ( ( key_splitted[2], request.form[key], uidhash, user_idhash1 ) )
-        if key_splitted[0] == 'cba':
-            try:
-                cur.execute ( "UPDATE common_aspect SET type = %s, description = %s WHERE user_idhash = %s, user_idhash1 = %s and type = %s and description = %s", ( key_splitted[1], request.form[key], uidhash, user_idhash1, key_splitted[1], request.form[key]  ) )
-            except:
-                cur.execute ( "INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, key_splitted[1], request.form[key] ) )
-            #common_aspects.append ( ( uidhash, user_idhash1, key_splitted[1], request.form[key] ) )
-            #common_aspects_update.append ( ( key_splitted[1], request.form[key], uidhash, user_idhash1  ) )
-    
-    cur.execute ("UPDATE closeness_channels SET face_to_face = %s, phone_calls = %s, video_chats = %s, social_networks = %s, messaging = %s WHERE user_idhash = %s and user_idhash1 = %s ", ( channels['ftf'], channels['pc'], channels['vc'], channels['sn'],channels['sms'], uidhash, user_idhash1 ) )
-    #cur.executemany("INSERT INTO relationship (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s)", relationships)
-    #cur.executemany("INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", common_aspects)
+    granted_users = get_granted_users(cur)
+    if uidhash not in granted_users:
+        for key in survey_data_keys:
+            key_splitted = key.split('_')
+            if key_splitted[0] == 'cbr':
+                try:
+                    cur.execute("INSERT INTO relationship (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, key_splitted[2], request.form[key] ) )
+                except:
+                    pass
 
-    conn.commit()
+            if key_splitted[0] == 'cba':
+                try:
+                    cur.execute ( "INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, key_splitted[1], request.form[key] ) )
+                except:                   
+                    pass
+        
+
+        cur.execute("UPDATE user SET granted_permissions = %s, WHERE idhash = %s ", (True, uidhash) )
+        conn.commit()
