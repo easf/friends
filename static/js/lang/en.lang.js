@@ -48,6 +48,7 @@
 		},
 		"common":
 		{
+			"progress" : "Completed ",
 			"title" : "What do you share in common with your friends?",
 			"gralInst" : "Please, answer the questions for the 10 friends below.",
 			"spInstTraits" : "Please, check the traits that strongly define ",
@@ -107,7 +108,7 @@
 	"bestfriends":
 	{
 		"title":"Friends who most interacted in your posts.",
-		"subtitle":", we've done a top list of friends based on aproximated amount of interactions in your posts. Look!!",
+		"subtitle":" we've done a top list of friends based on aproximated amount of interactions in your posts. Look!!",
 		"bttn":"Finish"
 	},
 	"recoverpage":

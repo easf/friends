@@ -50,6 +50,7 @@
 	},
 	"common":
 	{
+		"progress" : "Progreso ",
 		"title" : "¿Qué aspectos en común tienes con tus amigos?",
 		"gralInst" : "Por favor, contesta a continuación las preguntas acerca de tus 10 amigos siguientes.",
 		"spInstTraits" : "Por favor, indica los rasgos que distinguen a ",
@@ -109,7 +110,7 @@
 	"bestfriends":
 	{
 		"title":"Amigos quiénes más interactuaron con tus publicaciones.",
-		"subtitle":", hemos hecho una lista de amigos sobresalientes basado en un número aproximado de interacciones relacionadas a tus publicaciones. ¡Mira quiénes están en la lista!",
+		"subtitle":" hemos hecho una lista de amigos sobresalientes basado en un número aproximado de interacciones relacionadas a tus publicaciones. ¡Mira quiénes están en la lista!",
 		"bttn" : "Finalizar"
 	},
 	"recoverpage":

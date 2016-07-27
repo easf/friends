@@ -129,7 +129,7 @@ def connectedness():
     elif status == 'user_connectedness_data_stored':
     	return redirect(url_for('connectednessdata'))
     elif status == 'finished':
-    	return 'thanks for your collaboration!!'
+    	return render_template('thanks.html')
 
     start_time = time.time()
     return render_template('closeness.html', users=friends_for_connectedness, userLang = chlang, textlang=textlang)
@@ -180,7 +180,7 @@ def connectednessdata():
     elif status == 'user_connectedness_data_stored':
         friends_for_common_points = procedures.store_connectedness_data( connectedness_data, friends_for_connectedness, uidhash, mysql )
     elif status == 'finished':
-        return 'thanks for your collaboration!!'
+        return render_template('thanks.html')
 
     return redirect(url_for('commonpoints'))
 
@@ -196,7 +196,7 @@ def commonpoints():
     conn.close()
     fname = "backup/" + uidhash + "_commonpoints"
     if status == 'finished':
-        return 'thanks for your collaboration!!'
+        return render_template('thanks.html')
     else: #if status == 'user_connectedness_data_stored':
         if os.path.isfile(fname):
             return redirect( url_for('commonpointsdata') )
