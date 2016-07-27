@@ -18,11 +18,9 @@
                   <h3><span class="label label-default">Please, fill this form about: </span></h3>  
                 </label>
             </div>
-            <!--
-            {% set user ={"id":"0" ,"name":"Emanuel Sanchiz", 'pic':"https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/13124828_1405791279447233_1812688549634903355_n.jpg?oh=85e93710c4000544ccadbe2535cdf09e&oe=57EC99C8"} %}
-            -->
+
             <div class= "col-sm-1 vcenter">
-                <img src="{{ user['pic'] }}" class="img-thumbnail">
+                <img src="//graph.facebook.com/{{ user['fbid'] }}/picture" class="img-thumbnail">
             </div>
 
             <div class= "col-sm-8 vcenter">

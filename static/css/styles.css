@@ -88,3 +88,22 @@ nav.navbar-white {
   }    
 }
 
+.close-friends .checkbox {
+  margin-top:0px;
+}
+
+
+.traits {
+  margin-top: 10px;
+}
+
+.traits label {
+  min-width: 110px;
+  font-size: 1.2em;
+  font-weight: normal;
+  text-align: center;  
+}
+.traits label span{
+  font-size: 2em;
+  display: block;  
+}

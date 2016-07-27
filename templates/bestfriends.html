@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+     <!-- You can use Open Graph tags to customize link previews.
+    Learn more: https://developers.facebook.com/docs/sharing/webmasters -->
+  <meta property="og:url"           content="http://localhost:5000" />
+  <meta property="og:type"          content="website" />
+  <meta property="og:title"         content="Friends" />
+  <meta property="og:description"   content="Complete a survey on Facebook an get your friends who most interact with your posts" />
+  
+
+  <link href="static/css/bootstrap.min.css" rel="stylesheet" type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Alegreya+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href='static/css/styles.css' rel='stylesheet' type='text/css'>
+       <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="static/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="static/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="static/js/jquery-1.12.4.js"></script>
+  <script src="static/js/jquery.validate.js"></script> 
+  <script src="static/js/html2canvas.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.js"></script>
+   
+  
+</head>
+<body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7&appId=1733963700184652";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+      <nav class="navbar navbar-white navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          <img class="logo" alt="Brand" src="static/src/img/logo.png"> 
+        </a>
+      </div>
+        <!--<div class="navbar-text navbar-right"><div class="score"><h4>You &nbsp; <img class="img-circle" id="{{ uid }}" src="https://graph.facebook.com/{{ uid }}/picture" ></h4> </div></div>-->
+
+      
+      <div class="collapse navbar-collapse">
+        
+        <!-- ul class="nav navbar-nav navbar-right">
+          <li role="presentation" ><a href='?lang=en' target="_self">English</a></li>
+          <li role="presentation"><a href='?lang=it' target="_self" >Italian</a></li>
+          <li role="presentation"><a href='?lang=ru' target="_self" >Russian</a></li>
+          <li role="presentation" ><a href='?lang=es' target="_self">Spanish</a></li>
+        </ul-->
+
+      </div><!-- /.navbar-collapse -->      
+    </div><!-- /.container-fluid -->
+  </nav>    
+  
+  <div class="container">
+  
+    <div class="row">
+      <div class="col-md-12">
+
+        <div class="question page-header text-center">
+          <h1>{{ textlang["bestfriends"]["title"] }}</h1>
+          <img class="img-circle" id="{{ uid }}" src="https://graph.facebook.com/{{ users[0]['pfbid'] }}/picture" >
+          <p class="lead">{{ users[0]['pname'] }}, {{ textlang["bestfriends"]["subtitle"] }}</p>
+        </div>        
+      </div>
+    </div>
+     <form id="myform3" method="post" action="{{ url_for('commonpointsdata') }}">
+
+        <!-- friends [ -->
+        
+        <div class="row">
+          <div class="col-md-12 close-friends">
+              
+
+              <script>
+                  var datag = [];
+                  var labelsg = [];
+                  var backgroundColorg = [];
+              </script>
+
+              {% set colors = [ "#FF6384", "#4BC0C0", "#FFCE56", "#E7E9ED", "#36A2EB", "#800000", "#808000", "#800080", "#0000A0", "#FFCBA4" ] %}
+              {% set count = 0 %}
+
+                  <!-- friend [ -->
+              <div class="friend" align="center">      
+                    <!-- ] picture -->
+         <div class="row traits">   
+  
+            <div class="col-md-12"> 
+              <div class="form-group feedback"> 
+              {% for user in users %} 
+
+ 
+
+                          <label class="myclass_rimg">
+                              <figure>
+                                <img class="img-circle" id="{{ user['fbid'] }}" src="https://graph.facebook.com/{{ user['fbid'] }}/picture" >
+                                <figcaption style=" border-style: solid;
+                                border-color: {{ colors[count] }};"></figcaption>
+                                <figcaption><h5>{{ user['name'].split(' ')[0] }}</h5></figcaption>
+                              </figure>
+                          </label>                                                        
+                                                                                                  
+
+      
+              <script>
+                datag.push ( parseInt ( "{{ user ['interaction'] }}" ) );
+                labelsg.push("{{ user ['name'] }}");
+                backgroundColorg.push("{{ colors[count] }}");
+                var image = document.getElementById("{{ user['fbid'] }}");
+                image.style.border.color = "{{ colors[count] }}";
+              </script>
+              {% set count = count + 1 %}
+              {% endfor %}
+              </div>                    
+            
+          </div>
+      </div>                                                                              
+              </div>
+              
+               
+              <div class="friend" align="center">      
+                    <!-- ] picture -->
+         <div class="row traits">   
+  
+            <div class="col-md-12"> 
+              <div class="form-group feedback"> 
+                      <canvas id="myChart" width="200" height="200" style="width:100%; height:100%; margin:0px; "></canvas>
+                    </div>                                                 
+                  </div>
+                  </div>
+                  </div>
+               <div id="url"></div>
+             
+              
+   
+               
+                <!-- ] friend -->
+           
+      </div>
+ 
+
+        
+    </div>
+      <!-- nav buttons [ -->
+        <div class="col-md-12 text-center">
+          <button type="submit" class="btn btn-info btn-lg" href="thanks.html">{{ textlang["bestfriends"]["bttn"] }}</button> 
+
+        </div>
+        <div align="center">
+          <div class="fb-share-button" data-href="http://mateine.org/friends" data-layout="button_count" data-size="large" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fmateine.org%2Ffriends&amp;src=sdkpreparse">Compartir</a></div>
+        </div>
+      <!-- ] nav buttons -->        
+
+
+
+
+      </form>   
+    
+  
+  </div>  
+
+
+  <script src="static/src/app.js"></script>
+  <script>
+    $(document).ready(function(){
+        console.log( datag );
+        console.log( labelsg );
+        console.log( backgroundColorg );
+
+        var ctx = document.getElementById("myChart");
+
+        ctx.width  = window.innerWidth;
+          ctx.height = window.innerHeight;
+        var data = {
+            datasets: [{
+                data: datag,
+                backgroundColor: backgroundColorg,
+                label: 'Friends' // for legend
+            }],
+            labels: labelsg
+        };
+        var myChart = new Chart(ctx, {
+            data: data,
+            type: 'polarArea',
+            options: {
+                legend: {
+                    display: false,
+                    labels: {
+                        fontColor: 'rgb(255, 99, 132)'
+                    }
+                }
+            }
+           // onAnimationComplete:  done()
+
+        });
+
+        setTimeout(done(), 10000);
+        function done () {
+                 html2canvas(document.body, {
+                        timeout: 3000,
+                        onrendered: function(canvas) {
+                            var myImage = canvas.toDataURL();
+                          // alert(myImage);
+                            
+                        }
+            });
+        }
+ 
+});
+
+
+            
+
+    
+  </script>
+
+</body>
+</html>

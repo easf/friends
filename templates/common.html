@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  
+  <link href="static/css/bootstrap.min.css" rel="stylesheet" type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Alegreya+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href='static/css/styles.css' rel='stylesheet' type='text/css'>
+  
+  
+</head>
+<body>
+
+      <nav class="navbar navbar-white navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          <img class="logo" alt="Brand" src="static/src/img/logo.png"> 
+        </a>
+      </div>
+      <div class="navbar-text navbar-right"><div class="score"><h4>{{ textlang["common"]["progress"] }}<span class="label label-primary completed">0</span> / 10</h4> </div></div>
+      
+      <div class="collapse navbar-collapse">
+        
+        <!-- ul class="nav navbar-nav navbar-right">
+          <li role="presentation" ><a href='?lang=en' target="_self">English</a></li>
+          <li role="presentation"><a href='?lang=it' target="_self" >Italian</a></li>
+          <li role="presentation"><a href='?lang=ru' target="_self" >Russian</a></li>
+          <li role="presentation" ><a href='?lang=es' target="_self">Spanish</a></li>
+        </ul-->
+
+      </div><!-- /.navbar-collapse -->      
+    </div><!-- /.container-fluid -->
+  </nav>    
+  
+  <div class="container">
+  
+    <div class="row">
+      <div class="col-md-12">
+
+        <div class="question page-header text-center">
+          <h1>{{ textlang["common"]["title"] }}</h1>
+          <p class="lead">{{ textlang["common"]["gralInst"] }}</p>
+        </div>        
+      </div>
+    </div>
+     <form id="myform3" method="post" action="{{ url_for('commonpointsdata') }}">
+    {% for user in users %}
+        <!-- friends [ -->
+        
+        <div class="row">
+          <div class="col-md-12 close-friends">
+              
+              <!-- friend [ -->
+              <div class="friend">
+                <!-- picture [ -->
+                <div class="row">              
+                  <div class="col-md-12">
+                      <div class="name text-info etc" title="{{ user['name'] }}">
+                      <img class="img-circle" src="//graph.facebook.com/{{ user['fbid'] }}/picture">
+                      {{ user['name'] }}                          
+                      </div>
+                      
+                       
+
+                      
+                  </div>                
+                </div>             
+                  <!-- ] picture -->
+                <div class="row traits">   
+                    <div class="col-md-12"> 
+                      <p class="lead">{{ textlang["common"]["spInstTraits"] }}<span class="text-info">{{ user['name'] }}</span>.</p>
+                    </div>             
+                    <div class="col-md-12"> 
+                      <div class="form-group feedback">  
+
+                        <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait1"] }}>😂  </span>
+                          <input type="checkbox" id="r1" name="trait_funny_{{ user['id'] }}" value="funny" required>
+                          {{ textlang["common"]["trait1"] }}
+                        </label>
+                        <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait2"] }}>😇  </span>
+                          <input type="checkbox" id="r1" name="trait_kind_{{ user['id'] }}" value="kind" required>
+                          {{ textlang["common"]["trait2"] }}
+                        </label>
+                        <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait3"] }}>😎  </span>
+                          <input type="checkbox" id="r1" name="trait_cool_{{ user['id'] }}" value="cool" required>
+                          {{ textlang["common"]["trait3"] }}
+                        </label>
+                        <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait4"] }}>😱  </span>
+                          <input type="checkbox" id="r1" name="trait_worrisome_{{ user['id'] }}" value="worrisome" required>
+                          {{ textlang["common"]["trait4"] }}
+                        </label>
+                        <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait5"] }}>😡  </span>
+                          <input type="checkbox" id="r1" name="trait_explosive_{{ user['id'] }}" value="explosive" required>
+                          {{ textlang["common"]["trait5"] }}
+                        </label>    
+                        <label class="myclass_rimg">
+                           <span title={{ textlang["common"]["trait6"] }}>🤓</span>
+                          <input type="checkbox" id="r1" name="trait_smart_{{ user['id'] }}" value="smart" required>
+                          {{ textlang["common"]["trait6"] }}
+                        </label>  
+                        <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait7"] }}>💬</span>
+                          <input type="checkbox" id="r1" name="trait_extrovert_{{ user['id'] }}" value="extrovert" required>
+                          {{ textlang["common"]["trait7"] }}
+                        </label>  
+                         <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait8"] }}>🙋</span>
+                          <input type="checkbox" id="r1" name="trait_active_{{ user['id'] }}" value="active" required>
+                          {{ textlang["common"]["trait8"] }}
+                        </label>                                                         
+                                                                                                
+                      </div>                    
+                      
+                    </div>
+                </div>  
+                  
+                <!-- closeness [ -->
+                  <div class="row closeness">   
+                    <div class="col-md-12"> 
+                      <p class="lead">{{ textlang["common"]["spInstRel"] }} <span class="text-info">{{ user['name'] }}</span>.</p>
+                    </div>             
+                    <div class="col-md-12">                
+                      <div class="form-group feedback">  
+
+                          <div class="col-md-6 col-xs-12">
+                            
+                            <label>
+                                {{ textlang["common"]["relTypepf"] }}
+                            </label>                        
+                            <div class="checkbox">                                                
+                              <label>
+                                <input type="checkbox" name="cbr_partOfFamily_{{ user['id'] }}" value="core_family">
+                                {{ textlang["common"]["relTypecf"] }}
+                              </label>   
+                            </div>                     
+                            <div class="checkbox"> 
+                              <label>
+                                <input type="checkbox" name="cbr_extendedFamily_{{ user['id'] }}" value="extended_family">
+                                {{ textlang["common"]["relTypeef"] }}
+                              </label>                        
+                            </div> 
+
+                            <label>{{ textlang["common"]["commPlace"] }}</label>
+                            <div class="checkbox"> 
+                             <label>
+                                <input type="checkbox" name="cbr_commonPlace_hometown_{{ user['id'] }}" value="same_hometown">
+                                {{ textlang["common"]["sameHomeT"] }}
+                              </label>    
+                            </div>                     
+                            <div class="checkbox">                                                
+                              <label>
+                                <input type="checkbox" name="cbr_commonPlace_city_{{ user['id'] }}" value="live_same_city">
+                                 {{ textlang["common"]["sameCity"] }}
+                              </label> 
+                            </div>                     
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cbr_commonPlace_together_{{ user['id'] }}" value="live_together">
+                                {{ textlang["common"]["sharedFlat"] }}
+                              </label>                         
+                             </div>                                                                        
+                            
+                          </div>
+
+
+                          <div class="col-md-6 col-xs-12">
+
+                             <label>{{ textlang["common"]["romanticalRel"] }}</label>                        
+                             <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cbr_romantic_married_{{ user['id'] }}" value="married_legal_union">
+                                {{ textlang["common"]["married"] }}
+                              </label>                         
+                             </div>                         
+                             
+                             <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cbr_romantic_gbfriend_{{ user['id'] }}" value="girlfriend_boyfriend">
+                                {{ textlang["common"]["significantOther"] }}
+                              </label>                         
+                             </div>                                                  
+                            
+                            
+                          <label>{{ textlang["common"]["sameInstitution"] }}</label><br>                        
+                           <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cbr_sameInstitution_school_{{ user['id'] }}" value="same_school"> 
+                              {{ textlang["common"]["sameSchool"] }}
+                            </label>                         
+                           </div>  
+                           
+                           <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cbr_sameInstitution_university_{{ user['id'] }}" value="same_university"> 
+                              {{ textlang["common"]["sameUniversity"] }}
+                            </label>                         
+                           </div>                                                                                                                                                   
+                           <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cbr_sameInstitution_coworker_{{ user['id'] }}" value="coworker"> 
+                              {{ textlang["common"]["coworkers"] }}
+                            </label>                         
+                           </div> 
+                            
+                           <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" id="cbr_other_same_institution" name="cbr_sameInstitution_other_{{ user['id'] }}" value="same_other_institution"> 
+                              {{ textlang["common"]["otherInstitutions"] }}
+                            </label>                         
+                           </div>                                                                                                                                              
+                          </div>
+                      
+                      </div>                                                 
+                    </div>
+                  </div>
+                <!-- ] closeness -->
+                  
+                <!-- Interactions [ -->          
+                  <div class="row interactions">   
+                    <div class="col-md-12"> 
+                      <p class="lead">{{ textlang["common"]["spInstcomm"] }} <span class="text-info">{{ user['name'] }}</span>?.</p>
+                    </div>
+                    <div class="col-md-12">                                    
+                      <div class="form-group feedback">      
+
+                          <!--div class="col-xs-2">
+                            <label>Shared environment</label><br>
+                            <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect1" value="work"> Work <br>
+                            <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect2" value="education"> Education institution<br>
+                            <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect3" value="club_association"> Club/Association<br>
+                            <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect4" value="household"> Household<br>
+                            <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect5" value="neighborhood"> Neighborhood<br>
+                            <input type="checkbox" name="cba_{{ user[id] }}_environment_commonaspect6" value="online_community"> Online community<br>
+                          </div-->
+
+                          <div class="col-xs-3">
+                            <label>{{ textlang["common"]["sharedBeliefs"] }}</label>
+                            <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cba_sharedBeliefs_politics_{{ user['id'] }}" value="politics"> 
+                              {{ textlang["common"]["politics"] }}
+                            </label>                         
+                           </div> 
+                            <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cba_sharedBeliefs_religion_{{ user['id'] }}" value="religion"> 
+                              {{ textlang["common"]["religious"] }}
+                            </label>                         
+                           </div> 
+                            <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cba_sharedBeliefs_cultural_{{ user['id'] }}" value="cultural_background"> 
+                              {{ textlang["common"]["culturalBackground"] }}
+                            </label>                         
+                           </div> 
+                            <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cba_sharedBeliefs_causes_{{ user['id'] }}" value="causes_you_care_about"> 
+                              {{ textlang["common"]["similarCauses"] }}
+                            </label>                         
+                           </div>
+                            
+                             <!-- Intellectual? -->
+                            
+                          </div>
+
+
+                          <div class="col-xs-3">
+                            <label>{{ textlang["common"]["sharedActivities"] }}</label><br>
+                            
+                            <!--
+                            both working / both studying
+                            work / study in the same domain
+                            we attend the same events
+                            same level of sport and outdoor activities
+                            we travel to the same places
+                                                    -->
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedActivities_ws_{{ user['id'] }}" value="work_study"> 
+                                {{ textlang["common"]["workStudy"] }} 
+                              </label>                                                 
+                            </div>   
+                             
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedActivities_business_{{ user['id'] }}" value="business"> 
+                                {{ textlang["common"]["business"] }}
+                              </label>                                                 
+                            </div>                                                                                                
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedActivities_events_{{ user['id'] }}" value="event_attendance"> 
+                                {{ textlang["common"]["eventAttendance"] }}
+                              </label>                                                 
+                            </div>                                                    
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedActivities_outdoor_{{ user['id'] }}" value="sports_outdoor"> 
+                                {{ textlang["common"]["sportsOutdoor"] }}
+                              </label>                                                 
+                            </div> 
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedActivities_goingout_{{ user['id'] }}" value="going_out"> 
+                                {{ textlang["common"]["goingOut"] }}
+                              </label>                                                 
+                            </div>                                                 
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedActivities_activism_{{ user['id'] }}" value="activism"> 
+                                {{ textlang["common"]["activism"] }}
+                              </label>                                                 
+                            </div>                          
+                            
+                          </div>
+
+                          <div class="col-xs-3">
+                            <label>{{ textlang["common"]["sharedInterest"] }}</label><br>
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_books_{{ user['id'] }}" value="books"> 
+                                {{ textlang["common"]["books"] }}
+                              </label>                                                 
+                            </div>    
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_tvmovies_{{ user['id'] }}" value="tv_movies"> 
+                                {{ textlang["common"]["tvMovies"] }}
+                              </label>                                                 
+                            </div> 
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_music_{{ user['id'] }}" value="music"> 
+                                {{ textlang["common"]["music"] }}
+                              </label>                                                 
+                            </div> 
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_games_{{ user['id'] }}" value="games"> 
+                                {{ textlang["common"]["games"] }}
+                              </label>                                                 
+                            </div>                                                                                               
+                            
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_sports_{{ user['id'] }}" value="sports"> 
+                                {{ textlang["common"]["sports"] }}
+                              </label>                                                 
+                            </div>                         
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_pets_{{ user['id'] }}" value="pets"> 
+                                {{ textlang["common"]["animals"] }} 
+                              </label>                                                 
+                            </div>                          
+                            
+     
+
+                          </div>
+                          <div class="col-xs-3">
+
+                                  
+                            <label>{{ textlang["common"]["culture"] }}</label>
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_fb_{{ user['id'] }}" value="food_beverages">
+                                {{ textlang["common"]["foodBeverages"] }}
+                              </label>                                                 
+                            </div> 
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_hbf_{{ user['id'] }}" value="health_beauty_fashion"> 
+                                {{ textlang["common"]["health"] }}
+                              </label>                                                 
+                            </div> 
+                            <!--div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_{{ user['id'] }}_interests_commonaspect11" value="clothes_fashion"> 
+                                Clothing / Fashion   
+                              </label>                                                 
+                            </div--> 
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_amp_{{ user['id'] }}" value="art_museum_photography"> 
+                                {{ textlang["common"]["art"] }}
+                              </label>                                                 
+                            </div>                                                                                                                        
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_sciencestech_{{ user['id'] }}" value="sciences_tech"> 
+                                {{ textlang["common"]["scienceTech"] }}
+                              </label>                                                 
+                            </div>   
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_history_{{ user['id'] }}" value="history"> 
+                                {{ textlang["common"]["history"] }}
+                              </label>                                                 
+                            </div>                         
+                            <div class="checkbox">                           
+                              <label>
+                                <input type="checkbox" name="cba_sharedInterest_economy_{{ user['id'] }}" value="economy"> 
+                                {{ textlang["common"]["economy"] }}
+                              </label>                                                 
+                            </div>                          
+                            
+                          </div>  
+                  
+                        
+                         
+                       </div>
+                    </div>
+                                                                                                                                                                                                                                                                                                                                                    
+                  </div>                                     
+                <!-- ] Interactions -->  
+                  
+                <hr>                                                                               
+                </div>
+                <!-- ] friend -->
+           
+      </div>
+      {% endfor %} 
+
+        
+    </div>
+      <!-- nav buttons [ -->
+        <div class="col-md-12 text-center">
+          <button type="submit" class="btn btn-info btn-lg" href="thanks.html">{{ textlang["common"]["bttn"] }}</button>      
+        </div>
+      <!-- ] nav buttons -->        
+
+      </form>   
+    
+  
+  </div>  
+  
+     <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="static/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="static/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="static/js/jquery-1.12.4.js"></script>
+  <script src="static/js/jquery.validate.js"></script> 
+
+   <script src="static/src/app.js"></script>
+   <script> </script>
+  
+</body>
+</html>
