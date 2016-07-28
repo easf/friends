@@ -424,7 +424,7 @@ def get_granted_users(cur):
     return granted_users
 
 def get_user_status (uidhash, cur):
-    cur.execute ("SELECT status FROM user WHERE idhash = %s ", uidhash )
+    cur.execute ("SELECT status FROM user WHERE idhash = %s ", (uidhash) )
     result = cur.fetchall()
     if result == ():
         status = None
