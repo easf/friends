@@ -805,7 +805,7 @@ def get_friends_for_connectedness(uidhash, mysql, token):
 
 
 
-def store_connectedness_data( connectedness_data, friends_for_connectedness, uidhash, mysql):
+def store_connectedness_data( connectedness_data, uidhash, mysql):
     conn = mysql.connect()
     cur = conn.cursor()
     closer_users = []

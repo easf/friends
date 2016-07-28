@@ -13,6 +13,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 # Facebook app details
+
 FB_APP_ID = '1733963700184652'
 FB_APP_NAME = 'Matching Finder'
 FB_APP_SECRET = 'a6b94f66589e9f9a7d558cda0e83a3dd'
@@ -31,44 +32,60 @@ app.config['MYSQL_DATABASE_PASSWORD'] = config.MYSQL_DATABASE_PASSWORD
 app.config['MYSQL_DATABASE_DB'] = config.MYSQL_DATABASE_DB
 app.config['MYSQL_DATABASE_HOST'] = config.MYSQL_DATABASE_HOST
 
-# PREFIX SETTING
+# URL PREFIX SETTING
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix = config.PREFIX)
 
 mysql.init_app(app)
 
+# it makes accesible from all pages the hash id and token of current experiment participant
 uidhash = None
-current_close_user = None
-friends_for_common_points = []
-friends_for_connectedness = []
 token = None
-chlang = None
+
+# it contains the list of friends to complete the questions about connectedness and so on
+friends_for_connectedness = []
+
+# it contains the list of friends to complete the questions about common points and so on
+friends_for_common_points = []
+
+
+# it contains the top list of friends who most interacted in the current experiment participants
 top_ten = []
+
+# variables to track the time that is taken by the participant doing the experiment
 start_time = None
 end_time = None
 ftimepath = None
 ftime = None
-# initialize language
+
+# UI language, initialize language, english as a default language
+chlang = None
 fname = "static/js/lang/en.lang.js"
 f = open( fname, "r" )
 textlang = json.load(f)
 f.close()
 
 
+# initial page
 @app.route('/')
 def index():
 	return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION, textlang=textlang)
 
+# changing UI language
 @app.route('/language', methods=['GET','POST'])
 def language():
 	global chlang
 	global textlang
+
 	chlang = request.args.get('chLang', 0, type=str)
+
 	fname = "static/js/lang/"+ chlang + ".lang.js"
 	f = open( fname, "r" )
 	textlang = json.load(f)
 	f.close()
+
 	return jsonify(result="ok")
 
+# downloading user data
 @app.route('/userdata')
 def userdata():
     global uidhash
@@ -77,9 +94,6 @@ def userdata():
     global ftimepath
     global ftime
     
-    conn = mysql.connect()
-    cur = conn.cursor()
-
     token = request.args.get('token', 0, type=str)
     uid = request.args.get('uid', 0, type=str)
     browserlang = request.args.get('browserlang', 0, type=str)
@@ -93,18 +107,17 @@ def userdata():
     ftime = open (ftimepath, "w")
     ftime.close()
 
+    conn = mysql.connect()
+    cur = conn.cursor()
+    # verify the status of the participants (the experiment stage in which he/she is )
     status = procedures.get_user_status (uidhash, cur)
     cur.close()
     conn.close()
 
+    # if we don't have yet the participant data (None represents the first state), then we proceed to download the data
     if status == None:
     	procedures.download_data(uid, browserlang, ipcountry, device, token, mysql)    
-    # elif status == 'user_data_downloaded':
-    # 	pass
-    # elif status == 'connectedness_questions':
-    # 	return redirect(url_for('connectednessdata'))
-    # elif status == 'finished':
-    # 	return 'thanks for your collaboration!!'
+
     return jsonify(result="ok")
 
 
@@ -112,12 +125,17 @@ def userdata():
 def connectedness():
     global friends_for_connectedness
     global start_time
+
     conn = mysql.connect()
     cur = conn.cursor()
     status = procedures.get_user_status (uidhash, cur)
     cur.close()
     conn.close()
+
+    # file to backup the answers of users
     fname = "backup/" + uidhash + "_connectedness"
+
+    # Do the routing according user state and connectedness_file existence
     if status == 'connectedness_questions' and friends_for_connectedness <> []:
     	pass 
     elif status == 'user_data_downloaded':
@@ -132,7 +150,7 @@ def connectedness():
     	return render_template('thanks.html')
 
     start_time = time.time()
-    return render_template('closeness.html', users=friends_for_connectedness, userLang = chlang, textlang=textlang)
+    return render_template('connectedness.html', users = friends_for_connectedness, userLang = chlang, textlang = textlang)
 
 
 @app.route('/connectednessdata', methods=['GET','POST'] )
@@ -157,12 +175,12 @@ def connectednessdata():
         data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
         if len(data) > 4:
             if not os.path.isfile(fname):
-                print 'jajajajaajjajaja'
                 f = open( fname, "w" )
                 json.dump(data, f)
                 f.close()
     except:
         pass
+
     connectedness_data = request.form
 
     if os.path.isfile(fname):
@@ -175,10 +193,10 @@ def connectednessdata():
         ftime = open (ftimepath, "a")
     	ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (end_time - start_time)/60 ) + " minutes" + "\n" )
     	ftime.close()
-        friends_for_common_points = procedures.store_connectedness_data( connectedness_data, friends_for_connectedness, uidhash, mysql )
+        friends_for_common_points = procedures.store_connectedness_data( connectedness_data,  uidhash, mysql )
 
     elif status == 'user_connectedness_data_stored':
-        friends_for_common_points = procedures.store_connectedness_data( connectedness_data, friends_for_connectedness, uidhash, mysql )
+        friends_for_common_points = procedures.store_connectedness_data( connectedness_data, uidhash, mysql )
     elif status == 'finished':
         return render_template('thanks.html')
 
