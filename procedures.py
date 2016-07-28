@@ -424,7 +424,7 @@ def get_granted_users(cur):
     return granted_users
 
 def get_user_status (uidhash, cur):
-    cur.execute ("SELECT status FROM user WHERE idhash = %s ", (uidhash) )
+    cur.execute ("SELECT status FROM user WHERE idhash = %s ", (uidhash,) )
     result = cur.fetchall()
     if result == ():
         status = None
@@ -680,7 +680,7 @@ def get_friends_for_connectedness(uidhash, mysql, token):
     cur = conn.cursor()
     graph = facebook.GraphAPI(access_token=token, timeout=float(60.0), version='2.6')
     #rows -> po_fbid, po_id, post_owner, friend_fbid, friend_id, friend, total_interaction
-    cur.execute("SELECT * FROM interactions_in_posts_summary WHERE po_id= %s ", uidhash)
+    cur.execute("SELECT * FROM interactions_in_posts_summary WHERE po_id= %s ", (uidhash,))
     result = cur.fetchall()
     conn.commit()
     total_interaction_values = []
@@ -866,7 +866,7 @@ def store_connectedness_data( connectedness_data, uidhash, mysql):
             break
     top_ten_temp =[]
     for user in top_ten:
-        cur.execute ("SELECT id, name FROM user WHERE idhash = %s", user)
+        cur.execute ("SELECT id, name FROM user WHERE idhash = %s", (user,))
         result = cur.fetchall()
         user_fbid = result[0][0]
         user_name = result[0][1]
@@ -918,7 +918,7 @@ def insert_common_points_data(commonpoints_data, uidhash, mysql):
 def get_best_friends (uidhash, mysql):
     conn = mysql.connect()
     cur = conn.cursor()
-    cur.execute("SELECT friend_fbid, friend_id, friend, total_interaction, po_fbid, post_owner  FROM interactions_in_posts_summary WHERE po_id= %s limit 10", uidhash)
+    cur.execute("SELECT friend_fbid, friend_id, friend, total_interaction, po_fbid, post_owner  FROM interactions_in_posts_summary WHERE po_id= %s limit 10", (uidhash,))
     result = cur.fetchall()
     top_ten = []
     
