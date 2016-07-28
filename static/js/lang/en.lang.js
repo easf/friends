@@ -29,7 +29,7 @@
 		"connectedness" : 
 		{ 
 			"progress" : "Completed ",
-			"connTitle" :  "How close do you feel to your facebook friends?",
+			"connTitle" :  "How connected do you feel to your facebook friends?",
 			"connGralInst" :  "Please, answer the questions for the 20 friends below.",
 			"is":"is a",
 			"gender1":  "Male",
