@@ -2,17 +2,32 @@
 <html>
 <head>
   
-  <!-- Twitter bootstrap -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">  
-  
-  <!-- jquery -->
-  <script   src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>  
-  
+  <link href="static/css/bootstrap.min.css" rel="stylesheet" type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Alegreya+Sans:400,300' rel='stylesheet' type='text/css'>
-  <link href='styles.css' rel='stylesheet' type='text/css'>
+  <link href='static/css/styles.css' rel='stylesheet' type='text/css'>
+
+       <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="static/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="static/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="static/js/jquery-1.12.4.js"></script>
+  <script src="static/js/jquery.validate.js"></script> 
   
 </head>
 <body>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 
 <!-- HEADER -->
       <nav class="navbar navbar-white navbar-fixed-top">
@@ -24,7 +39,7 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="#">
-          <img class="logo" alt="Brand" src="img/logo.png"> 
+          <img class="logo" alt="Brand" src="static/src/img/logo.png"> 
         </a>
       </div>
           
@@ -37,7 +52,7 @@
     <div class="col-md-12 col-lg-10 col-lg-offset-1">
     
       <div class="welcome text-center page-header">
-        <h1> Thanks! TODO.</h1>
+        <h1> {{ textlang["thanks"]["title"] }}</h1>
       </div>
 
       <div class="row">
@@ -47,24 +62,26 @@
             in social networks and what aspects their share in common
             -->
           <p class="lead">        
-            You've contributed to science.</p>
+            {{ textlang["thanks"]["firstMessage"] }} 😎 </p>
+        <div class="row">
+          <div class="col-md-4">
+          <p class="lead"> {{ textlang["thanks"]["secondMessage"] }} 😇 </p>
+          </div>
+          <div class="col-md-8">
+          <div class="fb-share-button" data-href="http://happy.mateine.org/friends/" data-layout="button" data-size="large" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhappy.mateine.org%2Ffriends%2F&amp;src=sdkpreparse">{{ textlang["thanks"]["fbBttn"] }}</a></div>
+          </div>
 
-          <p class="lead"> Share on facebook</p>
-
+        </div>
           <p class="lead">
-          The experiment requires Facebook login. The access to profile information is requested to: 
-            i) identify common aspects among facebook profiles and ii) the number of interaction online<strong>*</strong>.   
+              {{ textlang["thanks"]["thirdMessage"] }} 🙋
           </p>  
-
+          <p class="lead">
+          {{ textlang["thanks"]["goodbye"] }} 😊 
+          </p>
 
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-12">
-          <a type="button" class="btn btn-info btn-lg" href="closeness.html">Start the experiment</a>        
-        </div>
-      </div>
 
       <hr>
       
@@ -74,7 +91,7 @@
     </div>
     
   </div>
-  <script src="app.js"></script>
+  <script src="static/src/app.js"></script>
   
 </body>
 </html>

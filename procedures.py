@@ -857,9 +857,9 @@ def store_connectedness_data( connectedness_data, uidhash, mysql):
     cur.execute ("UPDATE user SET status = %s WHERE idhash = %s", ('user_connectedness_data_stored', uidhash))
     conn.commit()
     dict_users_keys = dict_users.keys()
-    sorted ( dict_users_keys, reverse =  True )
+    dict_users_keys.sort() 
     limit = 10
-    for user_conn_key in dict_users_keys:
+    for user_conn_key in reversed(dict_users_keys):
         top_ten.append ( dict_users[user_conn_key] )
         limit -= 1
         if limit == 0:

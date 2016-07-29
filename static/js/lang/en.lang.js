@@ -109,12 +109,21 @@
 	{
 		"title":"Friends who most interacted in your posts.",
 		"subtitle":" we've done a top list of friends based on aproximated amount of interactions in your posts. Look!!",
-		"bttn":"Finish"
+		"bttn":"Next"
 	},
 	"recoverpage":
 	{
 		"title" : "Unexpected things have been ocurred but, don't worry! Just press the button below to continue with the experiment.",
 		"bttn" : "Continue"
 	},
-	"thanks": "under construction"
+	"thanks": 
+	{
+		"title" : "Thanks!",
+		"firstMessage": "You've contributed to science! ",
+		"secondMessage": "Share on facebook ",
+		"thirdMessage" : "Thanks for your colaboration !!! ",
+		"fbBttn" : "Share",
+		"goodbye": "We've finished, just close the browser tab and good bye! " 
+
+	}
 }

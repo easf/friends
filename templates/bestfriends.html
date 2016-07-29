@@ -2,12 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-     <!-- You can use Open Graph tags to customize link previews.
-    Learn more: https://developers.facebook.com/docs/sharing/webmasters -->
-  <meta property="og:url"           content="http://localhost:5000" />
-  <meta property="og:type"          content="website" />
-  <meta property="og:title"         content="Friends" />
-  <meta property="og:description"   content="Complete a survey on Facebook an get your friends who most interact with your posts" />
+
   
 
   <link href="static/css/bootstrap.min.css" rel="stylesheet" type='text/css'>
@@ -29,15 +24,6 @@
   
 </head>
 <body>
-
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
 
       <nav class="navbar navbar-white navbar-fixed-top">
     <div class="container">
@@ -79,7 +65,7 @@
         </div>        
       </div>
     </div>
-     <form id="myform3" method="post" action="{{ url_for('commonpointsdata') }}">
+     <form id="myform3" method="post" action="{{ url_for('thanks') }}">
 
         <!-- friends [ -->
         
@@ -162,9 +148,7 @@
           <button type="submit" class="btn btn-info btn-lg" href="thanks.html">{{ textlang["bestfriends"]["bttn"] }}</button> 
 
         </div>
-        <div align="center">
-<div class="fb-share-button" data-href="http://happy.mateine.org/friends/" data-layout="button" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhappy.mateine.org%2Ffriends%2F&amp;src=sdkpreparse">Share</a></div>
-        </div>
+      
       <!-- ] nav buttons -->        
 
 

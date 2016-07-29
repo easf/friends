@@ -104,11 +104,13 @@ def userdata():
     uidhash = hashlib.sha1(uid).hexdigest()
     
     ftimepath = "backup/" + uidhash + "_time"
-    ftime = open (ftimepath, "w")
-    ftime.close()
+    if not os.path.isfile(ftimepath):
+        ftime = open (ftimepath, "w")
+        ftime.close()
 
     conn = mysql.connect()
     cur = conn.cursor()
+
     # verify the status of the participants (the experiment stage in which he/she is )
     status = procedures.get_user_status (uidhash, cur)
     cur.close()
@@ -120,7 +122,7 @@ def userdata():
 
     return jsonify(result="ok")
 
-
+# rendering connectedness and interaction frequecncy questions
 @app.route('/connectedness', methods=['GET','POST'])
 def connectedness():
     global friends_for_connectedness
@@ -136,37 +138,29 @@ def connectedness():
     fname = "backup/" + uidhash + "_connectedness"
 
     # Do the routing according user state and connectedness_file existence
-    if status == 'connectedness_questions' and friends_for_connectedness <> []:
+    if status == 'connectedness_questions' and friends_for_connectedness <> []: # if the user reload the page 
     	pass 
-    elif status == 'user_data_downloaded':
+    elif status == 'user_data_downloaded': # if the application was crashed and then recover, recalculate friends for connectedness
     	friends_for_connectedness = procedures.get_friends_for_connectedness(uidhash, mysql, token)
-    elif status == 'connectedness_questions' and not os.path.isfile(fname):
+    elif status == 'connectedness_questions' and not os.path.isfile(fname): # if the app crashed during or something worng happend when the participant was anwering the questions
     	friends_for_connectedness = procedures.get_friends_for_connectedness(uidhash, mysql, token)
-    elif status == 'connectedness_questions' and os.path.isfile(fname):
+    elif status == 'connectedness_questions' and os.path.isfile(fname): # if the user already anwsered the questions about connectedness before the app got crashed
     	return redirect(url_for('connectednessdata'))
-    elif status == 'user_connectedness_data_stored':
+    elif status == 'user_connectedness_data_stored': # if we aalready stored the data about connectedness and interaction frequency questions
     	return redirect(url_for('connectednessdata'))
-    elif status == 'finished':
-    	return render_template('thanks.html')
+    elif status == 'finished': # if the user finished the experiment, say thanks
+    	return redirect(url_for('friends'))
 
     start_time = time.time()
+
     return render_template('connectedness.html', users = friends_for_connectedness, userLang = chlang, textlang = textlang)
 
-
+# store connectedness data and get friend list for common points
 @app.route('/connectednessdata', methods=['GET','POST'] )
 def connectednessdata():
     global uidhash
     global friends_for_common_points
     global end_time
-
-    conn = mysql.connect()
-    cur = conn.cursor()
-    status = procedures.get_user_status (uidhash, cur)
-    cur.close()
-    conn.close()
-    # convert user anwsers in dict
-    end_time = time.time()
-    ts = time.time()
 
 
     fname = "backup/" + uidhash + "_connectedness"
@@ -189,19 +183,29 @@ def connectednessdata():
         f.close()
         connectedness_data = user_answers
 
+    conn = mysql.connect()
+    cur = conn.cursor()
+    status = procedures.get_user_status (uidhash, cur)
+    cur.close()
+    conn.close()
+    # convert user anwsers in dict
+    end_time = time.time()
+    ts = time.time()
+
     if status == 'connectedness_questions' and friends_for_connectedness <> []:
         ftime = open (ftimepath, "a")
     	ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (end_time - start_time)/60 ) + " minutes" + "\n" )
     	ftime.close()
         friends_for_common_points = procedures.store_connectedness_data( connectedness_data,  uidhash, mysql )
 
-    elif status == 'user_connectedness_data_stored':
+    elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (crashed or no crashed)
         friends_for_common_points = procedures.store_connectedness_data( connectedness_data, uidhash, mysql )
     elif status == 'finished':
-        return render_template('thanks.html')
+        return redirect(url_for('friends'))
 
     return redirect(url_for('commonpoints'))
 
+# rendering common points
 @app.route('/commonpoints', methods=['GET','POST'] )
 def commonpoints():
     global current_close_user
@@ -214,14 +218,14 @@ def commonpoints():
     conn.close()
     fname = "backup/" + uidhash + "_commonpoints"
     if status == 'finished':
-        return render_template('thanks.html')
+        return redirect(url_for('friends'))
     else: #if status == 'user_connectedness_data_stored':
-        if os.path.isfile(fname):
+        if os.path.isfile(fname): # if the user already answer the questions about common points
             return redirect( url_for('commonpointsdata') )
-        elif friends_for_common_points <> []:
+        elif friends_for_common_points <> []: # if the user reload the page
             start_time = time.time()
             return render_template('common.html', users=friends_for_common_points, textlang=textlang)
-        elif status == 'user_connectedness_data_stored':
+        elif status == 'user_connectedness_data_stored': # if there were a chrash, get again friends for common points
             connectedness_data = request.form
             if os.path.isfile(fname):
                 f = open( fname, "r" )  
@@ -239,17 +243,11 @@ def commonpointsdata():
     global end_time
     fname = "backup/" + uidhash + "_commonpoints"
     
-    end_time = time.time()
-    ftime = open (ftimepath, "a")
-    ts = time.time()
-    ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (end_time - start_time)/60 ) + " minutes" + "\n" )
-    ftime.close()
 
     try:
         data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
         if len(data) > 4:
             if not os.path.isfile(fname):
-                print 'jajajajaajjajaja'
                 f = open( fname, "w" )
                 json.dump(data, f)
                 f.close()
@@ -263,8 +261,23 @@ def commonpointsdata():
          f.close()
          commonpoints_data = user_answers
 
-    procedures.insert_common_points_data( commonpoints_data, uidhash, mysql )
+    conn = mysql.connect()
+    cur = conn.cursor()
+    status = procedures.get_user_status (uidhash, cur)
+    cur.close()
+    conn.close()
+    
+    end_time = time.time()
+    ts = time.time()
+    
+    if status <> 'finished':
+        ftime = open (ftimepath, "a")
+        ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (end_time - start_time)/60 ) + " minutes" + "\n" )
+        ftime.close()
+    	procedures.insert_common_points_data( commonpoints_data, uidhash, mysql )
+
     return redirect(url_for('friends'))
+
 
 @app.route('/friends', methods=['GET','POST'] )
 def friends():
@@ -274,7 +287,7 @@ def friends():
     
 @app.route('/thanks', methods=['GET','POST'] )
 def thanks():
-	return render_template('thankyou.html', userLang=chlang)
+	return render_template('thanks.html', textlang=textlang)
 
 @app.errorhandler(500)
 def internal_error(error):
@@ -283,6 +296,7 @@ def internal_error(error):
 @app.errorhandler(404)
 def not_found(error):
     return "404 error",404
+
 
 if __name__ == "__main__":
     try:

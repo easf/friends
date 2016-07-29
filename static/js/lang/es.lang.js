@@ -111,13 +111,22 @@
 	{
 		"title":"Amigos quiénes más interactuaron con tus publicaciones.",
 		"subtitle":" hemos hecho una lista de amigos sobresalientes basado en un número aproximado de interacciones relacionadas a tus publicaciones. ¡Mira quiénes están en la lista!",
-		"bttn" : "Finalizar"
+		"bttn" : "Continuar"
 	},
 	"recoverpage":
 	{
 		"title" : "¡Ups! cosas insesperadas han ocurrido pero, ¡no te preocupes! Sólo presiona el botón de abajo para continuar con el experimento",
-		"bttn" : "Continuar"
+		"bttn" : "Continuemos"
 	},
-	"thanks": "under construction"
+	"thanks":
+	{
+		"title" : "Gracias!",
+		"firstMessage": "Has contribuido con la ciencia! ",
+		"secondMessage": "Comparte en Facebook ",
+		"thirdMessage" : "Gracias por tu colaboración !!! ",
+		"fbBttn" : "Compartir",
+		"goodbye": "Hemos terminado, cierra esta página y adiós! " 
+
+	}
 
 }

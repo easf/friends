@@ -70,6 +70,9 @@ $(document).ready(function(){
     
   });
 
+  function close_window() {
+      close();
+  }
 
 });
 
