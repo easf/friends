@@ -64,6 +64,9 @@ f = open( fname, "r" )
 textlang = json.load(f)
 f.close()
 
+#recover request form
+request_form_connectednessdata = None
+request_form_commonpointsdata = None
 
 # initial page
 @app.route('/')
@@ -161,12 +164,13 @@ def connectednessdata():
     global uidhash
     global friends_for_common_points
     global end_time
+    global request_form_connectednessdata
 
-
-    fname = "backup/" + uidhash + "_connectedness"
+    request_form_connectednessdata = request.form
+    fname = "backup/" + str(uidhash) + "_connectedness"
 
     try:
-        data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
+        data = dict((key, request_form_connectednessdata.getlist(key)[0]) for key in request_form_connectednessdata.keys())
         if len(data) > 4:
             if not os.path.isfile(fname):
                 f = open( fname, "w" )
@@ -175,7 +179,7 @@ def connectednessdata():
     except:
         pass
 
-    connectedness_data = request.form
+    connectedness_data = request_form_connectednessdata
 
     if os.path.isfile(fname):
         f = open( fname, "r" )  
@@ -241,11 +245,14 @@ def commonpoints():
 @app.route('/commonpointsdata', methods=['GET','POST'] )
 def commonpointsdata():
     global end_time
+    global request_form_commonpointsdata
+    
+    request_form_commonpointsdata = request.form
     fname = "backup/" + uidhash + "_commonpoints"
     
 
     try:
-        data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
+        data = dict((key, request_form_commonpointsdata.getlist(key)[0]) for key in request_form_commonpointsdata.keys())
         if len(data) > 4:
             if not os.path.isfile(fname):
                 f = open( fname, "w" )
@@ -253,7 +260,7 @@ def commonpointsdata():
                 f.close()
     except:
         pass
-    commonpoints_data = request.form
+    commonpoints_data = request_form_commonpointsdata
 
     if os.path.isfile(fname):
          f = open( fname, "r" )  
