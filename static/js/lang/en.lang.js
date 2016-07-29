@@ -60,6 +60,7 @@
 			"trait6": "Smart",
 			"trait7": "Extrovert",
 			"trait8": "Active",
+			"trait9": "Other",
 			"spInstRel" : "Please, check the options that describe your relationship with ",
 			"relTypepf" : "Part of my family",
 			"relTypecf" : "Core family (parent, child, sibbling)",
@@ -76,6 +77,8 @@
 			"sameUniversity": "Same college/university",
 			"coworkers" : "We are/were co-workers",
 			"otherInstitutions" : "Attend(ed) together other type of institutions",
+			"otherlabel": "Other",
+			"other": "Other",
 			"spInstcomm": "What do you share in common with ",
 			"sharedBeliefs": "Shared beliefs",
 			"politics": "Political views",
@@ -103,6 +106,9 @@
 			"scienceTech": "Science & technology",
 			"history": "History & Current affairs",
 			"economy": "Economy & politics",
+			"otherOptions" : "Other options",
+			"other": "Other",
+			"nothing":"Nothing",
 			"bttn" : "He terminado" 
 	},
 	"bestfriends":

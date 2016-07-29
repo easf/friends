@@ -114,11 +114,16 @@
                           <input type="checkbox" id="r1" name="trait_extrovert_{{ user['id'] }}" value="extrovert" required>
                           {{ textlang["common"]["trait7"] }}
                         </label>  
-                         <label class="myclass_rimg">
+                        <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait8"] }}>🙋</span>
                           <input type="checkbox" id="r1" name="trait_active_{{ user['id'] }}" value="active" required>
                           {{ textlang["common"]["trait8"] }}
-                        </label>                                                         
+                        </label>
+                        <label class="myclass_rimg">
+                          <span title={{ textlang["common"]["trait9"] }}>😶</span>
+                          <input type="checkbox" id="r1" name="trait_other_{{ user['id'] }}" value="other" required>
+                          {{ textlang["common"]["trait9"] }}
+                        </label>                                                          
                                                                                                 
                       </div>                    
                       
@@ -169,13 +174,15 @@
                                 <input type="checkbox" name="cbr_commonPlace_together_{{ user['id'] }}" value="live_together">
                                 {{ textlang["common"]["sharedFlat"] }}
                               </label>                         
-                             </div>                                                                        
+                             </div>  
+
+
                             
                           </div>
 
 
                           <div class="col-md-6 col-xs-12">
-
+                          
                              <label>{{ textlang["common"]["romanticalRel"] }}</label>                        
                              <div class="checkbox">                           
                               <label>
@@ -189,8 +196,7 @@
                                 <input type="checkbox" name="cbr_romantic_gbfriend_{{ user['id'] }}" value="girlfriend_boyfriend">
                                 {{ textlang["common"]["significantOther"] }}
                               </label>                         
-                             </div>                                                  
-                            
+                             </div>   
                             
                           <label>{{ textlang["common"]["sameInstitution"] }}</label><br>                        
                            <div class="checkbox">                           
@@ -218,7 +224,15 @@
                               <input type="checkbox" id="cbr_other_same_institution" name="cbr_sameInstitution_other_{{ user['id'] }}" value="same_other_institution"> 
                               {{ textlang["common"]["otherInstitutions"] }}
                             </label>                         
-                           </div>                                                                                                                                              
+                           </div>    
+
+                          <!--<label>{{ textlang["common"]["otherlabel"] }}</label><br> -->                       
+                           <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cbr_sameInstitution_school_{{ user['id'] }}" value="same_school"> 
+                              <strong>{{ textlang["common"]["other"] }}</strong>
+                            </label>                         
+                           </div>                                                                                                                                            
                           </div>
                       
                       </div>                                                 
@@ -270,7 +284,22 @@
                               {{ textlang["common"]["similarCauses"] }}
                             </label>                         
                            </div>
-                            
+                          
+                          <br>
+                            <label>{{ textlang["common"]["otherOptions"] }}</label>
+                            <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cba_other_causes_{{ user['id'] }}" value="other"> 
+                              {{ textlang["common"]["other"] }}
+                            </label>                         
+                           </div> 
+
+                            <div class="checkbox">                           
+                            <label>
+                              <input type="checkbox" name="cba_nothing_causes_{{ user['id'] }}" value="nothing"> 
+                              {{ textlang["common"]["nothing"] }}
+                            </label>                         
+                           </div>       
                              <!-- Intellectual? -->
                             
                           </div>

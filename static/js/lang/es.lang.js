@@ -62,6 +62,7 @@
 		"trait6": "Inteligente",
 		"trait7": "Extrovertido/a",
 		"trait8": "Activo/a",
+		"trait9": "Otro",
 		"spInstRel" : "Por favor, indica las opciones que describen tu relación con ",
 		"relTypepf" : "Parte de mi familia",
 		"relTypecf" : "Familia nuclear (padre/madre, hijo/a, hermano/a)",
@@ -78,6 +79,8 @@
 		"sameUniversity": "De la misma facultad / universidad",
 		"coworkers" : "Somos / Fuimos compañeros/as de trabajo",
 		"otherInstitutions" : "Vamos / Fuimos a la misma institución (otra)",
+		"otherlabel": "Otra",
+		"other": "Otra",
 		"spInstcomm": "¿Qué aspectos compartes con ",
 		"sharedBeliefs": "Creencias compartidas",
 		"politics": "Puntos de vista políticos",
@@ -105,6 +108,9 @@
 		"scienceTech": "Ciencia & Tecnología",
 		"history": "Historia & Actualidades",
 		"economy": "Economía & Política",
+		"otherOptions" : "Otras opciones",
+		"other": "Otro",
+		"nothing":"Nada",
 		"bttn" : "He terminado" 
 	},
 	"bestfriends":
