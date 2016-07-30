@@ -236,7 +236,7 @@ def commonpoints():
                 user_answers = json.load(f)
                 f.close()
                 connectedness_data = user_answers
-            friends_for_common_points = procedures.store_connectedness_data( connectedness_data, friends_for_connectedness, uidhash, mysql )
+            friends_for_common_points = procedures.store_connectedness_data( connectedness_data, uidhash, mysql )
             start_time = time.time()
             return render_template('common.html', users=friends_for_common_points, textlang=textlang)
         else:	
