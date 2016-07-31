@@ -886,7 +886,7 @@ def insert_common_points_data(commonpoints_data, uidhash, mysql):
     cur = conn.cursor()
     survey_data_keys = commonpoints_data.keys()
     
-    added_users = []
+#    added_keys = []
     
     status = get_user_status (uidhash, cur)
     if status == 'user_connectedness_data_stored':
@@ -895,22 +895,22 @@ def insert_common_points_data(commonpoints_data, uidhash, mysql):
             ids = key.split('_')
             user_idhash1 = ids[-1]
             data_id = ids[0] 
-            if user_idhash1 not in added_users:
-                added_users.append (user_idhash1)
-                if data_id == "trait":
-                    cur.execute ( "INSERT INTO trait (user_idhash, user_idhash1, trait) VALUES (%s, %s, %s)", (uidhash, user_idhash1, commonpoints_data[key] ) )
-                if data_id == 'cbr':
-                    try:
-                        cur.execute("INSERT INTO relationship_from_survey (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, ids[1], commonpoints_data[key] ) )
-                    except:
-                        pass
+ #           if user_idhash1 not in added_users:
+ #           added_users.append (user_idhash1)
+            if data_id == "trait":
+                cur.execute ( "INSERT INTO trait (user_idhash, user_idhash1, trait) VALUES (%s, %s, %s)", (uidhash, user_idhash1, commonpoints_data[key] ) )
+            if data_id == 'cbr':
+                try:
+                    cur.execute("INSERT INTO relationship_from_survey (user_idhash, user_idhash1, relationship_type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, ids[1], commonpoints_data[key] ) )
+                except:
+                    pass
 
-                if data_id == 'cba':
-                    try:
-                        cur.execute ( "INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, ids[1], commonpoints_data[key] ) )
-                    except:                   
-                        pass
-            
+            if data_id == 'cba':
+                try:
+                    cur.execute ( "INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, ids[1], commonpoints_data[key] ) )
+                except:                   
+                    pass
+        
 
         cur.execute ("UPDATE user SET status = %s WHERE idhash = %s", ('finished', uidhash))
         conn.commit()

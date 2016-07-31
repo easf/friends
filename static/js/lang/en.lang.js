@@ -10,9 +10,11 @@
 						 "firstSt": " how people interact ", "secondSt": " share in common" 
 					   },
 
-			"secondPar": { "firstSeg": "This experiment is part of an initiative by the ", "secondSeg": " group at ", 
-						  "thirdSeg": " aiming at helping older adults make new friends and possible reconnect with people from their past. ", 
-						  "firstLn": " Lifeparticipation ", "secondLn": " University of Trento " 
+			"secondPar": { "firstSeg": "This experiment is part of an initiative by the ", 
+						   "firstLn": " Lifeparticipation ", 
+						   "secondSeg": " group at ",
+						   "secondLn": " University of Trento ", 
+						   "thirdSeg": " aiming at helping older adults make new friends and possible reconnect with people from their past. "
 						},
 
 			"thirdPar":"The experiment requires Facebook login. The access to profile information is requested to: i) identify common aspects among facebook profiles and ii) the number of interaction online"
@@ -20,11 +22,12 @@
 		"consent": "Hereby, I accept to participate of the study, consenting the use of my data ONLY in the form expressed in this page and for the research purposes described above.",
 		"startBttn": "Start the experiment",
 		"footnote": { "firstSeg":"The questionaire is completely ", 
-					 "secondSeg":" and ", 
-					 "thirdSeg":"The resulting data will be used for the scientific purposes explained in this page. You can leave the questionnaire at any moment. For further info, please check our " , 
-					 "firstSt":" anonymous ", "secondSt":" no content about your posts will be recorded ", 
-					 "firstLn":" terms and conditions" 
-				   }
+					  "firstSt":" anonymous ",
+				 	  "secondSeg":" and ", 
+				 	  "secondSt":" no content about your posts will be recorded ", 
+					  "thirdSeg":"The resulting data will be used for the scientific purposes explained in this page. You can leave the questionnaire at any moment. For further info, please check our " ,  
+					  "firstLn":" terms and conditions" 
+				    }
 		},
 		"connectedness" : 
 		{ 
