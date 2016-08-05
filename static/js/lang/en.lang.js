@@ -112,7 +112,8 @@
 			"otherOptions" : "Other options",
 			"other": "Other",
 			"nothing":"Nothing",
-			"bttn" : "He terminado" 
+			"bttn" : "I've finished",
+			"completeMessage": "Please, choose at least one option per each question for each friend" 
 	},
 	"bestfriends":
 	{

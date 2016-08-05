@@ -79,14 +79,18 @@
               <div class="col-md-8">
                 <div class="gender form-group feedback">
                 <label class="radio-inline"><span id="isGender">{{ textlang["connectedness"]["is"] }}</span></label>
-                <label class="radio-inline">
-                    <input id="radio1" name="rg_{{ user['id'] }}" type="radio" value="m" required>
-                    <span id="gender1">{{ textlang["connectedness"]["gender1"] }}</span>
-                </label>
-                <label class="radio-inline">
-                    <input id="radio2" name="rg_{{ user['id'] }}" type="radio" value="f">
-                    <span id="gender2">{{ textlang["connectedness"]["gender2"] }}</span>                    
-                </label>  
+                <span>
+                  <label class="radio-inline">
+                      <input id="radio1" name="rg_{{ user['id'] }}" type="radio" value="m" required>
+                      {{ textlang["connectedness"]["gender1"] }}
+                  </label>
+                  <label class="radio-inline">
+                      <input id="radio2" name="rg_{{ user['id'] }}" type="radio" value="f">
+                      {{ textlang["connectedness"]["gender2"] }}                    
+                  </label>  
+                  <!--Set the position of error message -->
+                  <label for="rg_{{ user['id'] }}" class="error" title="THis is bad" value="Oh noo!" style="color:red; display:none;"></label>
+                </span>
                 </div>                          
               </div>  
             </div>             
@@ -99,7 +103,7 @@
                 </div>             
                 <div class="col-md-12">                
                   <div class="form-group feedback">  
-
+                    <span>
                     <label class="myclass_rimg">
                       <input type="radio" id="r1" name="connectedness_{{ user['id'] }}" value="1" required>
                       <img src="static/src/img/connectedness_1.png">
@@ -133,9 +137,10 @@
                     <label class="myclass_rimg">
                       <input type="radio" id="r7" name="connectedness_{{ user['id'] }}" value="7">
                       <img src="static/src/img/connectedness_7.png" class="img-rounded">
-
                     </label> <!--Set the position of error message -->
-                    <label for="connectedness_{{ user['id'] }}" class="error" style="display:none;"></label>
+
+                    <label for="connectedness_{{ user['id'] }}" class="error" style="color:red; display:none;"></label>
+                   </span>
                   </div>                                                 
                 </div>
               </div>
@@ -150,7 +155,8 @@
                   <div class="radio feedback">      
                     <label class="radio-inline radio-desc">  
                       <strong id="channel1"> {{ textlang["connectedness"]["channel1"] }}</strong>
-                    </label>                              
+                    </label> 
+                                              
                     <label class="radio-inline">
                       <input type="radio" id="r1" name="interaction_online_{{ user['id'] }}" value="1" required>
                       <span id="onlikertScale1" >{{ textlang["connectedness"]["likertScale1"] }}</span>
@@ -175,6 +181,9 @@
                       <input type="radio" id="r5" name="interaction_online_{{ user['id'] }}" value="5">
                       <span id="onlikertScale5">{{ textlang["connectedness"]["likertScale5"] }}</span>
                     </label>
+                    <!--Set the position of error message -->
+                    <label for="interaction_online_{{ user['id'] }}" class="error" style="color:red; display:none;"></label>
+                    
                    </div>
                 </div>
                 
@@ -182,7 +191,8 @@
                   <div class="radio feedback">      
                     <label class="radio-inline radio-desc">  
                       <strong id="channel2" > {{ textlang["connectedness"]["channel2"] }} </strong>
-                    </label>                              
+                    </label>  
+                                            
                     <label class="radio-inline" >
                       <input type="radio" id="r1" name="interaction_face_{{ user['id'] }}" value="1" required>
                       <span id="f2flikertScale1">{{ textlang["connectedness"]["likertScale1"] }}</span>
@@ -207,6 +217,9 @@
                       <input type="radio" id="r5" name="interaction_face_{{ user['id'] }}" value="5">
                       <span id="f2flikertScale5">{{ textlang["connectedness"]["likertScale5"] }}</span>
                     </label>
+                    <!--Set the position of error message -->
+                    <label for="interaction_face_{{ user['id'] }}" class="error" style="color:red; display:none;"></label>
+                    
                    </div>
                 </div>                                                                  
                                                                                                                                                                                                                                                                                                                                 
@@ -247,6 +260,10 @@
   
 
   <script src="static/src/app.js"></script>
+  <script>
+  $("#myform2").validate();
+
+  </script>
 
 
   

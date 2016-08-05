@@ -49,7 +49,7 @@
         </div>        
       </div>
     </div>
-     <form id="myform3" method="post" action="{{ url_for('commonpointsdata') }}">
+     <form id="myform3" class="control-form" method="post" action="{{ url_for('commonpointsdata') }}" onsubmit="return validateMyForm();">
     {% for user in users %}
         <!-- friends [ -->
         
@@ -76,55 +76,55 @@
                     <div class="col-md-12"> 
                       <p class="lead">{{ textlang["common"]["spInstTraits"] }}<span class="text-info">{{ user['name'] }}</span>.</p>
                     </div>             
-                    <div class="col-md-12"> 
+                    <div id="traitGroup" class="col-md-12"> 
                       <div class="form-group feedback">  
 
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait1"] }}>😂  </span>
-                          <input type="checkbox" id="r1" name="trait_funny_{{ user['id'] }}" value="funny" required>
+                          <input type="checkbox" id="r1" name="trait_funny_{{ user['id'] }}" value="funny">
                           {{ textlang["common"]["trait1"] }}
                         </label>
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait2"] }}>😇  </span>
-                          <input type="checkbox" id="r1" name="trait_kind_{{ user['id'] }}" value="kind" required>
+                          <input type="checkbox" id="r1" name="trait_kind_{{ user['id'] }}" value="kind" >
                           {{ textlang["common"]["trait2"] }}
                         </label>
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait3"] }}>😎  </span>
-                          <input type="checkbox" id="r1" name="trait_cool_{{ user['id'] }}" value="cool" required>
+                          <input type="checkbox" id="r1" name="trait_cool_{{ user['id'] }}" value="cool" >
                           {{ textlang["common"]["trait3"] }}
                         </label>
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait4"] }}>😱  </span>
-                          <input type="checkbox" id="r1" name="trait_worrisome_{{ user['id'] }}" value="worrisome" required>
+                          <input type="checkbox" id="r1" name="trait_worrisome_{{ user['id'] }}" value="worrisome" >
                           {{ textlang["common"]["trait4"] }}
                         </label>
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait5"] }}>😡  </span>
-                          <input type="checkbox" id="r1" name="trait_explosive_{{ user['id'] }}" value="explosive" required>
+                          <input type="checkbox" id="r1" name="trait_explosive_{{ user['id'] }}" value="explosive" >
                           {{ textlang["common"]["trait5"] }}
                         </label>    
                         <label class="myclass_rimg">
                            <span title={{ textlang["common"]["trait6"] }}>🤓</span>
-                          <input type="checkbox" id="r1" name="trait_smart_{{ user['id'] }}" value="smart" required>
+                          <input type="checkbox" id="r1" name="trait_smart_{{ user['id'] }}" value="smart" >
                           {{ textlang["common"]["trait6"] }}
                         </label>  
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait7"] }}>💬</span>
-                          <input type="checkbox" id="r1" name="trait_extrovert_{{ user['id'] }}" value="extrovert" required>
+                          <input type="checkbox" id="r1" name="trait_extrovert_{{ user['id'] }}" value="extrovert" >
                           {{ textlang["common"]["trait7"] }}
                         </label>  
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait8"] }}>🙋</span>
-                          <input type="checkbox" id="r1" name="trait_active_{{ user['id'] }}" value="active" required>
+                          <input type="checkbox" id="r1" name="trait_active_{{ user['id'] }}" value="active" >
                           {{ textlang["common"]["trait8"] }}
                         </label>
                         <label class="myclass_rimg">
                           <span title={{ textlang["common"]["trait9"] }}>😶</span>
-                          <input type="checkbox" id="r1" name="trait_other_{{ user['id'] }}" value="other" required>
+                          <input type="checkbox" id="r1" name="trait_other_{{ user['id'] }}" value="other" >
                           {{ textlang["common"]["trait9"] }}
                         </label>                                                          
-                                                                                                
+                                                                     
                       </div>                    
                       
                     </div>
@@ -466,7 +466,7 @@
     </div>
       <!-- nav buttons [ -->
         <div class="col-md-12 text-center">
-          <button type="submit" class="btn btn-info btn-lg" href="thanks.html">{{ textlang["common"]["bttn"] }}</button>      
+          <button id="commonBttn" type="submit" class="btn btn-info btn-lg" href="thanks.html">{{ textlang["common"]["bttn"] }}</button>      
         </div>
       <!-- ] nav buttons -->        
 
@@ -486,8 +486,23 @@
   <script src="static/js/jquery-1.12.4.js"></script>
   <script src="static/js/jquery.validate.js"></script> 
 
-   <script src="static/src/app.js"></script>
-   <script> </script>
+  
+   <script>   $("#myform3").validate();
+    var cncompleted= 0;
+    function validateMyForm () {
+    
+        if( cncompleted < 10)
+        {
+          alert("{{ textlang['common']['completeMessage'] }}");
+          return false;
+        } else {
+          return true;
+        }
+    
+    }
+  
+   </script>
+    <script src="static/src/app.js"></script>
   
 </body>
 </html>

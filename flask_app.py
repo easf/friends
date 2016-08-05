@@ -15,7 +15,7 @@ sys.setdefaultencoding('utf8')
 # Facebook app details
 
 FB_APP_ID = '1733963700184652'
-FB_APP_NAME = 'Matching Finder'
+FB_APP_NAME = 'FriendRover'
 FB_APP_SECRET = 'a6b94f66589e9f9a7d558cda0e83a3dd'
 API_VERSION = 'v2.6'
 
@@ -67,6 +67,7 @@ f.close()
 #recover request form
 request_form_connectednessdata = None
 request_form_commonpointsdata = None
+
 
 # initial page
 @app.route('/')

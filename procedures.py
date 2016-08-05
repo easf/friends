@@ -772,8 +772,10 @@ def get_friends_for_connectedness(uidhash, mysql, token):
         others = [ item for item in range(len(all_users)) if item not in ( rand_user_from_q1 + rand_user_from_q2 + rand_user_from_q3 + rand_user_from_q4 ) ]
         diff = NUMBER_OF_CHOSENS_REQUIRED - total_chosens
         if diff < len(others):
-            random.shuffle(others)
-            rand_user_rest = others[:diff]
+        	for ch in reversed(others):
+        		rand_user_rest.append ( ch )
+            	#random.shuffle(others)
+            	#rand_user_rest = others[:diff]
         else:
             rand_user_rest = others
 
@@ -795,6 +797,7 @@ def get_friends_for_connectedness(uidhash, mysql, token):
     for i in rand_user_rest:
         chosen_ones.append ( all_users[ i ] )
 
+    #print chosen_ones
 
     random.shuffle ( chosen_ones )
 

@@ -31,20 +31,21 @@ $(document).ready(function(){
   
   $(".close-friends .friend input[type=checkbox]").change(function(e){
    var N_QUESTIONS = 3;  
-   var ncompleted = 0;
+   cncompleted = 0;
     $(".friend").each(function(){
       var list = $(this).find(".feedback:has(input:checked)");
       if (list.length==N_QUESTIONS){
-          ncompleted++;
+          cncompleted++;
       }
     });
-    if ($(".score .label").text() != ncompleted){
-      $(".score .label").html(ncompleted);
+    if ($(".score .label").text() != cncompleted){
+      $(".score .label").html(cncompleted);
       $(".score .label").animate({ fontSize: "1.5em",  }, 500 )
                         .animate({ fontSize: "1em" }, 500 );
     }  
 
   });  
+
 
   $("#consentCheck").change(function(){
       $("#ranking").toggleClass("disabled");
@@ -70,9 +71,7 @@ $(document).ready(function(){
     
   });
 
-  function close_window() {
-      close();
-  }
+
 
 });
 
