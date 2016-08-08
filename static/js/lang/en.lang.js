@@ -128,12 +128,12 @@
 	},
 	"thanks": 
 	{
-		"title" : "Thanks!",
-		"firstMessage": "You've contributed to science! ",
-		"secondMessage": "Share on facebook ",
-		"thirdMessage" : "Thanks for your colaboration !!! ",
+		"title" : "Thanks for participating!",
+		"firstMessage": "Your contribution help us design tools to help older adults reconnect with old friends.",
+		"secondMessage": "Please, support our research by inviting other friends to participate of the study ",
+		"thirdMessage" : "You're awesome. ",
 		"fbBttn" : "Share",
-		"goodbye": "We've finished, just close the browser tab and good bye! " 
+		"goodbye": "The Life Participation Team. " 
 
 	}
 }
