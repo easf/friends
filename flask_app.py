@@ -68,6 +68,7 @@ f.close()
 request_form_connectednessdata = None
 request_form_commonpointsdata = None
 
+application = app  # make uwsgi happy
 
 # initial page
 @app.route('/')
@@ -305,6 +306,7 @@ def internal_error(error):
 def not_found(error):
     return "404 error",404
 
+application = app
 
 if __name__ == "__main__":
     try:
