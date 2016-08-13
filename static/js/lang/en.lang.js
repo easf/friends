@@ -75,7 +75,7 @@
 			"romanticalRel" : "Have / Had a romantical relation",
 			"married" : "Married / legal union (wife, husband, partner)",
 			"significantOther": "Girlfriend / boyfriend / fiancé / fiancée",
-			"sameInstitution": "Go / went to the same institution (other institution)",
+			"sameInstitution": "Go / went to the same institution",
 			"sameSchool": "Same school / high-school",
 			"sameUniversity": "Same college / university",
 			"coworkers" : "We are / were co-workers",
