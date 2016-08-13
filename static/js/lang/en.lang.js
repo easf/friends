@@ -130,7 +130,7 @@
 	{
 		"title" : "Thanks for participating!",
 		"firstMessage": "Your contribution help us design tools to help older adults reconnect with old friends.",
-		"secondMessage": "Please, support our research by inviting other friends to participate of the study ",
+		"secondMessage": "Please, support our research by inviting other friends to participate of the study.",
 		"thirdMessage" : "You're awesome. ",
 		"fbBttn" : "Share",
 		"goodbye": "The Life Participation Team. " 
