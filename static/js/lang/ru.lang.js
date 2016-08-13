@@ -47,7 +47,7 @@
 			"likertScale3":  "раз в неделю",
 			"likertScale4":  "2-3 в неделю",
 			"likertScale5":  "каждый день",
-			"bttnFinished":  "I've finished"
+			"bttnFinished":  "Завершить"
 		},
 		"common":
 		{
