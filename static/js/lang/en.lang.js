@@ -17,7 +17,7 @@
 						   "thirdSeg": " aiming at helping older adults make new friends and possible reconnect with people from their past. "
 						},
 
-			"thirdPar":"The experiment requires Facebook login. The access to profile information is requested to: i) identify common aspects among facebook profiles and ii) the number of interaction online"
+			"thirdPar":"The experiment requires Facebook login. The access to profile information is requested to identify: i) common aspects among Facebook profiles and ii) the number of interaction online"
 		},
 		"consent": "Hereby, I accept to participate of the study, consenting the use of my data ONLY in the form expressed in this page and for the research purposes described above.",
 		"startBttn": "Start the experiment",
@@ -32,14 +32,14 @@
 		"connectedness" : 
 		{ 
 			"progress" : "Completed ",
-			"connTitle" :  "How connected do you feel to your facebook friends?",
+			"connTitle" :  "How connected do you feel to your Facebook friends?",
 			"connGralInst" :  "Please, answer the questions for the 20 friends below.",
 			"is":"is a",
 			"gender1":  "Male",
 			"gender2":  "Female",
 			"connSpInst":  "Please, select the circles that best describes your connectedness to ",
 			"intSpInst1":  "How often did you interact with ",
-			"intSpInst2":  " in the last month?.",
+			"intSpInst2":  " in the last month?",
 			"channel1":  "Online (e.g., whatsapp, skype)",
 			"channel2":  "Face to face",
 			"likertScale1":  "None",
@@ -66,8 +66,8 @@
 			"trait9": "Other",
 			"spInstRel" : "Please, check the options that describe your relationship with ",
 			"relTypepf" : "Part of my family",
-			"relTypecf" : "Core family (parent, child, sibbling)",
-			"relTypeef" : "Extended family (aunt, nice, cousin, grandparents)",
+			"relTypecf" : "Core family (parent, child, sibling)",
+			"relTypeef" : "Extended family (aunt, niece, cousin, grandparents)",
 			"commPlace" : "Share / Shared a place in common",
 			"sameHomeT" : "We are from the same hometown",
 			"sameCity" : "We live(d) in the same city",
@@ -75,10 +75,10 @@
 			"romanticalRel" : "Have / Had a romantical relation",
 			"married" : "Married / legal union (wife, husband, partner)",
 			"significantOther": "Girlfriend / boyfriend / fiancé / fiancée",
-			"sameInstitution": "Coincided in some insitutions",
+			"sameInstitution": "Go / went to the same institution (other institution)",
 			"sameSchool": "Same school / high-school",
-			"sameUniversity": "Same college/university",
-			"coworkers" : "We are/were co-workers",
+			"sameUniversity": "Same college / university",
+			"coworkers" : "We are / were co-workers",
 			"otherInstitutions" : "Attend(ed) together other type of institutions",
 			"otherlabel": "Other",
 			"other": "Other",
@@ -90,7 +90,7 @@
 			"similarCauses" : "Support similar causes",
 			"sharedActivities": "Shared activities",
 			"workStudy" : "Work / Study",
-			"business" : "Business / Entepeneurship",
+			"business" : "Business / Entrepreneurship",
 			"eventAttendance" : "Event attendance",
 			"sportsOutdoor" : "Sports / Outdoor",
 			"goingOut" : "Going out / Travel",
@@ -118,12 +118,12 @@
 	"bestfriends":
 	{
 		"title":"Friends who most interacted in your posts.",
-		"subtitle":" we've done a top list of friends based on aproximated amount of interactions in your posts. Look!!",
+		"subtitle":" we've done a top list of friends based on approximated amount of interactions in your posts. Look!!",
 		"bttn":"Next"
 	},
 	"recoverpage":
 	{
-		"title" : "Unexpected things have been ocurred but, don't worry! Just press the button below to continue with the experiment.",
+		"title" : "Unexpected things have occurred but, don't worry! Just press the button below to continue with the experiment.",
 		"bttn" : "Continue"
 	},
 	"thanks": 
