@@ -12,7 +12,7 @@
 					   },
 
 			"secondPar" : { "firstSeg" : "Este experimento, es parte de una serie de iniciativas del grupo ", "secondSeg" : " perteneciente a la ", 
-						  "thirdSeg" : ", con el fin de ayudar a las personas adultas mayores a entablar nuevas amistades y posiblemente, a reconnectarse con personas de su pasado. ", 
+						  "thirdSeg" : ", con el fin de ayudar a las personas adultas mayores a entablar nuevas amistades y posiblemente, a reconectarse con personas de su pasado. ", 
 						  "firstLn" : " Lifeparticipation ", "secondLn" : " Universidad de Trento" 
 						},
 
@@ -22,7 +22,7 @@
 		"startBttn" :  "Empezar el experimento",
 		"footnote" : { "firstSeg" : "El cuestionario es completamente ", 
 					 "secondSeg":" y ", 
-					 "thirdSeg" : " Los datos serán utilizados para propósitos científicos descritos en esta página. Usted puede abandonar el cuestionario en cualquier momento. Para más información, por favor, recurra a nuestros " , 
+					 "thirdSeg" : " Los datos serán utilizados para los propósitos científicos descritos en esta página. Usted puede abandonar el cuestionario en cualquier momento. Para más información, por favor, recurra a nuestros " , 
 					 "firstSt" : " anónimo ", "secondSt" : " ningún contenido acerca de sus publicaciones serán almacenados", 
 					 "firstLn" : " términos y condiciones" 
 				   }

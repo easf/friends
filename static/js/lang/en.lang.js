@@ -12,19 +12,19 @@
 
 			"secondPar": { "firstSeg": "This experiment is part of an initiative by the ", 
 						   "firstLn": " Lifeparticipation ", 
-						   "secondSeg": " group at ",
+						   "secondSeg": " group at the ",
 						   "secondLn": " University of Trento ", 
-						   "thirdSeg": " aiming at helping older adults make new friends and possible reconnect with people from their past. "
+						   "thirdSeg": " aiming at helping older adults to make new friends and to possibly reconnect with people from their past. "
 						},
 
-			"thirdPar":"The experiment requires Facebook login. The access to profile information is requested to identify: i) common aspects among Facebook profiles and ii) the number of interaction online"
+			"thirdPar":"The experiment requires Facebook login. The access to profile information is requested to identify: i) common aspects among Facebook profiles and ii) the number of interactions online"
 		},
-		"consent": "Hereby, I accept to participate of the study, consenting the use of my data ONLY in the form expressed in this page and for the research purposes described above.",
+		"consent": "I hereby accept to participate of the study, consenting to the use of my data ONLY in the form expressed in this page and for the research purposes described above.",
 		"startBttn": "Start the experiment",
 		"footnote": { "firstSeg":"The questionaire is completely ", 
 					  "firstSt":" anonymous ",
 				 	  "secondSeg":" and ", 
-				 	  "secondSt":" no content about your posts will be recorded ", 
+				 	  "secondSt":" no content about your posts will be recorded", 
 					  "thirdSeg":"The resulting data will be used for the scientific purposes explained in this page. You can leave the questionnaire at any moment. For further info, please check our " ,  
 					  "firstLn":" terms and conditions" 
 				    }

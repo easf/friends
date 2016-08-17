@@ -17,7 +17,7 @@
 						   "thirdSeg": " volta ad aiutare gli anziani a trovare nuovi amici e ricongiungersi con persone del loro passato. "
 						},
 
-			"thirdPar":"L'esperimento richiede login tramite Facebook. Chiediamo accesso alle informazioni del profilo per identificare i) punti in comune tra profili Facebook e ii) il numero di interazioni online."
+			"thirdPar":"L'esperimento richiede login tramite Facebook. Chiediamo accesso alle informazioni del profilo per identificare i) punti in comune tra profili Facebook e ii) il numero di interazioni online"
 		},
 		"consent": "Accetto di partecipare all'esperimento, consentendo l'uso dei miei dati ESCLUSIVAMENTE nella forma espressa in questa pagina e per gli scopi di ricerca sopra descritti.",
 		"startBttn": "Inizia l'esperimento",

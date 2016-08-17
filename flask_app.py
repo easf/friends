@@ -298,6 +298,10 @@ def friends():
 def thanks():
 	return render_template('thanks.html', textlang=textlang)
 
+@app.route('/about', methods=['GET','POST'] )
+def about():
+    return render_template('about.html', textlang=textlang)
+
 @app.errorhandler(500)
 def internal_error(error):
     return render_template('recoverpage.html', app_id=FB_APP_ID, version=API_VERSION, textlang=textlang)
