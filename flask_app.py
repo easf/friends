@@ -93,8 +93,10 @@ def language():
     session['fname'] = "static/js/lang/"+ session['chlang'] + ".lang.js"
     print  'hola 3'
     f = open( session['fname'], "r" )
+    print  'hola 4'
     session['textlang'] = json.load(f)
     f.close()
+    print  'hola 5'
     return jsonify(result="ok")
 
 # downloading user data
