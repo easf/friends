@@ -322,6 +322,11 @@ def about():
 
 @app.errorhandler(500)
 def internal_error(error):
+    if 'textlang' not in session:
+        session['fname'] = "static/js/lang/en.lang.js" #fname = "static/js/lang/en.lang.js"
+        f = open( session['fname'], "r" )
+        session['textlang'] = json.load(f) #textlang = json.load(f)
+        f.close()
     return render_template('recoverpage.html', app_id=FB_APP_ID, version=API_VERSION, textlang=session['textlang'])
 
 @app.errorhandler(404)
@@ -332,7 +337,7 @@ application = app
 
 if __name__ == "__main__":
     try:
-        app.run(debug=False, port=5500, threaded=False)    
+        app.run(port=5500)    
     except socket.error, e:
         if isinstance(e.args, tuple):
             print "errno is %d" % e[0]
