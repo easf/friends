@@ -87,16 +87,11 @@ def index():
 def language():
     #global chlang
     #global textlang
-    print 'hola 1'
     session['chlang'] = request.args.get('chLang', 0, type=str)
-    print  'hola 2'
     session['fname'] = "static/js/lang/"+ session['chlang'] + ".lang.js"
-    print  'hola 3'
     f = open( session['fname'], "r" )
-    print  'hola 4'
     session['textlang'] = json.load(f)
     f.close()
-    print  'hola 5'
     return jsonify(result="ok")
 
 # downloading user data
