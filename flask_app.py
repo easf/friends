@@ -111,8 +111,8 @@ def userdata():
     session['uidhash'] = hashlib.sha1(uid).hexdigest()
     session['ftimepath'] = "backup/" + session['uidhash'] + "_time"
     if not os.path.isfile(session['ftimepath']):
-        session['ftime'] = open (session['ftimepath'], "w")
-        session['ftime'].close()
+        ftime = open (session['ftimepath'], "w")
+        ftime.close()
 
     conn = mysql.connect()
     cur = conn.cursor()
@@ -200,9 +200,9 @@ def connectednessdata():
     ts = time.time()
 
     if status == 'connectedness_questions' and 'friends_for_connectedness' in session:
-        session['ftime'] = open (session['ftimepath'], "a")
-    	session['ftime'].write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (session['end_time'] - session['start_time'])/60 ) + " minutes" + "\n" )
-    	session['ftime'].close()
+        ftime = open (session['ftimepath'], "a")
+    	ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (session['end_time'] - session['start_time'])/60 ) + " minutes" + "\n" )
+    	ftime.close()
         session['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data,  session['uidhash'], mysql )
 
     elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (crashed or no crashed)
@@ -251,22 +251,22 @@ def commonpointsdata():
     #global request_form_commonpointsdata
     
     session['request_form_commonpointsdata'] = request.form
-    session['fname'] = "backup/" + session['uidhash'] + "_commonpoints"
+    fname = "backup/" + session['uidhash'] + "_commonpoints"
     
 
     try:
         data = dict((key, session['request_form_commonpointsdata'].getlist(key)[0]) for key in session['request_form_commonpointsdata'].keys())
         if len(data) > 4:
-            if not os.path.isfile(session['fname']):
-                f = open( session['fname'], "w" )
+            if not os.path.isfile(fname):
+                f = open( fname, "w" )
                 json.dump(data, f)
                 f.close()
     except:
         pass
     commonpoints_data = session['request_form_commonpointsdata']
 
-    if os.path.isfile(session['fname']):
-         f = open( session['fname'], "r" )  
+    if os.path.isfile(fname):
+         f = open( fname, "r" )  
          user_answers = json.load(f)
          f.close()
          commonpoints_data = user_answers
@@ -281,9 +281,9 @@ def commonpointsdata():
     ts = time.time()
     
     if status <> 'finished':
-        session['ftime'] = open (session['ftimepath'], "a")
-        session['ftime'].write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (session['end_time'] - session['start_time'])/60 ) + " minutes" + "\n" )
-        session['ftime'].close()
+        ftime = open (session['ftimepath'], "a")
+        ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (session['end_time'] - session['start_time'])/60 ) + " minutes" + "\n" )
+        ftime.close()
     	procedures.insert_common_points_data( commonpoints_data, session['uidhash'], mysql )
 
     return redirect(url_for('friends'))
