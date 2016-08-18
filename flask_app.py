@@ -31,9 +31,11 @@ app.config['MYSQL_DATABASE_USER'] = config.MYSQL_DATABASE_USER
 app.config['MYSQL_DATABASE_PASSWORD'] = config.MYSQL_DATABASE_PASSWORD
 app.config['MYSQL_DATABASE_DB'] = config.MYSQL_DATABASE_DB
 app.config['MYSQL_DATABASE_HOST'] = config.MYSQL_DATABASE_HOST
+app.secret_key = 'super secret key'
 
 # URL PREFIX SETTING
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix = config.PREFIX)
+
 
 mysql.init_app(app)
 
@@ -337,7 +339,6 @@ application = app
 
 if __name__ == "__main__":
     try:
-        app.secret_key = 'super secret key'
         app.run(port=5500)    
     except socket.error, e:
         if isinstance(e.args, tuple):
