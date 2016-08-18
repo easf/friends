@@ -87,14 +87,11 @@ def index():
 def language():
 	#global chlang
 	#global textlang
-
 	session['chlang'] = request.args.get('chLang', 0, type=str)
-
 	session['fname'] = "static/js/lang/"+ session['chlang'] + ".lang.js"
 	f = open( session['fname'], "r" )
 	session['textlang'] = json.load(f)
 	f.close()
-
 	return jsonify(result="ok")
 
 # downloading user data
@@ -105,16 +102,13 @@ def userdata():
     #global chlang
     #global ftimepath
     #global ftime
-    
     session['token'] = request.args.get('token', 0, type=str)
     uid = request.args.get('uid', 0, type=str)
     browserlang = request.args.get('browserlang', 0, type=str)
     ipcountry = request.args.get('ipcountry', 0, type=str)
     session['chlang'] = request.args.get('chLang', 0, type=str)
     device = request.args.get('udevice', 0, type=str)
-    
     session['uidhash'] = hashlib.sha1(uid).hexdigest()
-    
     session['ftimepath'] = "backup/" + session['uidhash'] + "_time"
     if not os.path.isfile(session['ftimepath']):
         session['ftime'] = open (session['ftimepath'], "w")
