@@ -85,17 +85,17 @@ def index():
 # changing UI language
 @app.route('/language', methods=['GET','POST'])
 def language():
-	#global chlang
-	#global textlang
+    #global chlang
+    #global textlang
     print 'hola 1'
-	session['chlang'] = request.args.get('chLang', 0, type=str)
+    session['chlang'] = request.args.get('chLang', 0, type=str)
     print  'hola 2'
-	session['fname'] = "static/js/lang/"+ session['chlang'] + ".lang.js"
-	print  'hola 3'
+    session['fname'] = "static/js/lang/"+ session['chlang'] + ".lang.js"
+    print  'hola 3'
     f = open( session['fname'], "r" )
-	session['textlang'] = json.load(f)
-	f.close()
-	return jsonify(result="ok")
+    session['textlang'] = json.load(f)
+    f.close()
+    return jsonify(result="ok")
 
 # downloading user data
 @app.route('/userdata')
