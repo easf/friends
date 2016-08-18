@@ -31,7 +31,7 @@ app.config['MYSQL_DATABASE_USER'] = config.MYSQL_DATABASE_USER
 app.config['MYSQL_DATABASE_PASSWORD'] = config.MYSQL_DATABASE_PASSWORD
 app.config['MYSQL_DATABASE_DB'] = config.MYSQL_DATABASE_DB
 app.config['MYSQL_DATABASE_HOST'] = config.MYSQL_DATABASE_HOST
-app.secret_key = config.SECRET_KEY
+app.config['SECRET_KEY'] = config.SECRET_KEY
 
 # URL PREFIX SETTING
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix = config.PREFIX)
