@@ -337,6 +337,7 @@ application = app
 
 if __name__ == "__main__":
     try:
+        app.secret_key = 'super secret key'
         app.run(port=5500)    
     except socket.error, e:
         if isinstance(e.args, tuple):
