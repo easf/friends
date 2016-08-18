@@ -80,7 +80,7 @@ def index():
         f = open( session['fname'], "r" )
         session['textlang'] = json.load(f) #textlang = json.load(f)
         f.close()
-	return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION, textlang=session['textlang'])
+    return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION, textlang=session['textlang'])
 
 # changing UI language
 @app.route('/language', methods=['GET','POST'])
