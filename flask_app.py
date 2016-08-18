@@ -38,54 +38,59 @@ app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix = config.PREFIX)
 mysql.init_app(app)
 
 # it makes accesible from all pages the hash id and token of current experiment participant
-session['uidhash'] = None #uidhash = None
-session['token'] = None #token = None
+#session['uidhash'] = None #uidhash = None
+#session['token'] = None #token = None
 
 # it contains the list of friends to complete the questions about connectedness and so on
-session['friends_for_connectedness'] = [] #friends_for_connectedness = []
+#session['friends_for_connectedness'] = [] #friends_for_connectedness = []
 
 # it contains the list of friends to complete the questions about common points and so on
-session['friends_for_common_points'] = [] #friends_for_common_points = []
+#session['friends_for_common_points'] = [] #friends_for_common_points = []
 
 
 # it contains the top list of friends who most interacted in the current experiment participants
-session['top_ten'] = [] #top_ten = []
+#session['top_ten'] = [] #top_ten = []
 
 # variables to track the time that is taken by the participant doing the experiment
-session['start_time'] = None #start_time = None
-session['end_time'] = None #end_time = None
-session['ftimepath'] = None #ftimepath = None
-session['ftime'] = None #ftime = None
+#session['start_time'] = None #start_time = None
+#session['end_time'] = None #end_time = None
+#session['ftimepath'] = None #ftimepath = None
+#session['ftime'] = None #ftime = None
 
 # UI language, initialize language, english as a default language
-session['chlang'] = None #chlang = None
-session['fname'] = "static/js/lang/en.lang.js" #fname = "static/js/lang/en.lang.js"
-session['f'] = open( session['fname'], "r" )
-session['textlang'] = json.load(session['f']) #textlang = json.load(f)
-session['f'].close()
+#session['chlang'] = None #chlang = None
+#session['fname'] = "static/js/lang/en.lang.js" #fname = "static/js/lang/en.lang.js"
+#session['f'] = open( session['fname'], "r" )
+#session['textlang'] = json.load(session['f']) #textlang = json.load(f)
+#session['f'].close()
 
 #recover request form
-session['request_form_connectednessdata'] = None
-session['request_form_commonpointsdata'] = None
+#session['request_form_connectednessdata'] = None
+#session['request_form_commonpointsdata'] = None
 
 application = app  # make uwsgi happy
 
 # initial page
 @app.route('/')
 def index():
-	return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION, textlang=textlang)
+    if 'textlang' not in session:
+        session['fname'] = "static/js/lang/en.lang.js" #fname = "static/js/lang/en.lang.js"
+        f = open( session['fname'], "r" )
+        session['textlang'] = json.load(f) #textlang = json.load(f)
+        f.close()
+	return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION, textlang=session['textlang'])
 
 # changing UI language
 @app.route('/language', methods=['GET','POST'])
 def language():
 	#global chlang
-	global textlang
+	#global textlang
 
 	session['chlang'] = request.args.get('chLang', 0, type=str)
 
 	session['fname'] = "static/js/lang/"+ session['chlang'] + ".lang.js"
 	f = open( session['fname'], "r" )
-	textlang = json.load(f)
+	session['textlang'] = json.load(f)
 	f.close()
 
 	return jsonify(result="ok")
@@ -143,7 +148,7 @@ def connectedness():
     session['fname'] = "backup/" + session['uidhash'] + "_connectedness"
 
     # Do the routing according user state and connectedness_file existence
-    if status == 'connectedness_questions' and session['friends_for_connectedness'] <> []: # if the user reload the page 
+    if status == 'connectedness_questions' and 'friends_for_connectedness' in session: # if the user reload the page 
     	pass 
     elif status == 'user_data_downloaded': # if the application was crashed and then recover, recalculate friends for connectedness
     	session['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
@@ -158,7 +163,7 @@ def connectedness():
 
     session['start_time'] = time.time()
 
-    return render_template('connectedness.html', users = session['friends_for_connectedness'], userLang = session['chlang'], textlang = textlang)
+    return render_template('connectedness.html', users = session['friends_for_connectedness'], userLang = session['chlang'], textlang = session['textlang'])
 
 # store connectedness data and get friend list for common points
 @app.route('/connectednessdata', methods=['GET','POST'] )
@@ -198,7 +203,7 @@ def connectednessdata():
     session['end_time'] = time.time()
     ts = time.time()
 
-    if status == 'connectedness_questions' and session['friends_for_connectedness'] <> []:
+    if status == 'connectedness_questions' and 'friends_for_connectedness' in session:
         session['ftime'] = open (session['ftimepath'], "a")
     	session['ftime'].write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (session['end_time'] - session['start_time'])/60 ) + " minutes" + "\n" )
     	session['ftime'].close()
@@ -228,9 +233,9 @@ def commonpoints():
     else: #if status == 'user_connectedness_data_stored':
         if os.path.isfile(session['fname']): # if the user already answer the questions about common points
             return redirect( url_for('commonpointsdata') )
-        elif session['friends_for_common_points'] <> []: # if the user reload the page
+        elif 'friends_for_common_points' in session: # if the user reload the page
             session['start_time'] = time.time()
-            return render_template('common.html', users=session['friends_for_common_points'], textlang=textlang)
+            return render_template('common.html', users=session['friends_for_common_points'], textlang=session['textlang'])
         elif status == 'user_connectedness_data_stored': # if there were a chrash, get again friends for common points
             connectedness_data = request.form
             if os.path.isfile(session['fname']):
@@ -240,7 +245,7 @@ def commonpoints():
                 connectedness_data = user_answers
             session['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data, session['uidhash'], mysql )
             session['start_time'] = time.time()
-            return render_template('common.html', users=session['friends_for_common_points'], textlang=textlang)
+            return render_template('common.html', users=session['friends_for_common_points'], textlang=session['textlang'])
         else:	
             return redirect(url_for('thanks'))
 
@@ -291,20 +296,33 @@ def commonpointsdata():
 @app.route('/friends', methods=['GET','POST'] )
 def friends():
     #global top_ten
-    session['top_ten'] = procedures.get_best_friends(session['uidhash'], mysql)
-    return render_template('bestfriends.html', users=session['top_ten'], textlang=textlang)
+    session.pop('token', None)
+    session.pop('friends_for_connectedness', None)
+    session.pop('friends_for_common_points', None)
+    session.pop('start_time', None)
+    session.pop('end_time', None)
+    session.pop('ftimepath', None)
+    session.pop('ftime', None)
+    session.pop('chlang', None)
+    session.pop('fname', None)
+    session.pop('request_form_connectednessdata', None)
+    session.pop('request_form_commonpointsdata', None)
+    
+    top_ten = procedures.get_best_friends(session['uidhash'], mysql)
+
+    return render_template('bestfriends.html', users=top_ten, textlang=session['textlang'])
     
 @app.route('/thanks', methods=['GET','POST'] )
 def thanks():
-	return render_template('thanks.html', textlang=textlang)
+	return render_template('thanks.html', textlang=session['textlang'])
 
 @app.route('/about', methods=['GET','POST'] )
 def about():
-    return render_template('about.html', textlang=textlang)
+    return render_template('about.html', textlang=session['textlang'])
 
 @app.errorhandler(500)
 def internal_error(error):
-    return render_template('recoverpage.html', app_id=FB_APP_ID, version=API_VERSION, textlang=textlang)
+    return render_template('recoverpage.html', app_id=FB_APP_ID, version=API_VERSION, textlang=session['textlang'])
 
 @app.errorhandler(404)
 def not_found(error):
