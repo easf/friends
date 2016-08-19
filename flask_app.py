@@ -134,7 +134,7 @@ def userdata():
 
     # if we don't have yet the participant data (None represents the first state), then we proceed to download the data
     if status == None:
-    	procedures.download_data(uid, browserlang, ipcountry, device, session['token'], mysql)    
+        procedures.download_data(uid, browserlang, ipcountry, device, session['token'], mysql)    
 
     return jsonify(result="ok")
 
@@ -154,17 +154,17 @@ def connectedness():
 
     # Do the routing according user state and connectedness_file existence
     if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]: # if the user reload the page 
-    	pass 
+        pass 
     elif status == 'user_data_downloaded': # if the application was crashed and then recover, recalculate friends for connectedness
-    	sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
+        sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
     elif status == 'connectedness_questions' and not os.path.isfile(fname): # if the app crashed during or something worng happend when the participant was anwering the questions
-    	sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
+        sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
     elif status == 'connectedness_questions' and os.path.isfile(fname): # if the user already anwsered the questions about connectedness before the app got crashed
-    	return redirect(url_for('connectednessdata'))
+        return redirect(url_for('connectednessdata'))
     elif status == 'user_connectedness_data_stored': # if we aalready stored the data about connectedness and interaction frequency questions
-    	return redirect(url_for('connectednessdata'))
+        return redirect(url_for('connectednessdata'))
     elif status == 'finished': # if the user finished the experiment, say thanks
-    	return redirect(url_for('friends'))
+        return redirect(url_for('friends'))
 
     sdata[session['uidhash']]['start_time'] = time.time()
     
@@ -219,8 +219,8 @@ def connectednessdata():
 
     if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]:
         ftime = open (ftimepath, "a")
-    	ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
-    	ftime.close()
+        ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
+        ftime.close()
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data,  session['uidhash'], mysql )
 
     elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (crashed or no crashed)
@@ -312,7 +312,7 @@ def commonpointsdata():
         ftime = open (ftimepath, "a")
         ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
         ftime.close()
-    	procedures.insert_common_points_data( commonpoints_data, session['uidhash'], mysql )
+        procedures.insert_common_points_data( commonpoints_data, session['uidhash'], mysql )
 
     return redirect(url_for('friends'))
 
@@ -329,7 +329,6 @@ def friends():
         textlang = json.load(f)
         f.close()    
     top_ten = procedures.get_best_friends(session['uidhash'], mysql)
-
     return render_template('bestfriends.html', users=top_ten, textlang=textlang)
     
 @app.route('/thanks', methods=['GET','POST'] )
@@ -340,7 +339,7 @@ def thanks():
         f = open( fname, "r" )
         textlang = json.load(f)
         f.close()
-	return render_template('thanks.html', textlang= textlang)
+    return render_template('thanks.html', textlang= textlang)
 
 @app.route('/about', methods=['GET','POST'] )
 def about():
