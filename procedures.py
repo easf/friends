@@ -774,6 +774,9 @@ def get_friends_for_connectedness(uidhash, mysql, token):
         if diff < len(others):
         	for ch in reversed(others):
         		rand_user_rest.append ( ch )
+                diff -= 1
+                if diff == 0:
+                    break
             	#random.shuffle(others)
             	#rand_user_rest = others[:diff]
         else:
