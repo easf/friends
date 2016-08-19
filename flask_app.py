@@ -333,7 +333,7 @@ application = app
 
 if __name__ == "__main__":
     try:
-        app.run(port=5500)    
+        app.run(debug=False,port=5500)    
     except socket.error, e:
         if isinstance(e.args, tuple):
             print "errno is %d" % e[0]
