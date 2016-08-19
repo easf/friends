@@ -112,7 +112,7 @@ def userdata():
     if 'uidhash' in session:
         session.pop('uidhash', None)
     session['uidhash'] = hashlib.sha1(uid).hexdigest()
-    sdata[session['uidhash']] = []
+    sdata[session['uidhash']] = {}
     ftimepath = "backup/" + session['uidhash'] + "_time"
     if not os.path.isfile(ftimepath):
         ftime = open (ftimepath, "w")
