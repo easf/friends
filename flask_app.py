@@ -163,7 +163,10 @@ def connectedness():
     	return redirect(url_for('friends'))
 
     sdata[session['uidhash']]['start_time'] = time.time()
-
+    
+    if 'textlang' not in session:
+        session['textlang'] = textlang
+        
     return render_template('connectedness.html', users = sdata[session['uidhash']]['friends_for_connectedness'], textlang = session['textlang'])
 
 # store connectedness data and get friend list for common points
