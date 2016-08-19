@@ -356,10 +356,13 @@ def about():
 def internal_error(error):
     textlang = gtextlang
     if 'chlang' in session:
-        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
-        f = open( fname, "r" )
-        textlang = json.load(f)
-        f.close()
+        if session['chlang'] <> 0:
+            fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+            f = open( fname, "r" )
+            textlang = json.load(f)
+            f.close()
+        else:
+            session.pop('chlang', None)
     return render_template('recoverpage.html', app_id=FB_APP_ID, version=API_VERSION, textlang = textlang)
 
 @app.errorhandler(404)
