@@ -111,7 +111,7 @@ def userdata():
         session.pop('chlang', None)
 
     chlang = request.args.get('chLang', 0, type=str)
-    if chlang:
+    if chlang <> 0:
         session['chlang'] = chlang
     
     device = request.args.get('udevice', 0, type=str)
