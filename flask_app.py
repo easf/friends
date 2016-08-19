@@ -109,6 +109,10 @@ def userdata():
     if 'textlang' in session:
         session.pop('textlang', None)
     chlang = request.args.get('chLang', 0, type=str)
+    fname = "static/js/lang/" + chlang + ".lang.js"
+    f = open( fname, "r" )
+    session['textlang'] = json.load(f)
+    f.close()
     device = request.args.get('udevice', 0, type=str)
     if 'uidhash' in session:
         session.pop('uidhash', None)
@@ -166,7 +170,7 @@ def connectedness():
     
     if 'textlang' not in session:
         session['textlang'] = textlang
-        
+
     return render_template('connectedness.html', users = sdata[session['uidhash']]['friends_for_connectedness'], textlang = session['textlang'])
 
 # store connectedness data and get friend list for common points
