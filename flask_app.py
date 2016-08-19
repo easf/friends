@@ -70,7 +70,7 @@ f.close()
 #session['request_form_connectednessdata'] = None
 #session['request_form_commonpointsdata'] = None
 
-application = app  # make uwsgi happy
+#application = app  # make uwsgi happy
 sdata = []
 # initial page
 @app.route('/')
@@ -85,7 +85,7 @@ def language():
     #global chlang
     #global textlang
     chlang = request.args.get('chLang', 0, type=str)
-    fname = "static/js/lang/"+ chlang + ".lang.js"
+    fname = "static/js/lang/" + chlang + ".lang.js"
     f = open( fname, "r" )
     if 'textlang' in session:
         session.pop('textlang', None)
@@ -328,11 +328,10 @@ def internal_error(error):
 def not_found(error):
     return "404 error",404
 
-
-
 if __name__ == "__main__":
     try:
-        app.run(debug=False,port=5500)    
+        app.run(debug=False,port=5500, threaded=False)
+        print 'comienzooooooooo'    
     except socket.error, e:
         if isinstance(e.args, tuple):
             print "errno is %d" % e[0]
