@@ -106,7 +106,18 @@ def userdata():
     uid = request.args.get('uid', 0, type=str)
     browserlang = request.args.get('browserlang', 0, type=str)
     ipcountry = request.args.get('ipcountry', 0, type=str)
+    
+    if 'textlang' in session:
+        session.pop('textlang', None)
+
     chlang = request.args.get('chLang', 0, type=str)
+    if chlang:
+        fname = "static/js/lang/" + chlang + ".lang.js"
+        f = open( fname, "r" )
+        session['textlang'] = json.load(f)
+        f.close()
+    else:
+        session['textlang'] = textlang
     device = request.args.get('udevice', 0, type=str)
     if 'uidhash' in session:
         session.pop('uidhash', None)
