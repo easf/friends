@@ -86,7 +86,7 @@ def language():
     #global chlang
     #global textlang
     chlang = request.args.get('chLang', 0, type=str)
-    fname = "static/js/lang/" + chlang + ".lang.js"
+    fname = "static/js/lang/" + str(chlang) + ".lang.js"
     f = open( fname, "r" )
     if 'textlang' in session:
         session.pop('textlang', None)
@@ -109,7 +109,7 @@ def userdata():
     if 'textlang' in session:
         session.pop('textlang', None)
     chlang = request.args.get('chLang', 0, type=str)
-    fname = "static/js/lang/" + chlang + ".lang.js"
+    fname = "static/js/lang/" + str(chlang) + ".lang.js"
     f = open( fname, "r" )
     session['textlang'] = json.load(f)
     f.close()
