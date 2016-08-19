@@ -63,7 +63,7 @@ mysql.init_app(app)
 #session['chlang'] = None #chlang = None
 fname = "static/js/lang/en.lang.js" #fname = "static/js/lang/en.lang.js"
 f = open( fname, "r" )
-textlang = json.load(f) #textlang = json.load(f)
+gtextlang = json.load(f) #textlang = json.load(f)
 f.close()
 
 #recover request form
@@ -75,9 +75,12 @@ sdata = {}
 # initial page
 @app.route('/')
 def index():
-    global textlang
-    if 'textlang' in session:
-        textlang = session['textlang']
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+        f = open( fname, "r" )
+        textlang = json.load(f)
+        f.close()
     return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION, textlang=textlang)
 
 # changing UI language
@@ -86,12 +89,9 @@ def language():
     #global chlang
     #global textlang
     chlang = request.args.get('chLang', 0, type=str)
-    fname = "static/js/lang/" + str(chlang) + ".lang.js"
-    f = open( fname, "r" )
-    if 'textlang' in session:
-        session.pop('textlang', None)
-    session['textlang'] = json.load(f)
-    f.close()
+    if 'chlang' in session:
+        session.pop('chlang', None)
+    session['chlang'] = chlang 
     return jsonify(result="ok")
 
 # downloading user data
@@ -107,17 +107,13 @@ def userdata():
     browserlang = request.args.get('browserlang', 0, type=str)
     ipcountry = request.args.get('ipcountry', 0, type=str)
     
-    if 'textlang' in session:
-        session.pop('textlang', None)
+    if 'chlang' in session:
+        session.pop('chlang', None)
 
     chlang = request.args.get('chLang', 0, type=str)
     if chlang:
-        fname = "static/js/lang/" + chlang + ".lang.js"
-        f = open( fname, "r" )
-        session['textlang'] = json.load(f)
-        f.close()
-    else:
-        session['textlang'] = textlang
+        session['chlang'] = chlang
+    
     device = request.args.get('udevice', 0, type=str)
     if 'uidhash' in session:
         session.pop('uidhash', None)
@@ -146,8 +142,7 @@ def userdata():
 @app.route('/connectedness', methods=['GET','POST'])
 def connectedness():
     #global friends_for_connectedness
-    #global start_time
-
+    #global start_time    
     conn = mysql.connect()
     cur = conn.cursor()
     status = procedures.get_user_status (session['uidhash'], cur)
@@ -173,10 +168,14 @@ def connectedness():
 
     sdata[session['uidhash']]['start_time'] = time.time()
     
-    if 'textlang' not in session:
-        session['textlang'] = textlang
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+        f = open( fname, "r" )
+        textlang = json.load(f)
+        f.close()
 
-    return render_template('connectedness.html', users = sdata[session['uidhash']]['friends_for_connectedness'], textlang = session['textlang'])
+    return render_template('connectedness.html', users = sdata[session['uidhash']]['friends_for_connectedness'], textlang = textlang)
 
 # store connectedness data and get friend list for common points
 @app.route('/connectednessdata', methods=['GET','POST'] )
@@ -243,6 +242,14 @@ def commonpoints():
     cur.close()
     conn.close()
     fname = "backup/" + session['uidhash'] + "_commonpoints"
+
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+        f = open( fname, "r" )
+        textlang = json.load(f)
+        f.close()
+
     if status == 'finished':
         return redirect(url_for('friends'))
     else: #if status == 'user_connectedness_data_stored':
@@ -250,7 +257,7 @@ def commonpoints():
             return redirect( url_for('commonpointsdata') )
         elif 'friends_for_common_points' in sdata[session['uidhash']]: # if the user reload the page
             sdata[session['uidhash']]['start_time'] = time.time()
-            return render_template('common.html', users=sdata[session['uidhash']]['friends_for_common_points'], textlang=session['textlang'])
+            return render_template('common.html', users=sdata[session['uidhash']]['friends_for_common_points'], textlang=textlang)
         elif status == 'user_connectedness_data_stored': # if there were a chrash, get again friends for common points
             connectedness_data = request.form
             if os.path.isfile(fname):
@@ -260,7 +267,7 @@ def commonpoints():
                 connectedness_data = user_answers
             sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data, session['uidhash'], mysql )
             sdata[session['uidhash']]['start_time'] = time.time()
-            return render_template('common.html', users=sdata[session['uidhash']]['friends_for_common_points'], textlang=session['textlang'])
+            return render_template('common.html', users=sdata[session['uidhash']]['friends_for_common_points'], textlang=textlang)
         else:	
             return redirect(url_for('thanks'))
 
@@ -315,27 +322,45 @@ def friends():
     #global top_ten
     del sdata[session['uidhash']]
 #    session.pop('friends_for_connectedness', None)
-    
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+        f = open( fname, "r" )
+        textlang = json.load(f)
+        f.close()    
     top_ten = procedures.get_best_friends(session['uidhash'], mysql)
 
-    return render_template('bestfriends.html', users=top_ten, textlang=session['textlang'])
+    return render_template('bestfriends.html', users=top_ten, textlang=textlang)
     
 @app.route('/thanks', methods=['GET','POST'] )
 def thanks():
-	return render_template('thanks.html', textlang=session['textlang'])
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+        f = open( fname, "r" )
+        textlang = json.load(f)
+        f.close()
+	return render_template('thanks.html', textlang= textlang)
 
 @app.route('/about', methods=['GET','POST'] )
 def about():
-    return render_template('about.html', textlang=session['textlang'])
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+        f = open( fname, "r" )
+        textlang = json.load(f)
+        f.close()
+    return render_template('about.html', textlang=textlang)
 
 @app.errorhandler(500)
 def internal_error(error):
-    if 'textlang' not in session:
-        fname = "static/js/lang/en.lang.js" #fname = "static/js/lang/en.lang.js"
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
         f = open( fname, "r" )
-        session['textlang'] = json.load(f) #textlang = json.load(f)
+        textlang = json.load(f)
         f.close()
-    return render_template('recoverpage.html', app_id=FB_APP_ID, version=API_VERSION, textlang=session['textlang'])
+    return render_template('recoverpage.html', app_id=FB_APP_ID, version=API_VERSION, textlang = textlang)
 
 @app.errorhandler(404)
 def not_found(error):
@@ -344,7 +369,6 @@ def not_found(error):
 if __name__ == "__main__":
     try:
         app.run(debug=False,port=5500, threaded=False)
-        print 'comienzooooooooo'    
     except socket.error, e:
         if isinstance(e.args, tuple):
             print "errno is %d" % e[0]
