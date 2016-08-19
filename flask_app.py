@@ -71,7 +71,7 @@ f.close()
 #session['request_form_commonpointsdata'] = None
 
 #application = app  # make uwsgi happy
-sdata = []
+sdata = {}
 # initial page
 @app.route('/')
 def index():
