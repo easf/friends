@@ -187,7 +187,6 @@ def connectednessdata():
 
     request_form_connectednessdata = request.form
     fname = "backup/" + str(session['uidhash']) + "_connectedness"
-
     try:
         data = dict((key, request_form_connectednessdata.getlist(key)[0]) for key in request_form_connectednessdata.keys())
         if len(data) > 4:
@@ -222,7 +221,6 @@ def connectednessdata():
         ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
         ftime.close()
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data,  session['uidhash'], mysql )
-
     elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (crashed or no crashed)
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data, session['uidhash'], mysql )
     elif status == 'finished':
@@ -241,7 +239,6 @@ def commonpoints():
     status = procedures.get_user_status (session['uidhash'], cur)
     cur.close()
     conn.close()
-    fname = "backup/" + session['uidhash'] + "_commonpoints"
 
     textlang = gtextlang
     if 'chlang' in session:
@@ -250,6 +247,7 @@ def commonpoints():
         textlang = json.load(f)
         f.close()
 
+    fname = "backup/" + session['uidhash'] + "_commonpoints"
     if status == 'finished':
         return redirect(url_for('friends'))
     else: #if status == 'user_connectedness_data_stored':
