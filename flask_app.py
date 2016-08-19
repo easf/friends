@@ -75,6 +75,7 @@ sdata = {}
 # initial page
 @app.route('/')
 def index():
+    global textlang
     if 'textlang' in session:
         textlang = session['textlang']
     return render_template('index.html', app_id=FB_APP_ID, version=API_VERSION, textlang=textlang)
