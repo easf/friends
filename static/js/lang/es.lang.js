@@ -1,4 +1,3 @@
-
 {
 	"start" :
 	{
@@ -22,7 +21,7 @@
 		"startBttn" :  "Empezar el experimento",
 		"footnote" : { "firstSeg" : "El cuestionario es completamente ", 
 					 "secondSeg":" y ", 
-					 "thirdSeg" : " Los datos serán utilizados para los propósitos científicos descritos en esta página. Usted puede abandonar el cuestionario en cualquier momento. Para más información, por favor, recurra a nuestros " , 
+					 "thirdSeg" : " Los datos serán utilizados para los propósitos científicos descritos en esta página. Usted puede abandonar el cuestionario en cualquier momento. Para más información, por favor, recurra a nuestros ", 
 					 "firstSt" : " anónimo ", "secondSt" : " ningún contenido acerca de sus publicaciones serán almacenados", 
 					 "firstLn" : " términos y condiciones" 
 				   }
