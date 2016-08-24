@@ -318,7 +318,8 @@ def commonpointsdata():
 @app.route('/friends', methods=['GET','POST'] )
 def friends():
     #global top_ten
-    del sdata[session['uidhash']]
+    if session['uidhash'] in sdata:
+        del sdata[session['uidhash']]
 #    session.pop('friends_for_connectedness', None)
     textlang = gtextlang
     if 'chlang' in session:
