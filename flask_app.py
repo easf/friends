@@ -102,6 +102,8 @@ def userdata():
     #global chlang
     #global ftimepath
     #global ftime
+    if 'token' in session:
+        session.pop('token', None) 
     session['token'] = request.args.get('token', 0, type=str)
     uid = request.args.get('uid', 0, type=str)
     browserlang = request.args.get('browserlang', 0, type=str)
