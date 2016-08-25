@@ -27,7 +27,7 @@ USE `friendsdb` ;
 DROP TABLE IF EXISTS `friendsdb`.`user` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`user` (
-  `idhash` DECIMAL(10,0) NOT NULL,
+  `idhash` DECIMAL(25,0) NOT NULL,
   `id` VARCHAR(128) NOT NULL,
   `name` VARCHAR(256) NOT NULL,
   `granted_permissions` TINYINT(1) NULL,
@@ -56,7 +56,7 @@ ENGINE = InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 DROP TABLE IF EXISTS `friendsdb`.`profile` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`profile` (
-  `user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
   `birthday` VARCHAR(64) NULL,
   `gender` CHAR(1) NULL,
   `hometown_id` VARCHAR(128) NULL,
@@ -107,8 +107,8 @@ DROP TABLE IF EXISTS `friendsdb`.`relationship` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`relationship` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
-  `user_idhash1` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
+  `user_idhash1` DECIMAL(25,0) NOT NULL,
   `relationship_type` VARCHAR(128) NULL,
   `description` VARCHAR(256) NULL,
   PRIMARY KEY (`id`),
@@ -133,7 +133,7 @@ DROP TABLE IF EXISTS `friendsdb`.`reaction` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`reaction` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
   `post_id` VARCHAR(256) NOT NULL,
   `comment_id` VARCHAR(256) NULL,
   `type` VARCHAR(128) NULL,
@@ -155,7 +155,7 @@ DROP TABLE IF EXISTS `friendsdb`.`post` ;
 CREATE TABLE IF NOT EXISTS `friendsdb`.`post` (
   `local_id` INT NOT NULL AUTO_INCREMENT,
   `id` VARCHAR(256) NOT NULL,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
   `created_time` VARCHAR(128) NULL,
   `type` VARCHAR(128) NULL,
   `story` VARCHAR(256) NULL,
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `friendsdb`.`comment` (
   `local_id` INT NOT NULL AUTO_INCREMENT,
   `id` VARCHAR(256) NOT NULL,
   `post_id` VARCHAR(256) NOT NULL,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
   `created_time` VARCHAR(128) NULL,
   `has_picture` TINYINT(1) NULL,
   `has_link` TINYINT(1) NULL,
@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS `friendsdb`.`tag` (
   `post_id` VARCHAR(256) NOT NULL,
   `comment_id` VARCHAR(256) NULL,
   `type` VARCHAR(128) NULL,
-  `user_idhash` DECIMAL(10,0) NULL,
+  `user_idhash` DECIMAL(25,0) NULL,
   `page_id` VARCHAR(128) NULL,
   INDEX `fk_tag_user1_idx` (`user_idhash` ASC),
   INDEX `fk_tag_page1_idx` (`page_id` ASC),
@@ -235,7 +235,7 @@ ENGINE = InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 DROP TABLE IF EXISTS `friendsdb`.`user_likes_page` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`user_likes_page` (
-  `user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
   `page_id` VARCHAR(128) NOT NULL,
   PRIMARY KEY (`user_idhash`, `page_id`),
   INDEX `fk_user_has_page_page1_idx` (`page_id` ASC),
@@ -272,7 +272,7 @@ ENGINE = InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 DROP TABLE IF EXISTS `friendsdb`.`user_has_place` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`user_has_place` (
-  `user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
   `place_id` VARCHAR(128) NOT NULL,
   PRIMARY KEY (`user_idhash`, `place_id`),
   INDEX `fk_user_has_place_place1_idx` (`place_id` ASC),
@@ -296,8 +296,8 @@ ENGINE = InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 DROP TABLE IF EXISTS `friendsdb`.`user_with_in_place` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`user_with_in_place` (
-  `user_idhash` DECIMAL(10,0) NOT NULL,
-  `user_has_place_user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
+  `user_has_place_user_idhash` DECIMAL(25,0) NOT NULL,
   `user_has_place_place_id` VARCHAR(128) NOT NULL,
   PRIMARY KEY (`user_idhash`, `user_has_place_user_idhash`, `user_has_place_place_id`),
   INDEX `fk_user_has_user_has_place_user1_idx` (`user_idhash` ASC),
@@ -322,7 +322,7 @@ DROP TABLE IF EXISTS `friendsdb`.`user_in_place_details` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`user_in_place_details` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_has_place_user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_has_place_user_idhash` DECIMAL(25,0) NOT NULL,
   `user_has_place_place_id` VARCHAR(128) NOT NULL,
   `school_concentration` VARCHAR(256) NULL,
   `location_id` VARCHAR(128) NULL,
@@ -348,8 +348,8 @@ DROP TABLE IF EXISTS `friendsdb`.`connectedness` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`connectedness` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
-  `user_idhash1` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
+  `user_idhash1` DECIMAL(25,0) NOT NULL,
   `connectedness_level` INT NULL,
   `f2f_interaction` INT NULL,
   `online_interaction` INT NULL,
@@ -376,8 +376,8 @@ DROP TABLE IF EXISTS `friendsdb`.`common_aspect` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`common_aspect` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
-  `user_idhash1` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
+  `user_idhash1` DECIMAL(25,0) NOT NULL,
   `type` VARCHAR(64) NULL,
   `description` VARCHAR(128) NULL,
   PRIMARY KEY (`id`),
@@ -403,8 +403,8 @@ DROP TABLE IF EXISTS `friendsdb`.`relationship_from_survey` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`relationship_from_survey` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
-  `user_idhash1` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
+  `user_idhash1` DECIMAL(25,0) NOT NULL,
   `relationship_type` VARCHAR(128) NULL,
   `description` VARCHAR(128) NULL,
   PRIMARY KEY (`id`),
@@ -429,7 +429,7 @@ ENGINE = InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 DROP TABLE IF EXISTS `friendsdb`.`gender_from_survey` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`gender_from_survey` (
-  `user_idhash` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
   `gender` CHAR(1) NULL,
   PRIMARY KEY (`user_idhash`),
   CONSTRAINT `fk_gender_from_survey_user1`
@@ -447,8 +447,8 @@ DROP TABLE IF EXISTS `friendsdb`.`trait` ;
 
 CREATE TABLE IF NOT EXISTS `friendsdb`.`trait` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_idhash` DECIMAL(10,0) NOT NULL,
-  `user_idhash1` DECIMAL(10,0) NOT NULL,
+  `user_idhash` DECIMAL(25,0) NOT NULL,
+  `user_idhash1` DECIMAL(25,0) NOT NULL,
   `trait` VARCHAR(64) NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_traits_user1_idx` (`user_idhash` ASC),
