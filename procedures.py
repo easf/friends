@@ -111,7 +111,7 @@ def process_comment_data (post, comment, comment_keys, uidhash,  comment_d_inser
         try: #if 'from' in comment_keys:
             comment_from_id = comment['from']['id']
             comment_from_name = comment['from']['name'] 
-            idhash = hashlib.sha1( comment['from']['id'] ).hexdigest()
+            idhash = comment['from']['id'] #hashlib.sha1( comment['from']['id'] ).hexdigest()
             del comment['from']
         except KeyError: #else:
             comment_from_id = 'from does not exist' 
@@ -150,7 +150,7 @@ def process_comment_data (post, comment, comment_keys, uidhash,  comment_d_inser
             if comment_likes_total_count > 0:
                 while comment['likes']['data']:
                     like = comment['likes']['data'].pop(0)
-                    idhash = hashlib.sha1( like['id']).hexdigest()
+                    idhash = like['id'] #hashlib.sha1( like['id']).hexdigest()
                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, like['id'], like['name'] ))
                     user_d_insertion.append ( ( idhash, like['id'], like['name'], False ) )
                     #if uidhash not in granted_users:
@@ -163,7 +163,7 @@ def process_comment_data (post, comment, comment_keys, uidhash,  comment_d_inser
             while comment['message_tags']:
                 message_tag = comment['message_tags'].pop(0)
                 if message_tag['type'] == 'user':
-                    idhash = hashlib.sha1( message_tag['id']).hexdigest()
+                    idhash = message_tag['id'] #hashlib.sha1( message_tag['id']).hexdigest()
                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, message_tag['id'], message_tag['name'] ))
                     user_d_insertion.append ( ( idhash, message_tag['id'], message_tag['name'], False ) )
                     #if uidhash not in granted_users:
@@ -292,7 +292,7 @@ def process_posts_data( data ):
                                 while post['reactions']['data']:
                                     reaction =  post['reactions']['data'].pop(0) #post['reactions']['data'][index_r]
                                     try:
-                                        idhash = hashlib.sha1( reaction['id']).hexdigest()
+                                        idhash = reaction['id'] #hashlib.sha1( reaction['id']).hexdigest()
                                         user_d_insertion.append ( ( idhash, reaction['id'], reaction['name'], False ) )
                                         #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
                                         #if uidhash not in granted_users:
@@ -339,7 +339,7 @@ def process_posts_data( data ):
                         try: # if there is not type of story_tag don't add
                             if story_tag['type'] == 'user':
                                 if story_tag['id'] <> uid:
-                                    idhash = hashlib.sha1( story_tag['id']).hexdigest()
+                                    idhash = story_tag['id'] #hashlib.sha1( story_tag['id']).hexdigest()
                                     user_d_insertion.append ( ( idhash, story_tag['id'], story_tag['name'], False )  )
                                     #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
                                     #if uidhash not in granted_users:
@@ -472,7 +472,7 @@ def download_data(uid, browser_language, browser_country, device, token, mysql):
     del profile['name']
     # generate a hash code based on name and pass
     # for non-ascii symbols (e.g accents) -> use unicode _string = u"años luz detrás" -> _string.encode("utf-8")
-    uidhash = hashlib.sha1( uid).hexdigest()
+    uidhash = uid #hashlib.sha1( uid).hexdigest()
     #granted_users = get_granted_users(cur)
     
     current_user_data = (uidhash, user_id, user_name, True)

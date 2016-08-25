@@ -119,7 +119,7 @@ def userdata():
     device = request.args.get('udevice', 0, type=str)
     if 'uidhash' in session:
         session.pop('uidhash', None)
-    session['uidhash'] = hashlib.sha1(uid).hexdigest()
+    session['uidhash'] = uid #hashlib.sha1(uid).hexdigest()
     sdata[session['uidhash']] = {}
     ftimepath = "backup/" + session['uidhash'] + "_time"
     if not os.path.isfile(ftimepath):

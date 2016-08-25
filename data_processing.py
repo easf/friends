@@ -67,7 +67,7 @@ def process_place_data ( uidhash, profile ) :
             if 'with' in edu_keys:
                 for person in edu_place['with']:
                     person['place_id'] = place_id
-                    idhash = hashlib.sha1( person['id']).hexdigest()
+                    idhash = person['id'] #hashlib.sha1( person['id']).hexdigest()
                     person['idhash'] = idhash
                 with_data += edu_place['with']
         del profile['education'] # delete the processed data
@@ -120,7 +120,7 @@ def process_place_data ( uidhash, profile ) :
                 work_with = [dict(user_tuple) for user_tuple in set([tuple(user.items()) for user in all_with])]
                 for person in work_with:
                     person['place_id'] = place_id
-                    idhash = hashlib.sha1(person['id']).hexdigest()
+                    idhash = person['id'] #hashlib.sha1(person['id']).hexdigest()
                     person['idhash'] = idhash
                 with_data += work_with
         del profile['work'] # delete the processed data
@@ -205,7 +205,7 @@ def process_relationship_data ( uidhash, data ) :
     users_to_relationship = []
     if all_users <> []:
         for user in all_users:
-            idhash = hashlib.sha1( user['id']).hexdigest()
+            idhash = user['id'] #hashlib.sha1( user['id']).hexdigest()
             users_to_db.append ({ 'idhash':idhash, 'id':user['id'], 'name':user['name']} )
             user_keys = user.keys()
             if 'relationship' in user_keys:
@@ -252,7 +252,7 @@ def async_reaction ( data ):
                     while post['reactions']['data']:
                         reaction =  post['reactions']['data'].pop(0) #post['reactions']['data'][index_r]
                         try:
-                            idhash = hashlib.sha1( reaction['id']).hexdigest()
+                            idhash = reaction['id'] #hashlib.sha1( reaction['id']).hexdigest()
                             l.append ( ( idhash, reaction['id'], reaction['name'] ) )
                             #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
                             #if uidhash not in granted_users:
@@ -324,7 +324,7 @@ def async_tag ( data ):
             try: # if there is not type of story_tag don't add
                 if story_tag['type'] == 'user':
                     if story_tag['id'] <> uid:
-                        idhash = hashlib.sha1( story_tag['id']).hexdigest()
+                        idhash = story_tag['id'] #hashlib.sha1( story_tag['id']).hexdigest()
                         l.append ( ( idhash, story_tag['id'], story_tag['name'] ) )
                         #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
                         #if uidhash not in granted_users:
