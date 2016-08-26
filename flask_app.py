@@ -359,7 +359,7 @@ def about():
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
-            f = open( fname, "r" )
+        f = open( fname, "r" )
         textlang = json.load(f)
         f.close()
     return render_template('about.html', textlang=textlang)
