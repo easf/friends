@@ -334,6 +334,16 @@ def friends():
     
 @app.route('/thanks', methods=['GET','POST'] )
 def thanks():
+    conn = mysql.connect()
+    cur = conn.cursor()
+    cur.execute ("DELETE FROM reactionb USING postb INNER JOIN reactionb WHERE postb.user_idhash = %s AND postb.id = reactionb.id", (session['uidhash'],))
+    cur.execute ("DELETE FROM commentb USING postb INNER JOIN commentb WHERE postb.user_idhash = %s AND postb.id = commentb.id", (session['uidhash'],))
+    cur.execute ("DELETE FROM tagb USING postb INNER JOIN tagb WHERE postb.user_idhash = %s AND postb.id = tagb.id", (session['uidhash'],))
+    cur.execute ("DELETE FROM postb WHERE postb.user_idhash = %s ", (session['uidhash'],))
+    conn.commit()
+    #cur.close()
+    conn.close()
+
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
