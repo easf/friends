@@ -220,7 +220,8 @@ def connectednessdata():
 
     if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]:
         ftime = open (ftimepath, "a")
-        ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
+        if 'start_time' in sdata[session['uidhash']]:
+            ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
         ftime.close()
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data,  session['uidhash'], mysql )
     elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (crashed or no crashed)
@@ -310,7 +311,8 @@ def commonpointsdata():
 
     if status <> 'finished':
         ftime = open (ftimepath, "a")
-        ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
+        if 'start_time' in sdata[session['uidhash']]:
+            ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
         ftime.close()
         procedures.insert_common_points_data( commonpoints_data, session['uidhash'], mysql )
 
@@ -357,7 +359,7 @@ def about():
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
-        f = open( fname, "r" )
+            f = open( fname, "r" )
         textlang = json.load(f)
         f.close()
     return render_template('about.html', textlang=textlang)
