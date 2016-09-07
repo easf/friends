@@ -14,8 +14,8 @@ VIEW `most_reactions` AS
     FROM
         ((((`user` `u`
         JOIN `profile` `p` ON ((`u`.`idhash` = `p`.`user_idhash`)))
-        JOIN `postb` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
-        JOIN `reactionb` `r` ON ((`pt`.`id` = `r`.`post_id`)))
+        JOIN `post` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
+        JOIN `reaction` `r` ON ((`pt`.`id` = `r`.`post_id`)))
         JOIN `user` `u2` ON ((`r`.`user_idhash` = `u2`.`idhash`)))
     WHERE
         (`u`.`name` <> `u2`.`name`)
@@ -38,8 +38,8 @@ VIEW `most_comments` AS
     FROM
         ((((`user` `u`
         JOIN `profile` `p` ON ((`u`.`idhash` = `p`.`user_idhash`)))
-        JOIN `postb` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
-        JOIN `commentb` `r` ON ((`pt`.`id` = `r`.`post_id`)))
+        JOIN `post` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
+        JOIN `comment` `r` ON ((`pt`.`id` = `r`.`post_id`)))
         JOIN `user` `u2` ON ((`r`.`user_idhash` = `u2`.`idhash`)))
     WHERE
         (`u`.`name` <> `u2`.`name`)
@@ -63,8 +63,8 @@ VIEW `most_tagged` AS
     FROM
         ((((`user` `u`
         JOIN `profile` `p` ON ((`u`.`idhash` = `p`.`user_idhash`)))
-        JOIN `postb` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
-        JOIN `tagb` `r` ON ((`pt`.`id` = `r`.`post_id`)))
+        JOIN `post` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
+        JOIN `tag` `r` ON ((`pt`.`id` = `r`.`post_id`)))
         JOIN `user` `u2` ON ((`r`.`user_idhash` = `u2`.`idhash`)))
     WHERE
         (`u`.`name` <> `u2`.`name`)
@@ -143,11 +143,11 @@ VIEW `comments_replied_by_comment` AS
     FROM
         ((((((`user` `u`
         JOIN `profile` `p` ON ((`u`.`idhash` = `p`.`user_idhash`)))
-        JOIN `postb` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
-        JOIN `commentb` `r` ON ((`pt`.`id` = `r`.`post_id`)))
+        JOIN `post` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
+        JOIN `comment` `r` ON ((`pt`.`id` = `r`.`post_id`)))
         JOIN `user` `u2` ON ((`r`.`user_idhash` = `u2`.`idhash`)))
         JOIN `comment_has_comment` `c2` ON ((`r`.`id` = `c2`.`comment_id`)))
-        JOIN `commentb` `c3` ON (((`c3`.`id` = `c2`.`comment_id1`)
+        JOIN `comment` `c3` ON (((`c3`.`id` = `c2`.`comment_id1`)
             AND (`c3`.`user_idhash` = `u`.`idhash`))))
     WHERE
         (`u`.`name` <> `u2`.`name`)
@@ -170,10 +170,10 @@ VIEW `comments_replied_by_reaction` AS
     FROM
         (((((`user` `u`
         JOIN `profile` `p` ON ((`u`.`idhash` = `p`.`user_idhash`)))
-        JOIN `postb` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
-        JOIN `commentb` `r` ON ((`pt`.`id` = `r`.`post_id`)))
+        JOIN `post` `pt` ON ((`p`.`user_idhash` = `pt`.`user_idhash`)))
+        JOIN `comment` `r` ON ((`pt`.`id` = `r`.`post_id`)))
         JOIN `user` `u2` ON ((`r`.`user_idhash` = `u2`.`idhash`)))
-        JOIN `reactionb` `r2` ON ((`r`.`id` = `r2`.`comment_id`)))
+        JOIN `reaction` `r2` ON ((`r`.`id` = `r2`.`comment_id`)))
     WHERE
         ((`u`.`name` <> `u2`.`name`)
             AND (`r2`.`user_idhash` = `u`.`idhash`))

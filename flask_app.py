@@ -33,48 +33,29 @@ app.config['MYSQL_DATABASE_DB'] = config.MYSQL_DATABASE_DB
 app.config['MYSQL_DATABASE_HOST'] = config.MYSQL_DATABASE_HOST
 app.config['SECRET_KEY'] = config.SECRET_KEY
 app.config['DEBUG'] = False
+
 # URL PREFIX SETTING
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix = config.PREFIX)
 
 
 mysql.init_app(app)
 
-# it makes accesible from all pages the hash id and token of current experiment participant
-#session['uidhash'] = None #uidhash = None
-#session['token'] = None #token = None
-
-# it contains the list of friends to complete the questions about connectedness and so on
-#session['friends_for_connectedness'] = [] #friends_for_connectedness = []
-
-# it contains the list of friends to complete the questions about common points and so on
-#session['friends_for_common_points'] = [] #friends_for_common_points = []
-
-
-# it contains the top list of friends who most interacted in the current experiment participants
-#session['top_ten'] = [] #top_ten = []
-
-# variables to track the time that is taken by the participant doing the experiment
-#session['start_time'] = None #start_time = None
-#session['end_time'] = None #end_time = None
-#session['ftimepath'] = None #ftimepath = None
-#session['ftime'] = None #ftime = None
 
 # UI language, initialize language, english as a default language
-#session['chlang'] = None #chlang = None
-fname = "static/js/lang/en.lang.js" #fname = "static/js/lang/en.lang.js"
+fname = "static/js/lang/en.lang.js" 
 f = open( fname, "r" )
-gtextlang = json.load(f) #textlang = json.load(f)
+gtextlang = json.load(f) 
 f.close()
 
-#recover request form
-#session['request_form_connectednessdata'] = None
-#session['request_form_commonpointsdata'] = None
-
-#application = app  # make uwsgi happy
+# dict sdata to store some data (like friends or answers of participants) per each user
+# besides this dict we use the session dict (from flasksession) to store the id and token of user
 sdata = {}
+
+
 # initial page
 @app.route('/')
 def index():
+    # set to the default language
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
@@ -86,8 +67,7 @@ def index():
 # changing UI language
 @app.route('/language', methods=['GET','POST'])
 def language():
-    #global chlang
-    #global textlang
+    # set to the user chosen language
     chlang = request.args.get('chLang', 0, type=str)
     if 'chlang' in session:
         session.pop('chlang', None)
@@ -97,29 +77,22 @@ def language():
 # downloading user data
 @app.route('/userdata')
 def userdata():
-    #global uidhash
-    #global token
-    #global chlang
-    #global ftimepath
-    #global ftime
+    # set or update user's basic data
     if 'token' in session:
         session.pop('token', None) 
     session['token'] = request.args.get('token', 0, type=str)
     uid = request.args.get('uid', 0, type=str)
     browserlang = request.args.get('browserlang', 0, type=str)
     ipcountry = request.args.get('ipcountry', 0, type=str)
-    
-    #if 'chlang' in session:
-    #    session.pop('chlang', None)
 
     chlang = request.args.get('chLang', 0, type=str)
-    if chlang <> 0:
+    if chlang <> 0: # if chlang is null 
         session['chlang'] = chlang
 
     device = request.args.get('udevice', 0, type=str)
     if 'uidhash' in session:
         session.pop('uidhash', None)
-    session['uidhash'] = uid #hashlib.sha1(uid).hexdigest()
+    session['uidhash'] = uid # hashlib.sha1(uid).hexdigest()
     sdata[session['uidhash']] = {}
     ftimepath = "backup/" + session['uidhash'] + "_time"
     if not os.path.isfile(ftimepath):
@@ -128,12 +101,10 @@ def userdata():
 
     conn = mysql.connect()
     cur = conn.cursor()
-
     # verify the status of the participants (the experiment stage in which he/she is )
-    status = procedures.get_user_status (session['uidhash'], cur)
+    status = procedures.get_user_status ( session['uidhash'], cur )
     cur.close()
     conn.close()
-
     # if we don't have yet the participant data (None represents the first state), then we proceed to download the data
     if status == None:
         procedures.download_data(uid, browserlang, ipcountry, device, session['token'], mysql)    
@@ -143,33 +114,32 @@ def userdata():
 # rendering connectedness and interaction frequecncy questions
 @app.route('/connectedness', methods=['GET','POST'])
 def connectedness():
-    #global friends_for_connectedness
-    #global start_time    
     conn = mysql.connect()
     cur = conn.cursor()
     status = procedures.get_user_status (session['uidhash'], cur)
     cur.close()
     conn.close()
 
-    # file to backup the answers of users
+    # path of file to backup the answers of users
     fname = "backup/" + session['uidhash'] + "_connectedness"
 
     # Do the routing according user state and connectedness_file existence
     if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]: # if the user reload the page 
         pass 
-    elif status == 'user_data_downloaded': # if the application was crashed and then recover, recalculate friends for connectedness
+    elif status == 'user_data_downloaded': # if the application had crashed for some circunstance and then it recovered again, recalculate friends for connectedness
         sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
-    elif status == 'connectedness_questions' and not os.path.isfile(fname): # if the app crashed during or something worng happend when the participant was anwering the questions
+    elif status == 'connectedness_questions' and not os.path.isfile(fname): # if the app crashed during when the participant was anwering the questions about connectedness and interaction
         sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
     elif status == 'connectedness_questions' and os.path.isfile(fname): # if the user already anwsered the questions about connectedness before the app got crashed
         return redirect(url_for('connectednessdata'))
-    elif status == 'user_connectedness_data_stored': # if we aalready stored the data about connectedness and interaction frequency questions
+    elif status == 'user_connectedness_data_stored': # if we already stored the data about connectedness and interaction frequency questions
         return redirect(url_for('connectednessdata'))
-    elif status == 'finished': # if the user finished the experiment, say thanks
+    elif status == 'finished': # if the user finished the experiment, just show the final list of 10 friends
         return redirect(url_for('friends'))
 
+    # register the time when the user started the question
     sdata[session['uidhash']]['start_time'] = time.time()
-    
+    # check and set the language
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
@@ -182,13 +152,11 @@ def connectedness():
 # store connectedness data and get friend list for common points
 @app.route('/connectednessdata', methods=['GET','POST'] )
 def connectednessdata():
-    #global session['uidhash']
-    #global friends_for_common_points
-    #global end_time
-    #global request_form_connectednessdata
-
+    # store participant's answers
     request_form_connectednessdata = request.form
+    # backup the answers
     fname = "backup/" + str(session['uidhash']) + "_connectedness"
+    #verify if backup file exists, if not exists then create it
     try:
         data = dict((key, request_form_connectednessdata.getlist(key)[0]) for key in request_form_connectednessdata.keys())
         if len(data) > 4:
@@ -212,19 +180,19 @@ def connectednessdata():
     status = procedures.get_user_status (session['uidhash'], cur)
     cur.close()
     conn.close()
-    # convert user anwsers in dict
+    # "stop" the user answering time measurement
     sdata[session['uidhash']]['end_time'] = time.time()
     ts = time.time()
     
     ftimepath = "backup/" + session['uidhash'] + "_time"
 
-    if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]:
+    if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]: # if didn't store yet the answers, the store them
         ftime = open (ftimepath, "a")
         if 'start_time' in sdata[session['uidhash']]:
             ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
         ftime.close()
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data,  session['uidhash'], mysql )
-    elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (crashed or no crashed)
+    elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (after the app crashed or no)
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data, session['uidhash'], mysql )
     elif status == 'finished':
         return redirect(url_for('friends'))
@@ -235,14 +203,11 @@ def connectednessdata():
 @app.route('/commonpoints', methods=['GET','POST'] )
 def commonpoints():
     global current_close_user
-    #global friends_for_common_points
-    #global start_time
     conn = mysql.connect()
     cur = conn.cursor()
     status = procedures.get_user_status (session['uidhash'], cur)
     cur.close()
     conn.close()
-
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
@@ -259,7 +224,7 @@ def commonpoints():
         elif 'friends_for_common_points' in sdata[session['uidhash']]: # if the user reload the page
             sdata[session['uidhash']]['start_time'] = time.time()
             return render_template('common.html', users=sdata[session['uidhash']]['friends_for_common_points'], textlang=textlang)
-        elif status == 'user_connectedness_data_stored': # if there were a chrash, get again friends for common points
+        elif status == 'user_connectedness_data_stored': # if there were a chrashed, get again friends for common points
             connectedness_data = request.form
             if os.path.isfile(fname):
                 f = open( fname, "r" )  
@@ -272,15 +237,11 @@ def commonpoints():
         else:	
             return redirect(url_for('thanks'))
 
+#store the data from common points answers
 @app.route('/commonpointsdata', methods=['GET','POST'] )
 def commonpointsdata():
-    #global end_time
-    #global request_form_commonpointsdata
-    
     request_form_commonpointsdata = request.form
     fname = "backup/" + session['uidhash'] + "_commonpoints"
-    
-
     try:
         data = dict((key, request_form_commonpointsdata.getlist(key)[0]) for key in request_form_commonpointsdata.keys())
         if len(data) > 4:
@@ -318,13 +279,11 @@ def commonpointsdata():
 
     return redirect(url_for('friends'))
 
-
+# top ten one side interaction
 @app.route('/friends', methods=['GET','POST'] )
 def friends():
-    #global top_ten
     if session['uidhash'] in sdata:
         del sdata[session['uidhash']]
-#    session.pop('friends_for_connectedness', None)
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
@@ -336,16 +295,14 @@ def friends():
     
 @app.route('/thanks', methods=['GET','POST'] )
 def thanks():
-    conn = mysql.connect()
-    cur = conn.cursor()
-    cur.execute ("DELETE FROM reactionb USING postb INNER JOIN reactionb WHERE postb.user_idhash = %s AND postb.id = reactionb.post_id", (session['uidhash'],))
-    cur.execute ("DELETE FROM commentb USING postb INNER JOIN commentb WHERE postb.user_idhash = %s AND postb.id = commentb.post_id", (session['uidhash'],))
-    cur.execute ("DELETE FROM tagb USING postb INNER JOIN tagb WHERE postb.user_idhash = %s AND postb.id = tagb.post_id", (session['uidhash'],))
-    cur.execute ("DELETE FROM postb WHERE postb.user_idhash = %s ", (session['uidhash'],))
-    conn.commit()
-    #cur.close()
-    conn.close()
-
+    #conn = mysql.connect()
+    #cur = conn.cursor()
+    #cur.execute ("DELETE FROM reactionb USING postb INNER JOIN reactionb WHERE postb.user_idhash = %s AND postb.id = reactionb.post_id", (session['uidhash'],))
+    #cur.execute ("DELETE FROM commentb USING postb INNER JOIN commentb WHERE postb.user_idhash = %s AND postb.id = commentb.post_id", (session['uidhash'],))
+    #cur.execute ("DELETE FROM tagb USING postb INNER JOIN tagb WHERE postb.user_idhash = %s AND postb.id = tagb.post_id", (session['uidhash'],))
+    #cur.execute ("DELETE FROM postb WHERE postb.user_idhash = %s ", (session['uidhash'],))
+    #conn.commit()
+    #conn.close()
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"

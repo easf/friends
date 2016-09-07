@@ -9,32 +9,6 @@ from functools import partial
 Processing data for the insertion into DB
 
 """
-
-def pagination(data):
-    alldata = [] 
-    while(True):
-        try:
-#            alldata += data['data']
-            for item in data['data']:
-                alldata.append(item)
-            data=requests.get(data['paging']['next']).json()
-        except KeyError:
-            break
-    return alldata
-
-def get_granted_users(cur):
-    cur.execute("SELECT idhash, granted_permissions from user")
-    result = cur.fetchall()
-    granted_users = []
-    for row in result:
-        if row[1] <> None:
-            if row[1] == True:
-                granted_users.append(row[0])
-    return granted_users
-
-
-#       comments_data.append( { 'post_id':post['id'] , 'comment_id':comment['id'] ,'created_time':created_time, 'id':comment_from_id, 'name':comment_from_name, 'idhash':idhash, 'language':message_language, 'text_length':message_length, 'has_picture':has_picture, 'has_link':has_link, 'nreactions':comment_likes_total_count, 'ncomments':comment_summary_total_count } )
-
 def process_place_data ( uidhash, profile ) :
     place_data = []
     user_in_place_details = []
@@ -188,10 +162,10 @@ def process_relationship_data ( uidhash, data ) :
     family = {'data':[]}
     friends = {'data':[]}
     if data['family'] <> None:
-        family['data'] = data['family']['data']#pagination (data['family'])
+        family['data'] = data['family']['data']
     try:
         if len(data['friends']['data']) > 0:
-            friends['data'] = data['friends']['data']#pagination (data['friends'])
+            friends['data'] = data['friends']['data']
     except:
         pass
 
@@ -218,7 +192,7 @@ def process_relationship_data ( uidhash, data ) :
 
 
 def process_liked_pages_data (uidhash, data, statistics):
-    liked_pages = data['data']#pagination(data)
+    liked_pages = data['data']
     user_likes_pages = []
     for page in liked_pages:
         page['page_id'] = page['id']
@@ -226,113 +200,3 @@ def process_liked_pages_data (uidhash, data, statistics):
         user_likes_pages.append ( page['page_id'])
 
     return {'liked_pages':liked_pages, 'user_likes_pages':user_likes_pages}
-
-
-
-
-"""///////////////////////-----------------------//////////////////////////"""
-
-def async_reaction ( data ):
-    post = data[0]
-    uidhash = data[1]
-    post_reactions_summary_total_count = data[2] 
-    l = data[3]
-    r = data[4]
-    if 'reactions' in post.keys():
-        conn = mysql.connect()
-        cur = conn.cursor()    
-        granted_users = get_granted_users(cur)
-        try:
-            del post['reactions']['paging']
-        except KeyError:
-            pass
-        try:
-            if post_reactions_summary_total_count <> None:
-                if post_reactions_summary_total_count > 0:
-                    while post['reactions']['data']:
-                        reaction =  post['reactions']['data'].pop(0) #post['reactions']['data'][index_r]
-                        try:
-                            idhash = reaction['id'] #hashlib.sha1( reaction['id']).hexdigest()
-                            l.append ( ( idhash, reaction['id'], reaction['name'] ) )
-                            #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash", ( idhash, reaction['id'], reaction['name'] ) )
-                            #if uidhash not in granted_users:
-                            r.append ( ( idhash, post['id'], None, reaction['type'] ) )
-                                #cur.execute("INSERT INTO reaction ( user_idhash, post_id, comment_id, type ) " "VALUES (%s, %s, %s, %s)", ( idhash, post['id'], None, reaction['type'] ))
-                            #( user['idhash'], user['id'], user['name'] )
-                            #reactions_data.append( { 'post_id':post['id'], 'comment_id':None, 'type': reaction['type'], 'id':reaction['id'], 'name':reaction['name'], 'idhash':idhash} )
-                        except KeyError:
-                            pass
-        except KeyError:    
-            pass
-
-
-def async_comment ( data ):
-    post = data[0]
-    uidhash = data[1]
-    post_comments_summary_total_count = data[2]
-    l = data[3]
-    r = data[4]
-    if 'comments' in post.keys():
-        conn = mysql.connect()
-        cur = conn.cursor()    
-        granted_users = get_granted_users(cur)
-        try:
-            del post['comments']['paging']
-        except KeyError:
-            pass
-        try: 
-            if post_comments_summary_total_count <> None:
-                if post_comments_summary_total_count > 0:
-                    comment_len = len(post['comments']['data'])
-                    while post['comments']['data']:
-                        comment = post['comments']['data'].pop(0) # 
-                        try:
-                            comment_keys = comment.keys()
-                            process_comment_data ( post, comment, comment_keys, uidhash, granted_users, cur, l, r)
-                            if 'comments' in comment_keys:
-                                try:
-                                    del comment['comments']['paging']
-                                except KeyError:
-                                    pass
-                                while comment['comments']['data']:
-                                    inner_comment = comment['comments']['data'].pop()
-                                    inner_comment_keys = inner_comment.keys()
-                                    process_comment_data ( post, inner_comment, inner_comment_keys, uidhash, granted_users, cur,l,r)
-                                    #comments_inner_comm_data.append ({ 'comment_id':comment['id'], 'comment_id1':inner_comment['id'] })
-                                    cur.execute ("INSERT INTO comment_has_comment ( comment_id, comment_id1 ) " "VALUES (%s, %s) ON DUPLICATE KEY UPDATE comment_id = VALUES(comment_id), comment_id1 = VALUES(comment_id1)", (comment['id'], inner_comment['id'] ))
-                        except KeyError:
-                            pass
-        except KeyError:
-            pass
-
-
-def async_tag ( data ):
-    post = data[0]
-    uidhash = data[1]
-    uid = data[2]
-    l = data[3]
-    if 'story_tags' in post.keys():
-        conn = mysql.connect()
-        cur = conn.cursor()    
-        granted_users = get_granted_users(cur)
-        #granted_users = get_granted_users(cur)
-        #ct = 0
-        #story_tag_len = len ( post['story_tags'] )
-        #for index_st in range (story_tag_len):
-        while post['story_tags']:
-            story_tag = post['story_tags'].pop(0)
-            try: # if there is not type of story_tag don't add
-                if story_tag['type'] == 'user':
-                    if story_tag['id'] <> uid:
-                        idhash = story_tag['id'] #hashlib.sha1( story_tag['id']).hexdigest()
-                        l.append ( ( idhash, story_tag['id'], story_tag['name'] ) )
-                        #cur.execute( "INSERT INTO user ( idhash, id, name ) " "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE idhash = idhash",( idhash, story_tag['id'], story_tag['name'] ))
-                        #if uidhash not in granted_users:
-                        cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], idhash, None ))
-                elif story_tag['type'] == 'page':
-                    cur.execute("INSERT INTO page ( id, name, category, total_fans ) " "VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id = id", ( story_tag['id'], story_tag['name'], None, None ) )
-                    #if uidhash not in granted_users:
-                    cur.execute("INSERT INTO tag ( post_id, comment_id, type, user_idhash, page_id ) " "VALUES (%s, %s, %s, %s, %s)", ( post['id'], None, story_tag['type'], None, story_tag['id'] ))
-#                        story_tags_pages.append({'post_id':post['id'], 'comment_id':None , 'idhash':None, 'id':None, 'name':story_tag['name'], 'type':story_tag['type'], 'page_id':story_tag['id']})
-            except KeyError:
-                pass
