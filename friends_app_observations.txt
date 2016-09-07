@@ -1,0 +1,17 @@
+Some Observations:
+    User (possible) status:
+        - None (initial state)
+        - user_data_downloaded (data from facebook downloaded)
+        - connectedness_questions (the user is completing the connectedness and interaction questions)
+        - user_connectedness_data_stored (answer from connectedness and interaction stored and the user is anwsering the common points questions)
+        - finished  ( common points answers stored, we have all the data for which we asked )
+        
+    - At this moment we don't generate the id hash, we just use the (user) Facebook id, but to generate again the hash just uncoment what is next to "uid" (in several places) to replace it, just find for "hashlib."
+     
+
+
+    For running the app in background ( nginx + uwsgi )
+        - How it works: In "instance" directory there is the uwsgi configuration file for the app called "friends_uwsgi.ini", this file is linked to /etc/uwsgi/apps-enabled location, from this location a service script references the mentioned configuration file in order to run the app in background.The service script is /etc/init.d/friends.
+        - How to run: sudo /etc/init.d/friends start
+        - How to stop: sudo /etc/init.d/friends stop
+
