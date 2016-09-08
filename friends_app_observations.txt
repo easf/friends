@@ -1,17 +1,32 @@
 Some Observations:
-    User (possible) status:
-        - None (initial state)
-        - user_data_downloaded (data from facebook downloaded)
-        - connectedness_questions (the user is completing the connectedness and interaction questions)
-        - user_connectedness_data_stored (answer from connectedness and interaction stored and the user is anwsering the common points questions)
-        - finished  ( common points answers stored, we have all the data for which we asked )
-        
+    - framework: flask (python)
+    - server: nginx (+ uwsgi)
+
+    - main pyhton file: flask_app.py, additional python files: procedures.py, data_processing.py 
+    - the html files are in /var/www/happy/friends/templates
+    - the css, images and scripts in /var/www/happy/friends/static and inner directories
+    - the language files (en, es, it, ru) are in /var/www/happy/friends/static/js/lang/
+
+    - /var/www/happy/friends/config.py is the file where the database and other parameter are set
+    - the database model is in /var/www/happy/friends/database/model
+    - the data from "first" participants (6 aprox finished the experiment) is in /var/www/happy/friends/database/friendsdb_backup_25_08_2228.sql
+    - the data from the "last" participants (26 finished the experiment) is in /var/www/happy/friends/database/friendsdb_backup_07_09.sql
+    
+
+    - Inside the app context, the user (possible) status are:
+        1- None (initial state)
+        2- user_data_downloaded (data from facebook downloaded)
+        3- connectedness_questions (the user is completing the connectedness and interaction questions)
+        4- user_connectedness_data_stored (answer from connectedness and interaction stored and the user is anwsering the common points questions)
+        5- finished  ( common points answers stored, we have all the data for which we asked )
+        the routing also depends on these status.
     - At this moment we don't generate the id hash, we just use the (user) Facebook id, but to generate again the hash just uncoment what is next to "uid" (in several places) to replace it, just find for "hashlib."
-     
 
 
     For running the app in background ( nginx + uwsgi )
         - How it works: In "instance" directory there is the uwsgi configuration file for the app called "friends_uwsgi.ini", this file is linked to /etc/uwsgi/apps-enabled location, from this location a service script references the mentioned configuration file in order to run the app in background.The service script is /etc/init.d/friends.
         - How to run: sudo /etc/init.d/friends start
         - How to stop: sudo /etc/init.d/friends stop
+
+
 
