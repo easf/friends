@@ -340,7 +340,7 @@ def not_found(error):
 
 if __name__ == "__main__":
     try:
-        app.run(debug=False,port=5500, threaded=False)
+        app.run(debug=False,port=5100, threaded=False)
     except socket.error, e:
         if isinstance(e.args, tuple):
             print "errno is %d" % e[0]
