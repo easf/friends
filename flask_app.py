@@ -312,7 +312,7 @@ def thanks():
     return render_template('thanks.html', textlang= textlang)
 
 @app.route('/consent', methods=['GET','POST'] )
-def about():
+def consent():
     textlang = gtextlang
     if 'chlang' in session:
         fname = "static/js/lang/" + session['chlang'] + ".lang.js"
