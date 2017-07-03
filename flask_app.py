@@ -311,6 +311,16 @@ def thanks():
         f.close()
     return render_template('thanks.html', textlang= textlang)
 
+@app.route('/consent', methods=['GET','POST'] )
+def about():
+    textlang = gtextlang
+    if 'chlang' in session:
+        fname = "static/js/lang/" + session['chlang'] + ".lang.js"
+        f = open( fname, "r" )
+        textlang = json.load(f)
+        f.close()
+    return render_template('consent.html', textlang=textlang)
+
 @app.route('/about', methods=['GET','POST'] )
 def about():
     textlang = gtextlang

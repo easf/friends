@@ -19,14 +19,18 @@
 
 			"thirdPar":"The experiment requires Facebook login. The access to profile information is requested to identify: i) common aspects among Facebook profiles and ii) the number of interactions online"
 		},
-		"consent": "I hereby accept to participate of the study, consenting to the use of my data ONLY in the form expressed in this page and for the research purposes described above.",
+        "consent": { "firstSeg": "I acknowledge that I have read and understood the ",
+        			 "firstLn": "informed consent form ",
+					 "secondSeg": "and the ",
+		             "secondLn": "terms and conditions ",
+		             "third Seg": "of this site, and hereby accept to participate of this study, consenting to the use of my data ONLY in the form expressed in this page and for the research purposes described above."
+        },
 		"startBttn": "Start the experiment",
 		"footnote": { "firstSeg":"The questionnaire is completely ",
 					  "firstSt":" anonymous ",
 				 	  "secondSeg":" and ", 
-				 	  "secondSt":" no content about your posts will be recorded", 
-					  "thirdSeg":"The resulting data will be used for the scientific purposes explained in this page. You can leave the questionnaire at any moment. For further info, please check our " ,  
-					  "firstLn":" terms and conditions" 
+				 	  "secondSt":" no content about your posts will be recorded",
+        			  "thirdSeg":"The resulting data will be used for the scientific purposes explained in this page. You can leave the questionnaire at any moment."
 				    }
 		},
 		"connectedness" : 
@@ -133,7 +137,7 @@
 		"secondMessage": "Please, support our research by inviting other friends to participate of the study.",
 		"thirdMessage" : "You're awesome. ",
 		"fbBttn" : "Share",
-		"goodbye": "The Life Participation Team. " 
+		"goodbye": "The Life Participation Team. "
 
 	}
 }
