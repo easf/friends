@@ -23,7 +23,7 @@
         			 "firstLn": "informed consent form ",
 					 "secondSeg": "and the ",
 		             "secondLn": "terms and conditions ",
-		             "third Seg": "of this site, and hereby accept to participate of this study, consenting to the use of my data ONLY in the form expressed in this page and for the research purposes described above."
+		             "thirdSeg": "of this site, and hereby accept to participate of this study, consenting to the use of my data ONLY in the form expressed in this page and for the research purposes described above."
         },
 		"startBttn": "Start the experiment",
 		"footnote": { "firstSeg":"The questionnaire is completely ",
