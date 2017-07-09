@@ -334,7 +334,7 @@ def creditdata():
 
     procedures.insert_credit_data( credit_data, session['uidhash'], mysql )
 
-    return redirect(url_for('friends')):
+    return redirect(url_for('friends'))
     
 @app.route('/thanks', methods=['GET','POST'] )
 def thanks():
