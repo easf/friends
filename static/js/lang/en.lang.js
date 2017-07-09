@@ -133,6 +133,7 @@
 
 	"thanks":
 	{
-
+		"title": "Thanks for participating!",
+		"firstMessage": "If you would like to receive a copy of our findings, please email Dr. Kelly Campbell ("
 	}
 }
