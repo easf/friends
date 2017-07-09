@@ -802,6 +802,31 @@ def insert_common_points_data(commonpoints_data, uidhash, mysql):
         cur.execute ("UPDATE user SET status = %s WHERE idhash = %s", ('finished', uidhash))
         conn.commit()
 
+def insert_credit_data(credit_data, uidhash, mysql):
+    #channels = {}
+    #relationships = []
+    #relationships_update = []
+    #common_aspects = []
+    #common_aspect_update = []
+    conn = mysql.connect()
+    cur = conn.cursor()
+    #survey_data_keys = commonpoints_data.keys()
+
+    #process credit_data
+
+    # do we need to check status?
+    status = get_user_status (uidhash, cur)
+    #if status == 'user_connectedness_data_stored':
+    # insert, add indent if status check is needed
+    try:
+        #cur.execute ( "INSERT INTO trait (user_idhash, user_idhash1, trait) VALUES (%s, %s, %s)", (uidhash, user_idhash1, commonpoints_data[key] ) )
+        print 'insert to db'
+    except:
+        pass
+
+    #commit
+    conn.commit()
+
 def get_best_friends (uidhash, mysql):
     conn = mysql.connect()
     cur = conn.cursor()

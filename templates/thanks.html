@@ -60,22 +60,33 @@
             in social networks and what aspects their share in common
             -->
           <p class="lead">        
-            {{ textlang['thanks']['firstMessage'] }}      
-          </p>
-
-          <p class="lead"> {{ textlang['thanks']['secondMessage'] }} </p>
-          <p>
-          <div class="fb-share-button" data-href="http://happy.mateine.org/friends/" data-layout="button" data-size="large" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhappy.mateine.org%2Ffriends%2F&amp;src=sdkpreparse">{{ textlang['thanks']['fbBttn'] }}</a></div>
-          <!--<button class="btn-info">Share button goes here (we should personalise what goes in the text by using the meta tags)</button>-->
+            <span id="firstMessage">{{ textlang['thanks']['firstMessage'] }}</span><a id="firstEmail" href="emailto:Kelly@csusb.edu">{{ textlang['thanks']['firstEmail'] }}</a><span id="firstMessageEnd">{{ textlang['thanks']['firstMessageEnd'] }}</span>
           </p>
 
           <p class="lead">
-          {{ textlang['thanks']['thirdMessage'] }} 
-          </p>  
-          <p class="lead text-right">
-          {{ textlang['thanks']['goodbye'] }}  
-          </p>  
+            <span id="secondMessage">{{ textlang['thanks']['secondMessage'] }}</span>
+          </p>
 
+          <form id="myform4" method="post" action="{{ url_for('creditdata') }}">
+
+            <div>
+              <label for="fname">{{ textlang['thanks']['firstLabel'] }}</label>
+              <input type="text" id="fname" name="first_name">
+            </div>
+            <div>
+              <label for="lname">{{ textlang['thanks']['secondLabel'] }}</label>
+              <input type="text" id="lname" name="last_name">
+            </div>
+            <div>
+              <label for="id">{{ textlang['thanks']['thirdLabel'] }}</label>
+              <input type="text" id="id" name="sona_id">
+            </div>
+
+            <div>
+              <button id="endBttn" type="submit" class="btn btn-info btn-lg">{{ textlang['thanks']['endBttn'] }}</button>
+            </div>
+
+          </form>
 
         </div>
       </div>
@@ -89,6 +100,10 @@
     
   </div>
   <script src="static/src/app.js"></script>
+
+  <script>
+      $("#myform4").validate();
+  </script>
   
 </body>
 </html>

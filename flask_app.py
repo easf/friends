@@ -292,6 +292,49 @@ def friends():
         f.close()    
     top_ten = procedures.get_best_friends(session['uidhash'], mysql)
     return render_template('bestfriends.html', users=top_ten, textlang=textlang)
+
+#store student data for credits
+@app.route('/creditdata', methods=['GET','POST'] )
+def creditdata():
+    request_form_creditdata = request.form
+    fname = "backup/" + session['uidhash'] + "_credit"
+    try:
+        data = dict((key, request_form_creditdata.getlist(key)[0]) for key in request_form_creditdata.keys())
+        if not os.path.isfile(fname):
+            f = open( fname, "w" )
+            json.dump(data, f)
+            f.close()
+    except:
+        pass
+    credit_data = request_form_creditdata
+
+    if os.path.isfile(fname):
+         f = open( fname, "r" )
+         user_answers = json.load(f)
+         f.close()
+         credit_data = user_answers
+
+    conn = mysql.connect()
+    cur = conn.cursor()
+    status = procedures.get_user_status (session['uidhash'], cur)
+    cur.close()
+    conn.close()
+
+    sdata[session['uidhash']]['end_time'] = time.time()
+    ts = time.time()
+
+    #ftimepath = "backup/" + session['uidhash'] + "_time"
+
+    #if status <> 'finished':
+        #ftime = open (ftimepath, "a")
+        #if 'start_time' in sdata[session['uidhash']]:
+        #    ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
+        #ftime.close()
+        #procedures.insert_common_points_data( commonpoints_data, session['uidhash'], mysql )
+
+    procedures.insert_credit_data( credit_data, session['uidhash'], mysql )
+
+    return redirect(url_for('friends')):
     
 @app.route('/thanks', methods=['GET','POST'] )
 def thanks():
