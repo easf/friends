@@ -130,25 +130,9 @@
 		"title" : "Unexpected things have occurred but, don't worry! Just press the button below to continue with the experiment.",
 		"bttn" : "Continue"
 	},
+
 	"thanks":
 	{
-		"title" : "Thanks for participating!",
-		"firstMessage": "Your contribution help us design tools to help older adults reconnect with old friends.",
-		"secondMessage": "Please, support our research by inviting other friends to participate of the study.",
-		"thirdMessage" : "You're awesome. ",
-		"fbBttn" : "Share",
-		"goodbye": "The Life Participation Team. "
 
 	}
-    /*"thanks": {
-		"title" : "Thanks for participating!",
-		"firstMessage" : "If you would like to receive a copy of our findings, please email Dr. Kelly Campbell (",
-		"firstEmail" : "Kelly@csusb.edu",
-		"firstMessageEnd" : ").",
-		"secondMessage" : "If you would like to receive an extra credit point toward a Psychology class of your choice, at your instructor’s discretion, please provide the information below. This information will not be stored in connection with your anonymous data.",
-		"firstLabel" : "First Name:",
-		"secondLabel" : "Last Name:",
-		"thirdLabel" : "SONA ID:",
-		"endBttn" : "Submit"
-	}*/
 }
