@@ -130,7 +130,7 @@
 		"title" : "Unexpected things have occurred but, don't worry! Just press the button below to continue with the experiment.",
 		"bttn" : "Continue"
 	},
-	/*"thanks":
+	"thanks":
 	{
 		"title" : "Thanks for participating!",
 		"firstMessage": "Your contribution help us design tools to help older adults reconnect with old friends.",
@@ -139,8 +139,8 @@
 		"fbBttn" : "Share",
 		"goodbye": "The Life Participation Team. "
 
-	}*/
-    "thanks": {
+	}
+    /*"thanks": {
 		"title" : "Thanks for participating!",
 		"firstMessage" : "If you would like to receive a copy of our findings, please email Dr. Kelly Campbell (",
 		"firstEmail" : "Kelly@csusb.edu",
@@ -150,5 +150,5 @@
 		"secondLabel" : "Last Name:",
 		"thirdLabel" : "SONA ID:",
 		"endBttn" : "Submit"
-	}
+	}*/
 }
