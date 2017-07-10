@@ -70,14 +70,14 @@
           <form id="myform4" method="post" action="{{ url_for('creditdata') }}">
 
             <div class="form-group">
-              <label for="fname">{{ textlang['thanks']['firstLabel'] }}</label>
+              <label for="fname" class="col-2 col-form-label">{{ textlang['thanks']['firstLabel'] }}</label>
               <input type="text" id="fname" name="first_name">
             </div>
-            <div class="form-group">
+            <div class="form-group" class="col-2 col-form-label">
               <label for="lname">{{ textlang['thanks']['secondLabel'] }}</label>
               <input type="text" id="lname" name="last_name">
             </div>
-            <div class="form-group">
+            <div class="form-group" class="col-2 col-form-label">
               <label for="id">{{ textlang['thanks']['thirdLabel'] }}</label>
               <input type="text" id="id" name="sona_id">
             </div>
