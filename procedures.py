@@ -812,7 +812,10 @@ def insert_credit_data(credit_data, uidhash, mysql):
     cur = conn.cursor()
     #survey_data_keys = commonpoints_data.keys()
 
-    #process credit_data
+    #process credit_data from form
+    sona_id = credit_data['sona_id']
+    first_name = credit_data['first_name']
+    last_name = credit_data['last_name']
 
     # do we need to check status?
     status = get_user_status (uidhash, cur)
@@ -820,6 +823,7 @@ def insert_credit_data(credit_data, uidhash, mysql):
     # insert, add indent if status check is needed
     try:
         #cur.execute ( "INSERT INTO trait (user_idhash, user_idhash1, trait) VALUES (%s, %s, %s)", (uidhash, user_idhash1, commonpoints_data[key] ) )
+        cur.execute ( "INSERT INTO credit_data (sona_id, first_name, last_name) VALUES (%s, %s, %s)", (sona_id, first_name, last_name) )
         print 'insert to db'
     except:
         pass

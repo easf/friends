@@ -306,7 +306,10 @@ def creditdata():
             f.close()
     except:
         pass
+
     credit_data = request_form_creditdata
+    #check if all form fields are filled
+    credit_form_is_filled = credit_data['sona_id'] and credit_data['first_name'] and credit_data['last_name']
 
     if os.path.isfile(fname):
          f = open( fname, "r" )
@@ -320,19 +323,19 @@ def creditdata():
     cur.close()
     conn.close()
 
-    sdata[session['uidhash']]['end_time'] = time.time()
-    ts = time.time()
+    #sdata[session['uidhash']]['end_time'] = time.time()
+    #ts = time.time()
 
     #ftimepath = "backup/" + session['uidhash'] + "_time"
 
-    #if status <> 'finished':
-        #ftime = open (ftimepath, "a")
-        #if 'start_time' in sdata[session['uidhash']]:
-        #    ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
-        #ftime.close()
-        #procedures.insert_common_points_data( commonpoints_data, session['uidhash'], mysql )
+    if status <> 'finished':
+        if credit_form_is_filled:
+            #ftime = open (ftimepath, "a")
+            #if 'start_time' in sdata[session['uidhash']]:
+            #    ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Common points questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
+            #ftime.close()
 
-    procedures.insert_credit_data( credit_data, session['uidhash'], mysql )
+            procedures.insert_credit_data( credit_data, session['uidhash'], mysql )
 
     return redirect(url_for('friends'))
     
