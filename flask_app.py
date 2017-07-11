@@ -328,7 +328,7 @@ def creditdata():
 
     #ftimepath = "backup/" + session['uidhash'] + "_time"
 
-    if status <> 'finished':
+    if status == 'finished':
         if credit_form_is_filled:
             #ftime = open (ftimepath, "a")
             #if 'start_time' in sdata[session['uidhash']]:
