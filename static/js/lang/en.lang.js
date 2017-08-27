@@ -44,15 +44,12 @@
 			"connSpInst":  "Please, select the circles that best describe your connectedness to ",
 			"intSpInst1":  "How often did you interact with ",
 			"intSpInst2":  "in the last month?",
-			/*"channel1":  "Online (e.g., Whatsapp, Skype)",*/
 			"channel1":  "Online (e.g., email, text, videochat)",
 			"channel2":  "Face to face",
-			/*"likertScale1":  "Never",*/
             "likertScale1":  "Never in the last month",
 			"likertScale2":  "1-2 times",
 			"likertScale3":  "Once a week",
 			"likertScale4":  "2-3 times a week",
-			/*"likertScale5":  "Every day",*/
             "likertScale5":  "Every day in the last month",
 			"bttnFinished":  "I've finished"
 		},
@@ -94,7 +91,6 @@
 			"otherInstitutions" : "Attend(ed) together other type of institutions",
 			"otherlabel": "Other",
 			"other": "Other",
-			/*"spInstcomm": "What do you share in common with ",*/
             "spInstcomm": "What do you have in common with ",
 			"sharedBeliefs": "Shared beliefs",
 			"politics": "Political views",
