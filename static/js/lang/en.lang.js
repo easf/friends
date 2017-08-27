@@ -43,14 +43,18 @@
 			"gender2":  "Female",
 			"connSpInst":  "Please, select the circles that best describe your connectedness to ",
 			"intSpInst1":  "How often did you interact with ",
-			"intSpInst2":  " in the last month?",
-			"channel1":  "Online (e.g., Whatsapp, Skype)",
+			/*"intSpInst2":  " in the last month?",*/
+			"intSpInst2":  " in the <u>LAST MONTH</U>?",
+			/*"channel1":  "Online (e.g., Whatsapp, Skype)",*/
+			"channel1":  "Online (e.g., email, text, videochat)",
 			"channel2":  "Face to face",
-			"likertScale1":  "Never",
+			/*"likertScale1":  "Never",*/
+            "likertScale1":  "Never in the last month",
 			"likertScale2":  "1-2 times",
 			"likertScale3":  "Once a week",
 			"likertScale4":  "2-3 times a week",
-			"likertScale5":  "Every day",
+			/*"likertScale5":  "Every day",*/
+            "likertScale5":  "Every day in the last month",
 			"bttnFinished":  "I've finished"
 		},
 		"common":
@@ -72,6 +76,11 @@
 			"relTypepf" : "Part of my family",
 			"relTypecf" : "Core family (parent, child, sibling)",
 			"relTypeef" : "Extended family (aunt, niece, cousin, grandparents)",
+            "friendType" : "Friend",
+            "friendTypec" : "Close friend",
+            "friendTyped" : "Friend / Acquaintance",
+            "relTypecf" : "Core family (parent, child, sibling)",
+            "relTypeef" : "Extended family (aunt, niece, cousin, grandparents)",
 			"commPlace" : "Share / Shared a place in common",
 			"sameHomeT" : "We are from the same hometown",
 			"sameCity" : "We live(d) in the same city",
@@ -86,7 +95,8 @@
 			"otherInstitutions" : "Attend(ed) together other type of institutions",
 			"otherlabel": "Other",
 			"other": "Other",
-			"spInstcomm": "What do you share in common with ",
+			/*"spInstcomm": "What do you share in common with ",*/
+            "spInstcomm": "What do you have in common with ",
 			"sharedBeliefs": "Shared beliefs",
 			"politics": "Political views",
 			"religious" : "Religious views",
@@ -138,6 +148,7 @@
 		"firstEmail": "Kelly@csusb.edu",
 		"firstMessageEnd": ").",
         "secondMessage": "If you would like to receive an extra credit point toward a Psychology class of your choice, at your instructor's discretion, please provide the information below. This information will not be stored in connection with your anonymous data.",
+		"checkBttn": "I would like to receive an extra credit point."
         "firstLabel": "First Name:",
         "secondLabel": "Last Name:",
         "thirdLabel": "SONA ID:",
