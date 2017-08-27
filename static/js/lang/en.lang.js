@@ -5,7 +5,7 @@
 		"title": "What makes people bond?",
 		"body": 
 		{ 
-			"firstPar": { "firstSeg": "In this study we aim at addressing this question by looking at ", 
+			"firstPar": { "firstSeg": "In this study we aim at addressing this question by looking at ",
 						 "secondSeg": " on Facebook and what aspects they ", 
 						 "firstSt": " how people interact ", "secondSt": " share in common" 
 					   },
@@ -43,8 +43,7 @@
 			"gender2":  "Female",
 			"connSpInst":  "Please, select the circles that best describe your connectedness to ",
 			"intSpInst1":  "How often did you interact with ",
-			/*"intSpInst2":  " in the last month?",*/
-			"intSpInst2":  " in the <u>LAST MONTH</U>?",
+			"intSpInst2":  "in the last month?",
 			/*"channel1":  "Online (e.g., Whatsapp, Skype)",*/
 			"channel1":  "Online (e.g., email, text, videochat)",
 			"channel2":  "Face to face",
