@@ -77,8 +77,6 @@
             "friendType" : "Friend",
             "friendTypec" : "Close friend",
             "friendTyped" : "Friend / Acquaintance",
-            "relTypecf" : "Core family (parent, child, sibling)",
-            "relTypeef" : "Extended family (aunt, niece, cousin, grandparents)",
 			"commPlace" : "Share / Shared a place in common",
 			"sameHomeT" : "We are from the same hometown",
 			"sameCity" : "We live(d) in the same city",
@@ -129,7 +127,8 @@
 	"bestfriends":
 	{
 		"title":"Friends who most interacted in your posts.",
-		"subtitle":" Look! We've done a top list of friends based on the approximated amount of interactions in your posts.",
+		"subtitle":" Look!",
+        "message": "We've done a top list of friends based on the approximated amount of interactions in your posts.",
 		"bttn":"Next"
 	},
 	"recoverpage":
