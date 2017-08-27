@@ -148,7 +148,7 @@
 		"firstEmail": "Kelly@csusb.edu",
 		"firstMessageEnd": ").",
         "secondMessage": "If you would like to receive an extra credit point toward a Psychology class of your choice, at your instructor's discretion, please provide the information below. This information will not be stored in connection with your anonymous data.",
-		"checkBttn": "I would like to receive an extra credit point."
+		"checkBttn": "I would like to receive an extra credit point.",
         "firstLabel": "First Name:",
         "secondLabel": "Last Name:",
         "thirdLabel": "SONA ID:",
