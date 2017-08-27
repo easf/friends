@@ -156,6 +156,22 @@
                               </label>                        
                             </div>
 
+                            <label>
+                              {{ textlang["common"]["friendType"] }}
+                            </label>
+                            <div class="checkbox">
+                              <label>
+                                <input type="checkbox" name="cbr_closeFriend_{{ user['id'] }}" value="close_friend">
+                                {{ textlang["common"]["friendTypec"] }}
+                              </label>
+                            </div>
+                            <div class="checkbox">
+                              <label>
+                                <input type="checkbox" name="cbr_distantFriend_{{ user['id'] }}" value="distant_friend">
+                                {{ textlang["common"]["friendTyped"] }}
+                              </label>
+                            </div>
+
                             <label>{{ textlang["common"]["commPlace"] }}</label>
                             <div class="checkbox"> 
                              <label>

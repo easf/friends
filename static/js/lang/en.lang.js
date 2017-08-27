@@ -126,7 +126,7 @@
 	},
 	"bestfriends":
 	{
-		"title":"Friends who most interacted in your posts.",
+		"title":"Friends who most interacted in your posts",
 		"subtitle":" Look!",
         "message": "We've done a top list of friends based on the approximated amount of interactions in your posts.",
 		"bttn":"Next"
