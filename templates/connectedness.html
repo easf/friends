@@ -137,6 +137,11 @@
                     <label class="myclass_rimg">
                       <input type="radio" id="r7" name="connectedness_{{ user['id'] }}" value="7">
                       <img src="static/src/img/connectedness_7.png" class="img-rounded">
+                    </label>
+
+                    <label class="myclass_rimg">
+                      <input type="radio" id="r8" name="connectedness_{{ user['id'] }}" value="0">
+                      <span id="onConnectedness" >{{ textlang["connectedness"]["skip"] }}</span>
                     </label> <!--Set the position of error message -->
 
                     <label for="connectedness_{{ user['id'] }}" class="error" style="color:red; display:none;"></label>
@@ -181,6 +186,11 @@
                       <input type="radio" id="r5" name="interaction_online_{{ user['id'] }}" value="5">
                       <span id="onlikertScale5">{{ textlang["connectedness"]["likertScale5"] }}</span>
                     </label>
+
+                    <label class="radio-inline">
+                      <input type="radio" id="r6" name="interaction_online_{{ user['id'] }}" value="0">
+                      <span id="onlikertScale6">{{ textlang["connectedness"]["skip"] }}</span>
+                    </label>
                     <!--Set the position of error message -->
                     <label for="interaction_online_{{ user['id'] }}" class="error" style="color:red; display:none;"></label>
                     
@@ -216,6 +226,11 @@
                     <label class="radio-inline">
                       <input type="radio" id="r5" name="interaction_face_{{ user['id'] }}" value="5">
                       <span id="f2flikertScale5">{{ textlang["connectedness"]["likertScale5"] }}</span>
+                    </label>
+
+                    <label class="radio-inline">
+                      <input type="radio" id="r6" name="interaction_face_{{ user['id'] }}" value="0">
+                      <span id="f2flikertScale6">{{ textlang["connectedness"]["skip"] }}</span>
                     </label>
                     <!--Set the position of error message -->
                     <label for="interaction_face_{{ user['id'] }}" class="error" style="color:red; display:none;"></label>
