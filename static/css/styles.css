@@ -47,7 +47,8 @@ nav.navbar-white {
   max-height: 70px;
 }
 .closeness label {
-  min-width: 145px;
+  font-weight: 400px;
+  margin-right: 10px;
 }
 
 .closeness label:hover img, .closeness .selected img{
@@ -98,10 +99,10 @@ nav.navbar-white {
 }
 
 .traits label {
-  min-width: 110px;
   font-size: 1.2em;
   font-weight: normal;
-  text-align: center;  
+  text-align: center;
+  margin-right: 10px;
 }
 .traits label span{
   font-size: 2em;
