@@ -69,7 +69,7 @@
 
           <div class="checkbox">
             <label>
-              <input id="creditCheck" type="checkbox" required autofocus checked><span id="creditForm">{{ textlang['thanks']['checkBttn'] }}</span>
+              <input id="creditCheck" type="checkbox" autofocus checked><span id="creditForm">{{ textlang['thanks']['checkBttn'] }}</span>
             </label>
           </div>
 
@@ -79,12 +79,12 @@
               <div class="form-group">
                 <label for="fname" class="col-2 col-form-label">{{ textlang['thanks']['firstLabel'] }}</label>
                 <input type="text" id="fname" name="first_name">
-              </div>
-              <div class="form-group" class="col-2 col-form-label">
+              <!--/div>
+              <div class="form-group" class="col-2 col-form-label"-->
                 <label for="lname">{{ textlang['thanks']['secondLabel'] }}</label>
                 <input type="text" id="lname" name="last_name">
-              </div>
-              <div class="form-group" class="col-2 col-form-label">
+              <!--/div>
+              <div class="form-group" class="col-2 col-form-label"-->
                 <label for="id">{{ textlang['thanks']['thirdLabel'] }}</label>
                 <input type="text" id="id" name="sona_id">
               </div>
@@ -105,11 +105,47 @@
     </div>
     
   </div>
-  <script src="static/src/app.js"></script>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="static/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="static/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="static/js/jquery-1.12.4.js"></script>
+  <script src="static/js/jquery.validate.js"></script>
 
   <script>
-      $("#myform4").validate();
+      $("#myform4").validate({
+          rules:{
+              fname: {
+                  required: "#creditCheck:checked"
+              },
+              lname: {
+                  required: "#creditCheck:checked"
+              },
+              id: {
+                  required: "#creditCheck:checked"
+              }
+          }
+      });
+      /*function validateMyForm () {
+          //assume is valid
+          var isValid = true;
+          //check only if request for credit button is checked
+          if($("#creditCheck").is(":checked")){
+              $(':required').each(function() {
+                  if ( $(this).val() === '' )
+                      isValid = false;
+              });
+          }
+          return isValid;
+      }*/
   </script>
+
+  <script src="static/src/app.js"></script>
   
 </body>
 </html>
