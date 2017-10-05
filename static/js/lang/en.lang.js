@@ -71,6 +71,7 @@
             "trait7": "Perfectionist",
             "trait8": "Decisive",
             "trait9": "Other",
+            "trait0": "Skip",
 			"spInstRel" : "Please, check the options that describe your relationship with ",
 			"relTypepf" : "Part of my family",
 			"relTypecf" : "Core family (parent, child, sibling)",
@@ -122,6 +123,7 @@
 			"otherOptions" : "Other options",
 			"other": "Other",
 			"nothing":"Nothing",
+            "skip": "Skip",
 			"bttn" : "I've finished",
 			"completeMessage": "Please, choose at least one option per each question for each friend" 
 	},
