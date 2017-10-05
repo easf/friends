@@ -121,18 +121,18 @@
       $("#myform4").validate();
       function validateMyForm () {
 
+          var isValid = true;
           //check only if request for credit button is checked
           if($("#creditCheck").is(":checked")){
               $("input[type=text]").each(function(){
-                  if ( $(this).val() === '' ){
-                      alert("Please fill in all the fields so your credit can be computed");
-                      return false;
-                  }
+                  isValid = (isValid && ( $(this).val() === '' ));
               });
           }
-          return true;
+          if(isValid === false){
+              alert("Please fill all the fields so that your credit request can be computed.");
+          }
+          return isValid;
       }
-
 
   </script>
 
