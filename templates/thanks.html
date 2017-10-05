@@ -73,7 +73,7 @@
             </label>
           </div>
 
-          <form id="myform4" method="post" action="{{ url_for('creditdata') }}">
+          <form id="myform4" method="post" action="{{ url_for('creditdata') }}" onsubmit="return validateMyForm();">
 
             <div id="form4-fields">
               <div class="form-group">
@@ -118,19 +118,22 @@
   <script src="static/js/jquery.validate.js"></script>
 
   <script>
-      $("#myform4").validate({
-          rules:{
-              fname: {
-                  required: "#creditCheck:checked"
-              },
-              lname: {
-                  required: "#creditCheck:checked"
-              },
-              id: {
-                  required: "#creditCheck:checked"
-              }
+      $("#myform4").validate();
+      function validateMyForm () {
+
+          //check only if request for credit button is checked
+          if($("#creditCheck").is(":checked")){
+              $("input[type=text]").each(function(){
+                  if ( $(this).val() === '' ){
+                      alert("Please fill in all the fields so your credit can be computed");
+                      return false;
+                  }
+              });
           }
-      });
+          return true;
+      }
+
+
   </script>
 
   <script src="static/src/app.js"></script>
