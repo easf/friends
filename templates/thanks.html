@@ -125,7 +125,7 @@
           //check only if request for credit button is checked
           if($("#creditCheck").is(":checked")){
               $("input[type=text]").each(function(){
-                  isValid = (isValid && ( $(this).val() === '' ));
+                  isValid = (isValid && ( $(this).val() !== '' ));
               });
           }
           if(isValid === false){
