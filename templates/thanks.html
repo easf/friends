@@ -76,15 +76,25 @@
           <form id="myform4" method="post" action="{{ url_for('creditdata') }}" onsubmit="return validateMyForm();">
 
             <div id="form4-fields">
-              <div class="form-group">
-                <label for="fname">{{ textlang['thanks']['firstLabel'] }}</label>
-                <input type="text" id="fname" name="first_name">
+              <div class="form-group row">
+                <label for="fname" class="col-2 col-form-label">{{ textlang['thanks']['firstLabel'] }}</label>
+                <div class="col-3">
+                  <input type="text" id="fname" name="first_name">
+                </div>
+              </div>
 
-                <label for="lname">{{ textlang['thanks']['secondLabel'] }}</label>
-                <input type="text" id="lname" name="last_name">
+              <div class="form-group row">
+                <label for="lname" class="col-2 col-form-label">{{ textlang['thanks']['secondLabel'] }}</label>
+                <div class="col-3">
+                  <input type="text" id="lname" name="last_name">
+                </div>
+              </div>
 
-                <label for="id">{{ textlang['thanks']['thirdLabel'] }}</label>
-                <input type="text" id="id" name="sona_id">
+              <div class="form-group row">
+                <label for="id" class="col-2 col-form-label">{{ textlang['thanks']['thirdLabel'] }}</label>
+                <div class="col-3">
+                  <input type="text" id="id" name="sona_id">
+                </div>
               </div>
             </div>
 
