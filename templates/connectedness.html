@@ -247,6 +247,34 @@
        
       </div>
 
+      <div class="col-md-12">
+        <p class="lead"><span id="connCkInst">{{ textlang["connectedness"]["connCkInst"] }}</span>.</p>
+        <div class="form-group feedback">
+          <span>
+            <label class="radio-inline">
+              <input type="radio" id="r1" name="connectedness_check" value="0" required>
+              <span id="connCheck1">{{ textlang["connectedness"]["connCk1"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r2" name="connectedness_check" value="0">
+              <span id="connCheck2">{{ textlang["connectedness"]["connCk2"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r3" name="connectedness_check" value="1">
+              <span id="connCheck3">{{ textlang["connectedness"]["connCk3"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r4" name="connectedness_check" value="0">
+              <span id="connCheck4">{{ textlang["connectedness"]["connCk4"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r5" name="connectedness_check" value="0">
+              <span id="connCheck5">{{ textlang["connectedness"]["skip"] }}</span>
+            </label>
+          </span>
+        </div>
+      </div>
+
       {% endfor %}
       <!-- nav buttons [ -->
         <div class="col-md-12 text-center">

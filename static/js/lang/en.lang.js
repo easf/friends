@@ -53,6 +53,11 @@
 			"likertScale3":  "Once a week",
 			"likertScale4":  "2-3 times a week",
             "likertScale5":  "Every day in the last month",
+            "connCkInst": "If you are reading this question, please choose 'Do not respond' as an answer",
+            "connCk1":  "Amazon",
+            "connCk2":  "Apple",
+            "connCk3":  "Do not respond",
+            "connCk4":  "Google",
 			"bttnFinished":  "I've finished",
 			"skip": "Skip"
 		},

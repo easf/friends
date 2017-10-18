@@ -746,6 +746,9 @@ def store_connectedness_data( connectedness_data, uidhash, mysql):
             
             dict_users[ connectedness +'_'+ user_idhash1] = user_idhash1
 
+    connectedness_check = users_in_connectedness[ 'connectedness_check' ]
+    cur.execute ("INSERT INTO response_validity (user_idhash, connectedness_check) VALUES (%s, %s)", (uidhash, connectedness_check) )
+
     cur.execute ("UPDATE user SET status = %s WHERE idhash = %s", ('user_connectedness_data_stored', uidhash))
     conn.commit()
     dict_users_keys = dict_users.keys()
@@ -822,7 +825,6 @@ def insert_credit_data(credit_data, uidhash, mysql):
     #if status == 'user_connectedness_data_stored':
     # insert, add indent if status check is needed
     try:
-        #cur.execute ( "INSERT INTO trait (user_idhash, user_idhash1, trait) VALUES (%s, %s, %s)", (uidhash, user_idhash1, commonpoints_data[key] ) )
         cur.execute ( "INSERT INTO credit_data (sona_id, first_name, last_name) VALUES (%s, %s, %s)", (sona_id, first_name, last_name) )
         print 'insert to db'
     except:
