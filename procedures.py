@@ -730,7 +730,7 @@ def store_connectedness_data( connectedness_data, uidhash, mysql):
     
     for key in users_in_connectedness.keys():
         user_idhash1 = key.split('_')[-1]
-        if user_idhash1 not in added_users:
+        if (user_idhash1 not in added_users) and (user_idhash1 != 'check'):
             added_users.append ( user_idhash1 )
             gender = users_in_connectedness[ 'rg_' + user_idhash1 ]
             
