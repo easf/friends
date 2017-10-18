@@ -128,6 +128,11 @@
 			"otherOptions" : "Other options",
 			"other": "Other",
 			"nothing":"Nothing",
+            "commCkInst": "If you are reading this question, please choose 'Do not respond' as an answer",
+            "commCk1":  "Facebook",
+            "commCk2":  "Do not respond",
+            "commCk3":  "Instagram",
+            "commCk4":  "Twitter",
             "skip": "Skip",
 			"bttn" : "I've finished",
 			"completeMessage": "Please, choose at least one option per each question for each friend" 

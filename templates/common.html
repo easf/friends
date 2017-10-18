@@ -459,7 +459,35 @@
            
       </div>
     </div>
-      {% endfor %} 
+      {% endfor %}
+
+         <div class="col-md-12">
+             <p class="lead"><span id="commCkInst">{{ textlang["common"]["commCkInst"] }}</span>.</p>
+             <div class="form-group feedback">
+          <span>
+            <label class="radio-inline">
+              <input type="radio" id="r1" name="common_check" value="0" required>
+              <span id="commCheck1">{{ textlang["common"]["commCk1"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r2" name="common_check" value="0">
+              <span id="commCheck2">{{ textlang["common"]["commCk2"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r3" name="common_check" value="1">
+              <span id="commCheck3">{{ textlang["common"]["commCk3"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r4" name="common_check" value="0">
+              <span id="commCheck4">{{ textlang["common"]["commCk4"] }}</span>
+            </label>
+            <label class="radio-inline">
+              <input type="radio" id="r5" name="common_check" value="0">
+              <span id="commCheck5">{{ textlang["common"]["skip"] }}</span>
+            </label>
+          </span>
+             </div>
+         </div>
 
         
  

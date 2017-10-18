@@ -800,7 +800,9 @@ def insert_common_points_data(commonpoints_data, uidhash, mysql):
                     cur.execute ( "INSERT INTO common_aspect (user_idhash, user_idhash1, type, description) VALUES (%s, %s, %s, %s)", ( uidhash, user_idhash1, ids[1], commonpoints_data[key] ) )
                 except:                   
                     pass
-        
+
+        common_check = commonpoints_data[ 'common_check' ]
+        cur.execute ("UPDATE response_validity SET common_check = %s WHERE uidhash = %s", (common_check, uidhash))
 
         cur.execute ("UPDATE user SET status = %s WHERE idhash = %s", ('finished', uidhash))
         conn.commit()
