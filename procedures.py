@@ -746,8 +746,9 @@ def store_connectedness_data( connectedness_data, uidhash, mysql):
             
             dict_users[ connectedness +'_'+ user_idhash1] = user_idhash1
 
-    connectedness_check = users_in_connectedness[ 'connectedness_check' ]
-    cur.execute ("INSERT INTO response_validity (user_idhash, connectedness_check) VALUES (%s, %s)", (uidhash, connectedness_check) )
+    if status == 'connectedness_questions':
+        connectedness_check = users_in_connectedness[ 'connectedness_check' ]
+        cur.execute ("INSERT INTO response_validity (user_idhash, connectedness_check) VALUES (%s, %s)", (uidhash, connectedness_check) )
 
     cur.execute ("UPDATE user SET status = %s WHERE idhash = %s", ('user_connectedness_data_stored', uidhash))
     conn.commit()
