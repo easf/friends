@@ -803,7 +803,7 @@ def insert_common_points_data(commonpoints_data, uidhash, mysql):
                     pass
 
         common_check = commonpoints_data[ 'common_check' ]
-        cur.execute ("UPDATE response_validity SET common_check = %s WHERE uidhash = %s", (common_check, uidhash))
+        cur.execute ("UPDATE response_validity SET common_check = %s WHERE user_idhash = %s", (common_check, uidhash))
 
         cur.execute ("UPDATE user SET status = %s WHERE idhash = %s", ('finished', uidhash))
         conn.commit()
