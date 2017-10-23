@@ -88,7 +88,7 @@
 			"sameHomeT" : "We are from the same hometown",
 			"sameCity" : "We live(d) in the same city",
 			"sharedFlat" : "We share(d) an apartment/home",
-			"romanticalRel" : "Have / Had a romantic relation",
+			"romanticalRel" : "Have / Had a romantic relationship",
 			"married" : "Married / legal union (wife, husband, partner)",
 			"significantOther": "Girlfriend / boyfriend / fiancé / fiancée",
 			"sameInstitution": "Go / went to the same institutions",
