@@ -87,7 +87,7 @@
 			"commPlace" : "Share / Shared a place in common",
 			"sameHomeT" : "We are from the same hometown",
 			"sameCity" : "We live(d) in the same city",
-			"sharedFlat" : "We share(d) a flat",
+			"sharedFlat" : "We share(d) an apartment/home",
 			"romanticalRel" : "Have / Had a romantic relation",
 			"married" : "Married / legal union (wife, husband, partner)",
 			"significantOther": "Girlfriend / boyfriend / fiancé / fiancée",
