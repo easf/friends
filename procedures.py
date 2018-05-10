@@ -435,7 +435,9 @@ def download_data(uid, browser_language, browser_country, device, token, mysql):
     
     # id and names of current user
     user_id = uid
-    user_name = profile['name']
+    # anonymised
+    # user_name = profile['name']
+    user_name = "anonymised"
     del profile['name']
     # generate a hash code based on name and pass
     # for non-ascii symbols (e.g accents) -> use unicode _string = u"años luz detrás" -> _string.encode("utf-8")

@@ -124,17 +124,27 @@ def connectedness():
     fname = "backup/" + session['uidhash'] + "_connectedness"
 
     # Do the routing according user state and connectedness_file existence
-    if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]: # if the user reload the page 
-        pass 
-    elif status == 'user_data_downloaded': # if the application had crashed for some circunstance and then it recovered again, recalculate friends for connectedness
+    # 'user_data_downloaded' -> user profile data retrieved
+    # 'connectedness_questions' -> user friends for connectedness prepared
+    # 'user_connectedness_data_stored' -> connectedness answers saved in DB
+
+    # if the user reloads the page
+    if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]:
+        pass
+    # if the application had crashed for some circumstance and then it recovers again, recalculate friends for connectedness
+    elif status == 'user_data_downloaded':
         sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
-    elif status == 'connectedness_questions' and not os.path.isfile(fname): # if the app crashed during when the participant was anwering the questions about connectedness and interaction
+    # if the app crashed when the participant was answering the questions about connectedness and interaction
+    elif status == 'connectedness_questions' and not os.path.isfile(fname):
         sdata[session['uidhash']]['friends_for_connectedness'] = procedures.get_friends_for_connectedness(session['uidhash'], mysql, session['token'])
-    elif status == 'connectedness_questions' and os.path.isfile(fname): # if the user already anwsered the questions about connectedness before the app got crashed
+    # if the user already answered the questions about connectedness before the app crashed
+    elif status == 'connectedness_questions' and os.path.isfile(fname):
         return redirect(url_for('connectednessdata'))
-    elif status == 'user_connectedness_data_stored': # if we already stored the data about connectedness and interaction frequency questions
+    # if we already stored the data about connectedness and interaction frequency questions
+    elif status == 'user_connectedness_data_stored':
         return redirect(url_for('connectednessdata'))
-    elif status == 'finished': # if the user finished the experiment, just show the final list of 10 friends
+    # if the user finished the experiment, just show the final list of 10 friends
+    elif status == 'finished':
         return redirect(url_for('friends'))
 
     # register the time when the user started the question
@@ -186,13 +196,15 @@ def connectednessdata():
     
     ftimepath = "backup/" + session['uidhash'] + "_time"
 
-    if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]: # if didn't store yet the answers, the store them
+    # if answers weren't stored yet, then store them
+    if status == 'connectedness_questions' and 'friends_for_connectedness' in sdata[session['uidhash']]:
         ftime = open (ftimepath, "a")
         if 'start_time' in sdata[session['uidhash']]:
             ftime.write( "Current time: " + datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S') + ": Connectedness and interaction questions, user time -> " + str( (sdata[session['uidhash']]['end_time'] - sdata[session['uidhash']]['start_time'])/60 ) + " minutes" + "\n" )
         ftime.close()
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data,  session['uidhash'], mysql )
-    elif status == 'user_connectedness_data_stored': # in any case get again the list of friends for common points questions (after the app crashed or no)
+    # in any case get again the list of friends for common points questions (after the app crashed or not)
+    elif status == 'user_connectedness_data_stored':
         sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data, session['uidhash'], mysql )
     elif status == 'finished':
         return redirect(url_for('friends'))
@@ -219,12 +231,15 @@ def commonpoints():
     if status == 'finished':
         return redirect(url_for('friends'))
     else: #if status == 'user_connectedness_data_stored':
-        if os.path.isfile(fname): # if the user already answer the questions about common points
+        # if the user already answered the questions about common points
+        if os.path.isfile(fname):
             return redirect( url_for('commonpointsdata') )
-        elif 'friends_for_common_points' in sdata[session['uidhash']]: # if the user reload the page
+        # if the user reloads the page
+        elif 'friends_for_common_points' in sdata[session['uidhash']]:
             sdata[session['uidhash']]['start_time'] = time.time()
             return render_template('common.html', users=sdata[session['uidhash']]['friends_for_common_points'], textlang=textlang)
-        elif status == 'user_connectedness_data_stored': # if there were a chrashed, get again friends for common points
+        # if the app crashed, get again friends for common points
+        elif status == 'user_connectedness_data_stored':
             connectedness_data = request.form
             if os.path.isfile(fname):
                 f = open( fname, "r" )  
@@ -234,8 +249,9 @@ def commonpoints():
             sdata[session['uidhash']]['friends_for_common_points'] = procedures.store_connectedness_data( connectedness_data, session['uidhash'], mysql )
             sdata[session['uidhash']]['start_time'] = time.time()
             return render_template('common.html', users=sdata[session['uidhash']]['friends_for_common_points'], textlang=textlang)
-        else:	
-            return redirect(url_for('thanks'))
+        else:
+            #return redirect(url_for('thanks'))
+            return redirect(url_for('connectedness'))
 
 #store the data from common points answers
 @app.route('/commonpointsdata', methods=['GET','POST'] )
